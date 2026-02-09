@@ -1,40 +1,21 @@
 {
-  "name": "template-react",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "template-react-expressjs",
+  "version": "1.0.0",
+  "description": "[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)\r [![The Odin Project](https://img.shields.io/badge/The%20Odin%20Project-Lesson-red)](https://www.theodinproject.com/)",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "deploy": "npm run build && git checkout -B gh-pages && git merge main --no-edit && git add dist -f && git commit -m \"build: deployment commit\" && git subtree push --prefix dist origin gh-pages && git checkout main",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,less,html,json,md,mdx,yaml,yml}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,css,scss,less,html,json,md,mdx,yaml,yml}\"",
-    "test": "vitest"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router": "^7.12.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/top-submissions/template-react-expressjs.git"
   },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.1",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "jsdom": "^27.4.0",
-    "prettier": "^3.7.4",
-    "styled-components": "^6.3.5",
-    "vite": "^7.2.4",
-    "vitest": "^4.0.16"
-  }
+  "keywords": [],
+  "author": "matimotthetimoters",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/top-submissions/template-react-expressjs/issues"
+  },
+  "homepage": "https://github.com/top-submissions/template-react-expressjs#readme"
 }
