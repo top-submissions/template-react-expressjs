@@ -7,6 +7,10 @@ config();
 const app = express();
 
 app.use('/', appRouter);
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).send(err);
+});
 
 const PORT = process.env.PORT || 3000;
 
