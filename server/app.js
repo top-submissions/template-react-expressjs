@@ -30,5 +30,7 @@ app.listen(PORT, (error) => {
   if (error) {
     throw error;
   }
-  console.log(`Server started on port ${PORT}.`);
+  console.log(
+    `Server started on port ${PORT}.\nView live in http://localhost:${PORT}/`,
+  );
 });
