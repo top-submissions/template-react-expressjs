@@ -15,6 +15,10 @@ const __dirname = path.dirname(__filename);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Public assets setup
+const assetsPath = path.join(__dirname, 'public');
+app.use(express.static(assetsPath));
+
 // Routes
 app.use('/', appRouter);
 
