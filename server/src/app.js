@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import express from 'express';
-import appRouter from './routes/appRouter.js';
+import usersRouter from './routes/usersRouter.js';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,7 +23,7 @@ app.use(express.static(assetsPath));
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/', appRouter);
+app.use('/', usersRouter);
 
 // Error handling
 app.use((err, req, res, next) => {
