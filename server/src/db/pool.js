@@ -1,7 +1,7 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-export const MyPool = new Pool({
+export const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER,
   database: process.env.DB_NAME,
