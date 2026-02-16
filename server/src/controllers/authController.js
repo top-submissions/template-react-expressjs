@@ -1,17 +1,20 @@
-import { MyPool } from '../db/pool';
+import { pool } from '../db/pool';
 import passport from 'passport';
+import bcrypt from 'bcryptjs';
 
 export const authSignupGet = (req, res) => res.render('auth/sign-up-form');
 
 export const authSignupPost = async (req, res, next) => {
   try {
-    await MyPool.query(
-      'INSERT INTO users (username, password) VALUES ($1, $2)',
-      [req.body.username, req.body.password],
-    );
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [
+      req.body.username,
+      hashedPassword,
+    ]);
     res.redirect('/');
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };
 
