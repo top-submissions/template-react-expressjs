@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import session from 'express-session';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
+import './config/passport.js';
 
 config();
 
