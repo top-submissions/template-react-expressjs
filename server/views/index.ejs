@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+</head>
+<body>
+  <% if (locals.user) { %>
+    <h1>Welcome back, <%= user.username %></h1>
+    <a href="/log-out">LOG OUT</a>
+  <% } else { %>
+    <%- include('auth/log-in-form') %>
+  <% } %>
+</body>
+</html>
