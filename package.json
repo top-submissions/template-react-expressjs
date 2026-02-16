@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/top-submissions/template-react-expressjs/issues"
   },
-  "homepage": "https://github.com/top-submissions/template-react-expressjs#readme"
+  "homepage": "https://github.com/top-submissions/template-react-expressjs#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3"
+  }
 }
