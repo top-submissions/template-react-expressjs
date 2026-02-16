@@ -1,4 +1,4 @@
-import { pool } from '../db/pool';
+import pool from '../db/pool.js';
 import passport from 'passport';
 import bcrypt from 'bcryptjs';
 
