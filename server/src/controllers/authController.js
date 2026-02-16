@@ -22,3 +22,12 @@ export const authLoginPost = passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/',
 });
+
+export const authLogoutGet = (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/');
+  });
+};
