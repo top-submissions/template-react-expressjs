@@ -3,6 +3,9 @@ import express from 'express';
 import usersRouter from './routes/usersRouter.js';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import session from 'express-session';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
 
 config();
 
@@ -18,6 +21,16 @@ app.set('view engine', 'ejs');
 // Public assets setup
 const assetsPath = path.join(__dirname, '..', 'public');
 app.use(express.static(assetsPath));
+
+// Session setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
+app.use(passport.session());
 
 // Body parsing
 app.use(express.urlencoded({ extended: true }));
