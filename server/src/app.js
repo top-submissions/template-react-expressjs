@@ -1,12 +1,12 @@
 import { config } from 'dotenv';
 import express from 'express';
-import usersRouter from './routes/usersRouter.js';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import session from 'express-session';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import './config/passport.js';
+import authRouter from './routes/authRouter.js';
 
 config();
 
@@ -41,7 +41,7 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/', usersRouter);
+app.use('/', authRouter);
 
 // Error handling
 app.use((err, req, res, next) => {
