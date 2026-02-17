@@ -4,11 +4,13 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import session from 'express-session';
 import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import pgSession from 'connect-pg-simple';
+import pool from './db/pool.js';
 import './config/passport.js';
 import authRouter from './routes/authRouter.js';
 
 const app = express();
+const PostgresStore = pgSession(session);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,22 +23,32 @@ app.set('view engine', 'ejs');
 const assetsPath = path.join(__dirname, '..', 'public');
 app.use(express.static(assetsPath));
 
+// Body parsing
+app.use(express.urlencoded({ extended: true }));
+
 // Session setup
 app.use(
   session({
+    store: new PostgresStore({
+      pool: pool,
+      tableName: 'session',
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 Day (in milliseconds)
+    },
   }),
 );
+
+// Passport setup
 app.use(passport.session());
+
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
   next();
 });
-
-// Body parsing
-app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/', authRouter);
