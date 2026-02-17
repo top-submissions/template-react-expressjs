@@ -18,8 +18,7 @@ export const authSignupPost = async (req, res, next) => {
   }
 };
 
-export const authLoginGet = (req, res) =>
-  res.render('index', { user: req.user });
+export const authLoginGet = (req, res) => res.render('index');
 
 export const authLoginPost = passport.authenticate('local', {
   successRedirect: '/',
