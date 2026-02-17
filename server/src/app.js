@@ -37,7 +37,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1 Day (in milliseconds)
+      maxAge: 1000 * 60 * 60 * 24 * 30, // Log authenticated user after 30 days (1000ms * 60s * 60m * 24h * 30 days)
     },
   }),
 );
