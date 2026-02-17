@@ -6,12 +6,46 @@
   </head>
   <body>
     <h1>Login Form</h1>
+    
+    <% if (locals.errors && errors.length > 0) { %>
+      <div>
+        <h3>Please fix the following errors:</h3>
+        <% errors.forEach(error => { %>
+          <p><%= error.msg %></p>
+        <% }) %>
+      </div>
+    <% } %>
+    
+    <% if (locals.error) { %>
+      <div>
+        <p><%= locals.error %></p>
+      </div>
+    <% } %>
+    
     <form action="/log-in" method="POST">
-      <label for="username">Username</label>
-      <input id="username" name="username" placeholder="username" type="text" />
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" />
+      <div>
+        <label for="username">Username</label>
+        <input 
+          id="username" 
+          name="username" 
+          placeholder="username" 
+          type="text"
+          value="<%= locals.formData?.username || '' %>"
+        />
+      </div>
+      
+      <div>
+        <label for="password">Password</label>
+        <input 
+          id="password" 
+          name="password" 
+          type="password"
+        />
+      </div>
+      
       <button type="submit">Log In</button>
     </form>
+    
+    <p>Don't have an account? <a href="/sign-up">Sign up</a></p>
   </body>
 </html>
