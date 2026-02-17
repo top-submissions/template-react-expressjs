@@ -9,7 +9,7 @@
     "start": "cross-env NODE_ENV=production node src/app.js",
     "start:watch": "cross-env NODE_ENV=production node --watch src/app.js",
     "dev": "cross-env NODE_ENV=development nodemon src/app.js",
-    "db:init": "node src/db/populatedb.js"
+    "db:init": "node src/db/initDb.js"
   },
   "dependencies": {
     "connect-pg-simple": "^10.0.0",
