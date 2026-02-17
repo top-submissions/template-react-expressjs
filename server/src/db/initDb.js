@@ -1,5 +1,15 @@
 #! /usr/bin/env node
 
+/**
+ * Database Initialization Script
+ *
+ * Executable script to build database schema and seed initial data.
+ * Reads schema.sql and seed.sql files and executes them against the database.
+ * Run with: npm run db:init
+ *
+ * @module db/initDb
+ */
+
 import pkg from 'pg';
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -10,6 +20,15 @@ const { Client } = pkg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Main initialization function
+ *
+ * Connects to database, executes schema and seed SQL files in order.
+ * Handles connection lifecycle and error logging.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 async function main() {
   console.log('Building schema and seeding database...');
 
@@ -22,6 +41,7 @@ async function main() {
   });
 
   try {
+    // Read SQL files from disk
     const schemaSql = fs.readFileSync(
       path.join(__dirname, 'schema.sql'),
       'utf8',
@@ -30,9 +50,11 @@ async function main() {
 
     await client.connect();
 
+    // Execute schema creation (tables, indexes, etc.)
     console.log('Executing Schema...');
     await client.query(schemaSql);
 
+    // Execute seed data (initial records, test data)
     console.log('Executing Seeds...');
     await client.query(seedSql);
 
@@ -40,8 +62,10 @@ async function main() {
   } catch (err) {
     console.error('Error during database population:', err.stack);
   } finally {
+    // Always close database connection
     await client.end();
   }
 }
 
+// Execute main function
 main();
