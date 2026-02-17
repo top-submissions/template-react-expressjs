@@ -1,4 +1,4 @@
-import { config } from 'dotenv';
+import 'dotenv/config';
 import express from 'express';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,8 +7,6 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import './config/passport.js';
 import authRouter from './routes/authRouter.js';
-
-config();
 
 const app = express();
 
