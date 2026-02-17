@@ -6,8 +6,7 @@
 </head>
 <body>
     <% if (locals.currentUser) { %>
-        <h1>Welcome back, <%= currentUser.username %></h1>
-        <a href="/log-out">LOG OUT</a>
+        <%- include('dashboard') %>
     <% } else { %>
         <h1>Welcome to the App</h1>
         <p>Please <a href="/log-in">Log In</a> or <a href="/sign-up">Sign Up</a></p>
