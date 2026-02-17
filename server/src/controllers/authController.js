@@ -2,6 +2,8 @@ import pool from '../db/pool.js';
 import passport from 'passport';
 import bcrypt from 'bcryptjs';
 
+export const authIndexGet = (req, res) => res.render('index');
+
 export const authSignupGet = (req, res) => res.render('auth/sign-up-form');
 
 export const authSignupPost = async (req, res, next) => {
@@ -18,7 +20,7 @@ export const authSignupPost = async (req, res, next) => {
   }
 };
 
-export const authLoginGet = (req, res) => res.render('index');
+export const authLoginGet = (req, res) => res.render('auth/log-in-form');
 
 export const authLoginPost = passport.authenticate('local', {
   successRedirect: '/',
