@@ -10,7 +10,8 @@
     "start:watch": "cross-env NODE_ENV=production node --watch src/app.js",
     "dev": "cross-env NODE_ENV=development nodemon src/app.js",
     "db:init": "node src/db/initDb.js",
-    "db:migrate": "npx prisma migrate dev --name init"
+    "db:migrate": "npx prisma migrate dev --name init",
+    "db:generate": "npx prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.0",
