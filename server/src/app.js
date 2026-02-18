@@ -16,7 +16,7 @@ import passport from 'passport';
 import pgSession from 'connect-pg-simple';
 import pool from './db/pool.js';
 import './config/passport.js';
-import authRouter from './routes/authRouter.js';
+import indexRouter from './routes/indexRouter.js';
 
 const app = express();
 const PostgresStore = pgSession(session);
@@ -85,7 +85,7 @@ app.use((req, res, next) => {
  * Route Registration
  * Mounts all authentication-related routes under the root path
  */
-app.use('/', authRouter);
+app.use('/', indexRouter);
 
 /**
  * Global Error Handler
