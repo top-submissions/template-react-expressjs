@@ -187,7 +187,6 @@ export const authLoginPost = (req, res, next) => {
   passport.authenticate('local', {
     successRedirect: '/dashboard',
     failureRedirect: '/log-in',
-    failureFlash: true,
   })(req, res, next);
 };
 
