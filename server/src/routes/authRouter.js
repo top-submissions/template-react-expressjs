@@ -16,6 +16,7 @@ import {
   isAdmin,
   isNotAdmin,
 } from '../middleware/authMiddleware.js';
+import { validateSignup, validateLogin } from '../validators/authValidator.js';
 
 const authRouter = Router();
 
@@ -35,11 +36,11 @@ authRouter.get('/', authController.authLandingGet);
 
 // Sign-up routes
 authRouter.get('/sign-up', isNotAuthenticated, authController.authSignupGet);
-authRouter.post('/sign-up', authController.authSignupPost); // POST doesn't need middleware
+authRouter.post('/sign-up', validateSignup, authController.authSignupPost);
 
 // Login routes
 authRouter.get('/log-in', isNotAuthenticated, authController.authLoginGet);
-authRouter.post('/log-in', authController.authLoginPost); // POST doesn't need middleware
+authRouter.post('/log-in', validateLogin, authController.authLoginPost);
 
 /**
  * Protected Routes
