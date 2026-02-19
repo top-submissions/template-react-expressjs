@@ -51,9 +51,22 @@ export const loginPost = (req, res, next) => {
     });
   }
 
-  passport.authenticate('local', {
-    successRedirect: '/dashboard',
-    failureRedirect: '/log-in',
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.redirect('/log-in');
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      if (user.admin === true) {
+        return res.redirect('/admin/dashboard');
+      }
+      return res.redirect('/dashboard');
+    });
   })(req, res, next);
 };
 
