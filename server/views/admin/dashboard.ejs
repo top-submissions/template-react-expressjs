@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/admin/users">Manage Users</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Admin Dashboard</h1>
+
+      <section class="welcome-card">
+        <h2>Welcome back, <%= user.username %>!</h2>
+        <p>You are logged in as an <strong>Administrator</strong>.</p>
+      </section>
+
+      <section class="admin-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-grid">
+          <a href="/admin/users" class="button"> View & Manage All Users </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Template App</p>
+    </footer>
+  </body>
+</html>
