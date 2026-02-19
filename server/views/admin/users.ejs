@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/log-out">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>User Management</h1>
+        <p>Review and promote users to administrator status.</p>
+
+        <section class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td><%= user.id %></td>
+                            <td><%= user.username %></td>
+                            <td>
+                                <span class="badge <%= user.admin ? 'admin' : 'user' %>">
+                                    <%= user.admin ? 'Admin' : 'Standard User' %>
+                                </span>
+                            </td>
+                            <td>
+                                <% if (!user.admin) { %>
+                                    <form action="/admin/users/<%= user.id %>/promote" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn-promote" onclick="return confirm('Promote <%= user.username %> to Admin?')">
+                                            Promote to Admin
+                                        </button>
+                                    </form>
+                                <% } else { %>
+                                    <span class="text-muted">No actions available</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Admin Panel</p>
+    </footer>
+</body>
+</html>
