@@ -14,7 +14,9 @@
     "db:seed": "npx prisma db seed",
     "db:init": "npm run db:migrate && npm run db:generate && npm run db:seed",
     "db:studio": "npx prisma studio",
-    "db:reset": "npx prisma migrate reset"
+    "db:reset": "npx prisma migrate reset",
+    "db:baseline": "npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
+    "db:resolve": "npx prisma migrate resolve --applied 0_init"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
