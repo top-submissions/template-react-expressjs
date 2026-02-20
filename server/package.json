@@ -6,17 +6,28 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon src/app.js",
     "start": "cross-env NODE_ENV=production node src/app.js",
     "start:watch": "cross-env NODE_ENV=production node --watch src/app.js",
-    "dev": "cross-env NODE_ENV=development nodemon src/app.js",
-    "db:migrate": "npx prisma migrate dev --name init",
+    "=== INITIAL SETUP & BASELINING ===": "",
+    "db:baseline": "npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
+    "db:resolve": "npx prisma migrate resolve --applied 0_init",
+    "=== PROTOTYPING (Experimental) ===": "",
+    "db:push": "npx prisma db push",
+    "=== LOCAL DEVELOPMENT WORKFLOW (Iterative) ===": "",
+    "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
+    "db:sync": "npm run db:migrate && npm run db:generate",
     "db:seed": "npx prisma db seed",
     "db:init": "npm run db:migrate && npm run db:generate && npm run db:seed",
     "db:studio": "npx prisma studio",
-    "db:reset": "npx prisma migrate reset",
-    "db:baseline": "npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
-    "db:resolve": "npx prisma migrate resolve --applied 0_init"
+    "=== PREVIEW & PRODUCTION WORKFLOW (Safe) ===": "",
+    "db:deploy": "npx prisma migrate deploy",
+    "=== DRIFT RESOLUTION & REPAIR ===": "",
+    "db:diff": "npx prisma migrate diff --from-schema-datamodel prisma/schema.prisma --to-schema-datasource prisma/schema.prisma --script > drift.sql",
+    "db:execute": "npx prisma db execute --file ./drift.sql --schema prisma/schema.prisma",
+    "db:fix": "npm run db:diff && npm run db:execute",
+    "db:reset": "npx prisma migrate reset"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
