@@ -12,6 +12,7 @@
     "=== INITIAL SETUP & BASELINING ===": "",
     "db:baseline": "npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
     "db:resolve": "npx prisma migrate resolve --applied 0_init",
+    "db:rescue": "npm run db:baseline && npm run db:resolve",
     "=== PROTOTYPING (Experimental) ===": "",
     "db:push": "npx prisma db push",
     "=== LOCAL DEVELOPMENT WORKFLOW (Iterative) ===": "",
