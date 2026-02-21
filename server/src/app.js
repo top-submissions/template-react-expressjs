@@ -11,6 +11,7 @@ import 'dotenv/config';
 import express from 'express';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import pgSession from 'connect-pg-simple';
@@ -23,6 +24,13 @@ const PostgresStore = pgSession(session);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/**
+ * Cross-Origin Resource Sharing (CORS) Configuration
+ * Enables the server to accept requests from different origins (e.g., a React frontend).
+ * Placed at the top to handle pre-flight OPTIONS requests correctly.
+ */
+app.use(cors());
 
 /**
  * View Engine Configuration
