@@ -1,88 +1,77 @@
 /**
  * Passport Authentication Configuration
- *
- * Configures Passport.js with local strategy for username/password authentication.
- * Handles user verification, password comparison, and session serialization.
- *
+ * Sets up two strategies:
+ * 1. LocalStrategy: Validates credentials (username/password) to issue a token.
+ * 2. JwtStrategy: Validates the token on subsequent requests to authorize access.
  * @module config/passport
  */
 
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import pool from '../db/pool.js';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import bcrypt from 'bcryptjs';
+import * as userQueries from '../db/queries/userQueries.js';
+import * as authQueries from '../db/queries/authQueries.js';
 
 /**
  * Local Strategy Configuration
- *
- * Verifies user credentials during login attempts.
- * Queries database for username, validates password using bcrypt.
- *
- * @param {string} username - Username from login form
- * @param {string} password - Password from login form
- * @param {Function} done - Passport callback to indicate authentication result
- * @returns {void}
+ * Handles initial authentication. Finds the user by username and compares
+ * the provided password with the hashed version in the database.
  */
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
-      // Attempt to find user by username
-      const { rows } = await pool.query(
-        'SELECT * FROM users WHERE username = $1',
-        [username],
-      );
-      const user = rows[0];
+      const user = await userQueries.getUserByUsername(username);
+      if (!user) return done(null, false, { message: 'Incorrect username' });
 
-      // No user found with provided username
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username' });
-      }
-
-      // Compare provided password with stored hash
       const match = await bcrypt.compare(password, user.password);
-      if (!match) {
-        return done(null, false, { message: 'Incorrect password' });
-      }
+      if (!match) return done(null, false, { message: 'Incorrect password' });
 
-      // Authentication successful - return user object
       return done(null, user);
     } catch (err) {
-      // Database or server error
       return done(err);
     }
   }),
 );
 
 /**
- * Serialize User
- *
- * Determines what user data should be stored in the session.
- * Only stores the user ID to minimize session size.
- *
- * @param {Object} user - Authenticated user object from database
- * @param {Function} done - Callback to complete serialization
+ * Custom JWT Extractor
+ * Logic to retrieve the token from either:
+ * 1. An 'HttpOnly' cookie (standard for SSR/EJS sites).
+ * 2. An 'Authorization: Bearer' header (standard for SPA/Mobile apps).
+ * @param {Object} req - The Express request object
+ * @returns {string|null} The extracted JWT token
  */
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
+const cookieOrHeaderExtractor = (req) => {
+  // Try to get token from cookies first
+  if (req?.cookies?.token) return req.cookies.token;
+  // Fallback to standard Bearer header extraction
+  return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+};
 
 /**
- * Deserialize User
- *
- * Retrieves full user object from database using ID stored in session.
- * Called on every request after login to populate req.user.
- *
- * @param {number} id - User ID stored in session
- * @param {Function} done - Callback with retrieved user object
+ * JWT Strategy Configuration
+ * Intercepts requests to protected routes. It decodes the payload,
+ * verifies the signature using the JWT_SECRET, and ensures the user
+ * identified in the payload still exists in the database.
  */
-passport.deserializeUser(async (id, done) => {
-  try {
-    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [
-      id,
-    ]);
-    const user = rows[0];
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: cookieOrHeaderExtractor,
+      secretOrKey: process.env.JWT_SECRET,
+    },
+    async (payload, done) => {
+      try {
+        // payload.id was injected during JWT signing in authController
+        const user = await authQueries.getUserById(payload.id);
+        if (!user) return done(null, false);
+
+        // Passport attaches this user to req.user
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    },
+  ),
+);
