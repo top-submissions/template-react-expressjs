@@ -23,13 +23,3 @@ model User {
 
   @@map("users")
 }
-
-
-model Session {
-  sid    String   @id @db.VarChar
-  sess   Json     @db.Json
-  expire DateTime @db.Timestamp(6)
-
-  @@map("session")
-  @@index([expire], map: "IDX_session_expire")
-}
