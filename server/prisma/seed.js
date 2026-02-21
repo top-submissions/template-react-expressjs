@@ -1,44 +1,38 @@
-/**
- * Database Seeding Script
- * * Clears existing users and populates the database with initial test accounts.
- * Utilizes the shared connection pool and Prisma driver adapter.
- * * @module prisma/seed
- */
-
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/index.js';
-import pool from '../src/db/pool.js'; // Importing your existing pool
+import pool from '../src/db/pool.js';
 import bcrypt from 'bcryptjs';
 
 /**
- * Main seeding logic
- * * 1. Initializes Prisma with the shared pool adapter
- * 2. Deletes existing user records
- * 3. Creates seeded users with hashed passwords
- * * @async
- * @function main
+ * Executes the database seeding routine.
+ * * Purges existing user records to ensure a clean state.
+ * * Hashes a default password for all seed accounts.
+ * * Injects standard and administrative test accounts into the PostgreSQL database.
+ * @async
+ * @returns {Promise<void>}
  */
 async function main() {
+  // Initialize Prisma using the shared database pool adapter
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
 
   console.log('--- Database Seeding Started ---');
 
-  console.log('Step 1: Cleaning existing data...');
+  // Clear stale data from the user table
   await prisma.user.deleteMany({});
 
-  console.log('Step 2: Hashing passwords...');
+  // Generate secure hash for the default seed password
   const hashedPassword = await bcrypt.hash('testpass123', 10);
 
-  console.log('Step 3: Inserting user records...');
-
+  // Define initial account dataset
   const seedUsers = [
     { username: 'Bryan', password: hashedPassword, admin: false },
     { username: 'Odin', password: hashedPassword, admin: true },
     { username: 'Damon', password: hashedPassword, admin: false },
   ];
 
+  // Persist each user and log result
   for (const user of seedUsers) {
     const createdUser = await prisma.user.create({ data: user });
     console.log(
@@ -48,19 +42,17 @@ async function main() {
 
   console.log('--- Seed Completed Successfully! ---');
 
-  // Explicitly disconnect Prisma for the seed process
+  // Terminate Prisma connection
   await prisma.$disconnect();
 }
 
-/**
- * Script execution and lifecycle management
- */
+// Script execution lifecycle
 main()
   .catch((e) => {
     console.error('Seed error:', e);
     process.exit(1);
   })
   .finally(async () => {
-    // Close the shared pool connection to allow the process to exit
+    // Shutdown the pg pool to allow the Node process to exit cleanly
     await pool.end();
   });

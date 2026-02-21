@@ -1,24 +1,16 @@
-/**
- * Admin Router
- * Routes for administrator-only functionality.
- * @module routes/adminRouter
- */
 import { Router } from 'express';
 import * as adminController from '../controllers/adminController.js';
 import { isAdmin } from '../middleware/authMiddleware.js';
 
 const adminRouter = Router();
 
-/**
- * Apply Admin Authorization to ALL routes in this file.
- * Any user who is not logged in OR is not an admin will be rejected here.
- */
+// Secure all sub-routes with administrator check
 adminRouter.use(isAdmin);
 
-// Admin Home
+// Dashboard route
 adminRouter.get('/dashboard', adminController.dashboardGet);
 
-// User Management
+// User management routes
 adminRouter.get('/users', adminController.usersGet);
 adminRouter.post('/users/:id/promote', adminController.promotePost);
 

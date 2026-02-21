@@ -1,21 +1,14 @@
-/**
- * PostgreSQL Connection Pool
- *
- * Creates and exports a connection pool for database operations.
- * Pools provide reusable connections, improving performance over creating new connections.
- *
- * @module db/pool
- */
-
 import pkg from 'pg';
 const { Pool } = pkg;
 
 /**
- * Connection pool configuration
- * Uses environment variables with sensible defaults
- * Pool manages multiple connections automatically
+ * PostgreSQL Connection Pool.
+ * * Manages reusable database connections for performance.
+ * * Uses environment variables for flexible configuration.
+ * @type {Pool}
  */
 const pool = new Pool({
+  // Define connection parameters from environment
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER,
   database: process.env.DB_NAME,

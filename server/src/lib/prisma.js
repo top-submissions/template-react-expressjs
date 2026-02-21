@@ -1,25 +1,19 @@
-/**
- * Prisma Client Instance
- * * Configures the Prisma Client to use the shared PostgreSQL connection pool
- * via the Prisma driver adapter for node-postgres.
- * * @module lib/prisma
- */
-
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../generated/prisma/index.js';
 import pool from '../db/pool.js';
 
 /**
- * Prisma Adapter Configuration
- * Wraps the existing pg pool in the PrismaPg adapter
+ * Shared PrismaClient instance.
+ * * Utilizes the @prisma/adapter-pg to connect via an existing pg pool.
+ * * Maintains connection efficiency by reusing the node-postgres pool.
+ * @type {PrismaClient}
  */
+
+// Wrap pg pool in Prisma adapter
 const adapter = new PrismaPg(pool);
 
-/**
- * Shared PrismaClient instance
- * Configured with the driver adapter to maintain connection efficiency
- */
+// Initialize client with adapter
 const prisma = new PrismaClient({ adapter });
 
 export { prisma };

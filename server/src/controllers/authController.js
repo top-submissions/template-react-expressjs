@@ -1,10 +1,3 @@
-/**
- * Authentication Controller
- * * Manages user lifecycle events including registration, login via Local Strategy,
- * JWT issuance, and cookie-based logout.
- * * @module controllers/authController
- */
-
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -14,14 +7,18 @@ import { resolveJwtUser } from '../middleware/authMiddleware.js';
 
 /**
  * Handles the landing page request.
- * Uses the JWT resolution middleware to check for an existing token.
- * If a valid token is found in cookies or headers, redirects to the appropriate dashboard.
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
+ * * Uses JWT resolution to check for an existing token.
+ * * Redirects authenticated users to their specific dashboard based on role.
+ * * Renders the public landing page for unauthenticated visitors.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {void}
  */
 export const landingGet = (req, res) => {
+  // Identify user status from token
   resolveJwtUser(req, res, (err, user) => {
     if (user) {
+      // Redirect to specific dashboard based on role
       return user.admin
         ? res.redirect('/admin/dashboard')
         : res.redirect('/dashboard');
@@ -32,24 +29,33 @@ export const landingGet = (req, res) => {
 
 /**
  * Renders the user registration (sign-up) form.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {void}
  */
 export const signupGet = (req, res) => res.render('auth/sign-up-form');
 
 /**
  * Renders the login form.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {void}
  */
 export const loginGet = (req, res) => res.render('auth/log-in-form');
 
 /**
  * Handles user registration.
- * Validates input, hashes the password using bcrypt, and persists the
- * new user to the database via authQueries.
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
+ * * Validates form input and returns errors if necessary.
+ * * Hashes the user password using bcrypt (10 salt rounds).
+ * * Persists the new user record to the database via authQueries.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @returns {Promise<void>}
  */
 export const signupPost = async (req, res, next) => {
   try {
+    // Validate form inputs
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).render('auth/sign-up-form', {
@@ -58,8 +64,10 @@ export const signupPost = async (req, res, next) => {
       });
     }
 
+    // Encrypt password
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+    // Save user to DB
     await authQueries.registerUser({
       username: req.body.username,
       password: hashedPassword,
@@ -73,14 +81,17 @@ export const signupPost = async (req, res, next) => {
 
 /**
  * Handles login and JWT issuance.
- * Uses Passport's 'local' strategy to verify credentials. Upon success,
- * generates a signed JWT and stores it in an HttpOnly cookie for stateless
- * browser authentication.
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
+ * * Authenticates credentials via Passport local strategy.
+ * * Updates the user's last login timestamp in the database.
+ * * Generates a signed JWT valid for 30 days.
+ * * Sets an HttpOnly cookie containing the token for stateless auth.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @returns {void}
  */
 export const loginPost = (req, res, next) => {
+  // Validate login input
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).render('auth/log-in-form', {
@@ -89,6 +100,7 @@ export const loginPost = (req, res, next) => {
     });
   }
 
+  // Verify credentials via Local Strategy
   passport.authenticate(
     'local',
     { session: false },
@@ -96,6 +108,7 @@ export const loginPost = (req, res, next) => {
       if (err) return next(err);
       if (!user) return res.redirect('/log-in');
 
+      // Refresh last login timestamp
       await authQueries.updateLastLogin(user.id);
 
       const payload = {
@@ -103,22 +116,21 @@ export const loginPost = (req, res, next) => {
         username: user.username,
         admin: user.admin,
       };
+
+      // Issue 30-day token
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: '30d',
       });
 
-      /**
-       * Set the JWT in an HttpOnly cookie.
-       * This protects against XSS attacks and allows EJS templates to
-       * remain authenticated without client-side script intervention.
-       */
+      // Save token in secure cookie
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
+      // Send user to appropriate dashboard
       return user.admin
         ? res.redirect('/admin/dashboard')
         : res.redirect('/dashboard');
@@ -128,12 +140,14 @@ export const loginPost = (req, res, next) => {
 
 /**
  * Handles user logout.
- * In a JWT architecture, logout is performed by clearing the cookie on the client.
- * The server does not maintain a session to destroy.
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
+ * * Clears the 'token' cookie from the client's browser.
+ * * Redirects the user to the public landing page.
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {void}
  */
 export const logoutGet = (req, res) => {
+  // Delete authentication token
   res.clearCookie('token');
   res.redirect('/');
 };

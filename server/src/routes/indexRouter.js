@@ -1,8 +1,3 @@
-/**
- * Main Index Router
- * This file collects all sub-routers and exports them as one unit.
- * @module routes/indexRouter
- */
 import { Router } from 'express';
 import authRouter from './authRouter.js';
 import userRouter from './userRouter.js';
@@ -10,13 +5,13 @@ import adminRouter from './adminRouter.js';
 
 const indexRouter = Router();
 
-// 1. Auth routes (Login, Signup, Logout)
+// Mounting public and identity routes at root
 indexRouter.use('/', authRouter);
 
-// 2. Standard User routes (Dashboard, Settings)
+// Mounting authenticated user routes at root
 indexRouter.use('/', userRouter);
 
-// 3. Admin routes (Prefixed with /admin)
+// Mounting administrative routes under prefix
 indexRouter.use('/admin', adminRouter);
 
 export default indexRouter;
