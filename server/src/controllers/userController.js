@@ -8,7 +8,7 @@
  * Renders the user dashboard.
  */
 export const dashboardGet = (req, res) =>
-  res.render('dashboard', { user: req.user });
+  res.render('dashboard', { currentUser: req.user });
 
 /**
  * Renders the account upgrade page.
