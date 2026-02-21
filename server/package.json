@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "=== INITIAL SETUP & BASELINING ===": "",
     "db:baseline": "npx prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql",
     "db:resolve": "npx prisma migrate resolve --applied 0_init",
@@ -56,10 +57,11 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
     "cross-env": "^10.1.0",
     "nodemon": "^3.0.0",
-    "vitest": "^4.0.18",
-    "supertest": "^7.2.2"
+    "supertest": "^7.2.2",
+    "vitest": "^4.0.18"
   },
   "keywords": [],
   "author": "matimotthetimoters",
