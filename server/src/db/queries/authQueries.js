@@ -30,3 +30,14 @@ export const getUserById = async (id) => {
     where: { id },
   });
 };
+
+/**
+ * Updates the user's last login timestamp.
+ * @param {number} userId
+ */
+export const updateLastLogin = async (userId) => {
+  return await prisma.user.update({
+    where: { id: userId },
+    data: { lastLogin: new Date() },
+  });
+};
