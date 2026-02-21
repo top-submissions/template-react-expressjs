@@ -40,8 +40,10 @@ app.use(express.static(assetsPath));
 
 /**
  * Request Body Parsing
- * Parses URL-encoded bodies (from HTML form submissions)
+ * express.json() parses incoming JSON payloads (common for APIs).
+ * express.urlencoded() parses bodies from HTML form submissions.
  */
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /**
