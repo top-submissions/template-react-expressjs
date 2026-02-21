@@ -8,8 +8,28 @@ import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
 import * as authQueries from '../db/queries/authQueries.js';
 
-export const landingGet = (req, res) => res.render('landing');
+/**
+ * Handles the landing page request.
+ * If the user is already authenticated, they are redirected to their respective dashboard
+ * based on their role. Otherwise, the public landing page is rendered.
+ */
+export const landingGet = (req, res) => {
+  if (req.isAuthenticated()) {
+    return req.user.admin
+      ? res.redirect('/admin/dashboard')
+      : res.redirect('/dashboard');
+  }
+  res.render('landing');
+};
+
+/**
+ * Renders the sign-up form.
+ */
 export const signupGet = (req, res) => res.render('auth/sign-up-form');
+
+/**
+ * Renders the log-in form.
+ */
 export const loginGet = (req, res) => res.render('auth/log-in-form');
 
 /**
@@ -70,6 +90,10 @@ export const loginPost = (req, res, next) => {
   })(req, res, next);
 };
 
+/**
+ * Handles user logout.
+ * Destroys the session and redirects to the landing page.
+ */
 export const logoutGet = (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
