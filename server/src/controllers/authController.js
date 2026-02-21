@@ -1,39 +1,52 @@
 /**
  * Authentication Controller
- * @module controllers/authController
+ * * Manages user lifecycle events including registration, login via Local Strategy,
+ * JWT issuance, and cookie-based logout.
+ * * @module controllers/authController
  */
 
 import passport from 'passport';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
 import * as authQueries from '../db/queries/authQueries.js';
+import { resolveJwtUser } from '../middleware/authMiddleware.js';
 
 /**
  * Handles the landing page request.
- * If the user is already authenticated, they are redirected to their respective dashboard
- * based on their role. Otherwise, the public landing page is rendered.
+ * Uses the JWT resolution middleware to check for an existing token.
+ * If a valid token is found in cookies or headers, redirects to the appropriate dashboard.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
  */
 export const landingGet = (req, res) => {
-  if (req.isAuthenticated()) {
-    return req.user.admin
-      ? res.redirect('/admin/dashboard')
-      : res.redirect('/dashboard');
-  }
-  res.render('landing');
+  resolveJwtUser(req, res, (err, user) => {
+    if (user) {
+      return user.admin
+        ? res.redirect('/admin/dashboard')
+        : res.redirect('/dashboard');
+    }
+    res.render('landing');
+  });
 };
 
 /**
- * Renders the sign-up form.
+ * Renders the user registration (sign-up) form.
  */
 export const signupGet = (req, res) => res.render('auth/sign-up-form');
 
 /**
- * Renders the log-in form.
+ * Renders the login form.
  */
 export const loginGet = (req, res) => res.render('auth/log-in-form');
 
 /**
  * Handles user registration.
+ * Validates input, hashes the password using bcrypt, and persists the
+ * new user to the database via authQueries.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
  */
 export const signupPost = async (req, res, next) => {
   try {
@@ -47,7 +60,6 @@ export const signupPost = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    // Using authQueries instead of direct Prisma or pool calls
     await authQueries.registerUser({
       username: req.body.username,
       password: hashedPassword,
@@ -60,7 +72,13 @@ export const signupPost = async (req, res, next) => {
 };
 
 /**
- * Handles login via Passport.
+ * Handles login and JWT issuance.
+ * Uses Passport's 'local' strategy to verify credentials. Upon success,
+ * generates a signed JWT and stores it in an HttpOnly cookie for stateless
+ * browser authentication.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
  */
 export const loginPost = (req, res, next) => {
   const errors = validationResult(req);
@@ -71,32 +89,51 @@ export const loginPost = (req, res, next) => {
     });
   }
 
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.redirect('/log-in');
-    }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      if (user.admin === true) {
-        return res.redirect('/admin/dashboard');
-      }
-      return res.redirect('/dashboard');
-    });
-  })(req, res, next);
+  passport.authenticate(
+    'local',
+    { session: false },
+    async (err, user, info) => {
+      if (err) return next(err);
+      if (!user) return res.redirect('/log-in');
+
+      await authQueries.updateLastLogin(user.id);
+
+      const payload = {
+        id: user.id,
+        username: user.username,
+        admin: user.admin,
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+      });
+
+      /**
+       * Set the JWT in an HttpOnly cookie.
+       * This protects against XSS attacks and allows EJS templates to
+       * remain authenticated without client-side script intervention.
+       */
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      });
+
+      return user.admin
+        ? res.redirect('/admin/dashboard')
+        : res.redirect('/dashboard');
+    },
+  )(req, res, next);
 };
 
 /**
  * Handles user logout.
- * Destroys the session and redirects to the landing page.
+ * In a JWT architecture, logout is performed by clearing the cookie on the client.
+ * The server does not maintain a session to destroy.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
  */
-export const logoutGet = (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    res.redirect('/');
-  });
+export const logoutGet = (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
 };
