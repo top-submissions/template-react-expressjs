@@ -12,7 +12,7 @@ const userRouter = Router();
 // Require login for all user routes
 userRouter.use(isAuthenticated);
 
-userRouter.get('/dashboard', userController.dashboardGet);
+userRouter.get('/dashboard', isAuthenticated, userController.dashboardGet);
 
 // Specific to non-admins
 userRouter.get('/upgrade-account', isNotAdmin, userController.upgradeGet);
