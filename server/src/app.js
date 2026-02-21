@@ -12,15 +12,12 @@ import express from 'express';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import cors from 'cors';
-import session from 'express-session';
 import passport from 'passport';
-import pgSession from 'connect-pg-simple';
-import pool from './db/pool.js';
+import cookieParser from 'cookie-parser';
 import './config/passport.js';
 import indexRouter from './routes/indexRouter.js';
 
 const app = express();
-const PostgresStore = pgSession(session);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,32 +51,8 @@ app.use(express.static(assetsPath));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/**
- * Session Configuration
- * Stores session data in PostgreSQL using connect-pg-simple
- * Sessions persist across server restarts and scale horizontally
- */
-app.use(
-  session({
-    store: new PostgresStore({
-      pool: pool,
-      tableName: 'session',
-    }),
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days in milliseconds
-    },
-  }),
-);
-
-/**
- * Passport Session Integration
- * Connects Passport authentication with session management
- * This enables persistent login sessions across requests
- */
-app.use(passport.session());
+app.use(cookieParser());
+app.use(passport.initialize());
 
 /**
  * View Locals Middleware
