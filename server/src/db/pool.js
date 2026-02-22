@@ -3,17 +3,16 @@ const { Pool } = pkg;
 
 /**
  * PostgreSQL Connection Pool.
- * * Manages reusable database connections for performance.
- * * Uses environment variables for flexible configuration.
+ * * Manages reusable database connections.
+ * * Dynamically switches between Main and Test databases based on environment.
  * @type {Pool}
  */
 const pool = new Pool({
-  // Define connection parameters from environment
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT || 5432,
+  // Use TEST_DATABASE_URL if Vitest is running, otherwise use standard DATABASE_URL
+  connectionString:
+    process.env.NODE_ENV === 'test'
+      ? process.env.TEST_DATABASE_URL
+      : process.env.DATABASE_URL,
 });
 
 export default pool;
