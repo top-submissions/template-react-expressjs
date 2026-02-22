@@ -2,10 +2,10 @@
   "name": "server",
   "private": true,
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
+    "=== CORE WORKFLOW ===": "",
     "dev": "cross-env NODE_ENV=development nodemon src/app.js",
     "start": "cross-env NODE_ENV=production node src/app.js",
     "start:watch": "cross-env NODE_ENV=production node --watch src/app.js",
@@ -71,8 +71,5 @@
     "nodemon": "^3.0.0",
     "supertest": "^7.2.2",
     "vitest": "^4.0.18"
-  },
-  "keywords": [],
-  "author": "matimotthetimoters",
-  "license": "ISC"
+  }
 }
