@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import pool from '../db/pool.js';
+import pool from '../../db/pool.js';
 
 // Centralized error message fragments
 const alphaErr = 'must only contain letters.';
