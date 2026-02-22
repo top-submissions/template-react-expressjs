@@ -1,4 +1,4 @@
-import * as adminQueries from '../db/queries/admin/admin.js';
+import * as adminQueries from '../db/queries/admin/admin.queries.js';
 
 /**
  * Renders the primary administrator dashboard.

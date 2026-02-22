@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import * as authValidator from './auth.js';
+import * as authValidator from './auth.validator.js';
 import pool from '../../db/pool.js';
 
 // Intercept DB pool to bypass real network calls

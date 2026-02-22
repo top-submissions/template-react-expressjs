@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import * as userQueries from './user.js';
+import * as userQueries from './user.queries.js';
 import { prisma } from '../../../lib/prisma.js';
 
 // Isolate DB logic by mocking the Prisma client

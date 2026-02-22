@@ -2,8 +2,8 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
-import * as authQueries from '../db/queries/auth/auth.js';
-import { resolveJwtUser } from '../middleware/auth/auth.js';
+import * as authQueries from '../db/queries/auth/auth.queries.js';
+import { resolveJwtUser } from '../middleware/auth/auth.middleware.js';
 
 /**
  * Handles the landing page request.

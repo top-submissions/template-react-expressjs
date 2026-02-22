@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import * as authQueries from './auth.js';
+import * as authQueries from './auth.queries.js';
 import { prisma } from '../../../lib/prisma.js';
 
 // Setup Vitest mocks for Prisma client operations

@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import passport from 'passport';
-import * as authMiddleware from './auth.js';
+import * as authMiddleware from './auth.middleware.js';
 
 // Mock passport to control authentication outcomes
 vi.mock('passport', () => ({

@@ -1,17 +1,17 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import adminRouter from '../../routes/adminRouter.js';
-import * as adminQueries from '../../db/queries/admin/admin.js';
+import adminRouter from '../../routes/admin.routes.js';
+import * as adminQueries from '../../db/queries/admin/admin.queries.js';
 
 // Mock the query layer to avoid actual DB side effects
-vi.mock('../../db/queries/admin/admin.js', () => ({
+vi.mock('../../db/queries/admin/admin.queries.js', () => ({
   getAllUsersForManagement: vi.fn(),
   promoteUserToAdmin: vi.fn(),
 }));
 
 // Mock auth middleware to simulate an admin session
-vi.mock('../../middleware/auth/auth.js', () => ({
+vi.mock('../../middleware/auth/auth.middleware.js', () => ({
   isAdmin: vi.fn((req, res, next) => {
     req.user = { id: 1, username: 'admin', admin: true };
     next();
@@ -51,7 +51,6 @@ describe('Admin Integration Tests', () => {
       // --- Assert ---
       expect(response.status).toBe(200);
       expect(adminQueries.getAllUsersForManagement).toHaveBeenCalled();
-      // Since we can't easily check EJS output in unit tests, we verify logic completion
     });
   });
 

@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import * as authController from '../controllers/authController.js';
-import { isNotAuthenticated } from '../middleware/auth/auth.js';
-import { validateSignup, validateLogin } from '../validators/auth/auth.js';
+import * as authController from '../controllers/auth.controller.js';
+import { isNotAuthenticated } from '../middleware/auth/auth.middleware.js';
+import {
+  validateSignup,
+  validateLogin,
+} from '../validators/auth/auth.validator.js';
 
 const authRouter = Router();
 

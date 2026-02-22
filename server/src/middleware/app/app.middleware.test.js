@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import express from 'express';
-import * as appMiddleware from './app.js';
+import * as appMiddleware from './app.middleware.js';
 
 // Isolate app setup by mocking external dependencies
 vi.mock('../../config/corsOptions.js', () => ({

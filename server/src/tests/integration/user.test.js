@@ -1,9 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import userRouter from '../../routes/userRouter.js';
+import userRouter from '../../routes/user.routes.js';
 
-vi.mock('../../middleware/auth/auth.js', () => ({
+vi.mock('../../middleware/auth/auth.middleware.js', () => ({
   isAuthenticated: vi.fn((req, res, next) => {
     req.user = { id: 10, username: 'standard_user', admin: false };
     next();
@@ -64,7 +64,8 @@ describe('User Integration Tests', () => {
 
     it('should redirect if the user is an admin', async () => {
       // --- Arrange ---
-      const { isNotAdmin } = await import('../../middleware/auth/auth.js');
+      const { isNotAdmin } =
+        await import('../../middleware/auth/auth.middleware.js');
       isNotAdmin.mockImplementationOnce((req, res, next) => {
         res.redirect('/admin/dashboard');
       });

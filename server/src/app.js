@@ -6,8 +6,8 @@ import './config/passport.js';
 import {
   configureMiddleware,
   configureErrorHandling,
-} from './middleware/app/app.js';
-import indexRouter from './routes/indexRouter.js';
+} from './middleware/app/app.middleware.js';
+import indexRouter from './routes/index.routes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
