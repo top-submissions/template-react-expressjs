@@ -2,8 +2,8 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import bcrypt from 'bcryptjs';
-import * as userQueries from '../db/queries/userQueries.js';
-import * as authQueries from '../db/queries/authQueries.js';
+import * as userQueries from '../db/queries/user/user.js';
+import * as authQueries from '../db/queries/auth/auth.js';
 
 /**
  * Handles initial login by verifying username and password.

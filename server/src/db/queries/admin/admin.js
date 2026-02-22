@@ -1,4 +1,4 @@
-import { prisma } from '../../lib/prisma.js';
+import { prisma } from '../../../lib/prisma.js';
 
 /**
  * Fetches all users from the database for the management table.
