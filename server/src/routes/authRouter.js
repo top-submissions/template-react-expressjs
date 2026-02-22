@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as authController from '../controllers/authController.js';
-import { isNotAuthenticated } from '../middleware/authMiddleware.js';
+import { isNotAuthenticated } from '../middleware/auth/auth.js';
 import { validateSignup, validateLogin } from '../validators/authValidator.js';
 
 const authRouter = Router();

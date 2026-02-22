@@ -6,7 +6,7 @@ import './config/passport.js';
 import {
   configureMiddleware,
   configureErrorHandling,
-} from './middleware/appMiddleware.js';
+} from './middleware/app/app.js';
 import indexRouter from './routes/indexRouter.js';
 
 const app = express();

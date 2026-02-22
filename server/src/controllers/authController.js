@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
 import * as authQueries from '../db/queries/auth/auth.js';
-import { resolveJwtUser } from '../middleware/authMiddleware.js';
+import { resolveJwtUser } from '../middleware/auth/auth.js';
 
 /**
  * Handles the landing page request.

@@ -4,35 +4,36 @@ import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import corsOptions from '../config/corsOptions.js';
+import corsOptions from '../../config/corsOptions.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
  * Configures global application middleware.
- * * Sets up security via CORS and request parsing.
- * * Initializes authentication and static asset serving.
+ * - Sets up security via CORS and request parsing.
+ * - Initializes authentication and static asset serving.
+ * - Inject user data into all response locals for view engine access.
  * @param {import('express').Express} app - The Express application instance.
  * @returns {void}
  */
 export const configureMiddleware = (app) => {
-  // Apply CORS
+  // Setup cross-origin resource sharing
   app.use(cors(corsOptions));
 
-  // Serve assets from public directory
-  const assetsPath = path.join(__dirname, '..', '..', 'public');
+  // Enable public access to static files
+  const assetsPath = path.join(__dirname, '..', '..', '..', 'public');
   app.use(express.static(assetsPath));
 
-  // Parse payloads and cookies
+  // Setup body and cookie parsing
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  // Set up passport identity tracking
+  // Attach passport authentication system
   app.use(passport.initialize());
 
-  // Inject identity into templates
+  // Middleware to expose passport user to templates/views
   app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     next();
@@ -41,9 +42,13 @@ export const configureMiddleware = (app) => {
 
 /**
  * Global error handling setup.
+ * - Catches all upstream errors in the middleware chain.
+ * - Standardizes error responses with status codes and messages.
  * @param {import('express').Express} app - The Express application instance.
+ * @returns {void}
  */
 export const configureErrorHandling = (app) => {
+  // Final middleware to catch and format application errors
   app.use((err, req, res, next) => {
     console.error(err);
     res.status(err.statusCode || 500).send(err.message);
