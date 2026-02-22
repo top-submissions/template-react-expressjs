@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { getAllUsersForManagement, promoteUserToAdmin } from './admin.js';
+import * as adminQueries from './admin.js';
 import { prisma } from '../../../lib/prisma.js';
 
 // Setup Vitest to intercept prisma calls via the shared library path
@@ -28,7 +28,7 @@ describe('adminQueries module', () => {
       // Setup: instruct prisma mock to return data
       prisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const result = await getAllUsersForManagement();
+      const result = await adminQueries.getAllUsersForManagement();
 
       // Verify: check prisma selection and ordering logic
       expect(prisma.user.findMany).toHaveBeenCalledWith({
@@ -55,7 +55,7 @@ describe('adminQueries module', () => {
       // Setup: inject successful update response
       prisma.user.update.mockResolvedValue(mockUpdatedUser);
 
-      const result = await promoteUserToAdmin(userId);
+      const result = await adminQueries.promoteUserToAdmin(userId);
 
       // Verify: check update filter and data payload
       expect(prisma.user.update).toHaveBeenCalledWith({
