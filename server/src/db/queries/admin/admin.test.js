@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as adminQueries from './admin.js';
 import { prisma } from '../../../lib/prisma.js';
 
-// Setup Vitest to intercept prisma calls via the shared library path
+// Isolate DB calls by mocking the Prisma client
 vi.mock('../../../lib/prisma.js', () => ({
   prisma: {
     user: {
@@ -13,24 +13,26 @@ vi.mock('../../../lib/prisma.js', () => ({
 }));
 
 describe('adminQueries module', () => {
-  // Reset mock state to ensure clean test runs
+  // Clear mock history before each execution
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('getAllUsersForManagement()', () => {
     it('should query specific user fields sorted by id', async () => {
-      // Setup: define mock users
+      // --- Arrange ---
+      // Define a standard user list for the UI
       const mockUsers = [
         { id: 1, username: 'user1', admin: false, createdAt: new Date() },
       ];
-
-      // Setup: instruct prisma mock to return data
+      // Inject the mock data into the findMany call
       prisma.user.findMany.mockResolvedValue(mockUsers);
 
+      // --- Act ---
       const result = await adminQueries.getAllUsersForManagement();
 
-      // Verify: check prisma selection and ordering logic
+      // --- Assert ---
+      // Verify specific field selection and ascending sort order
       expect(prisma.user.findMany).toHaveBeenCalledWith({
         select: {
           id: true,
@@ -40,30 +42,27 @@ describe('adminQueries module', () => {
         },
         orderBy: { id: 'asc' },
       });
-
-      // Verify: return value matches mock
       expect(result).toEqual(mockUsers);
     });
   });
 
   describe('promoteUserToAdmin()', () => {
     it('should update the admin flag for a specific user id', async () => {
-      // Setup: define input and response
+      // --- Arrange ---
       const userId = 42;
       const mockUpdatedUser = { id: 42, admin: true };
-
-      // Setup: inject successful update response
+      // Inject the successful update response
       prisma.user.update.mockResolvedValue(mockUpdatedUser);
 
+      // --- Act ---
       const result = await adminQueries.promoteUserToAdmin(userId);
 
-      // Verify: check update filter and data payload
+      // --- Assert ---
+      // Verify the query targets the correct ID and sets admin to true
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: userId },
         data: { admin: true },
       });
-
-      // Verify: ensure returned record shows admin as true
       expect(result.admin).toBe(true);
     });
   });

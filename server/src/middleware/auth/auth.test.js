@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import passport from 'passport';
 import * as authMiddleware from './auth.js';
 
-// Setup Vitest to mock passport authentication behavior
+// Mock passport to control authentication outcomes
 vi.mock('passport', () => ({
   default: {
     authenticate: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock('passport', () => ({
 describe('authMiddleware module', () => {
   let req, res, next;
 
-  // Initialize fresh express mock objects before each test
+  // Initialize fresh mocks for every test case
   beforeEach(() => {
     vi.clearAllMocks();
     req = {};
@@ -26,33 +26,38 @@ describe('authMiddleware module', () => {
 
   describe('isAuthenticated()', () => {
     it('should attach user to req and call next if authenticated', () => {
+      // --- Arrange ---
+      // Define a valid user and simulate successful passport verification
       const mockUser = { id: 1, username: 'test' };
-
-      // Setup: Mock passport to successfully return a user
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, mockUser);
         },
       );
 
+      // --- Act ---
       authMiddleware.isAuthenticated(req, res, next);
 
-      // Verify: User is attached and request continues
+      // --- Assert ---
+      // Verify user injection and middleware progression
       expect(req.user).toEqual(mockUser);
       expect(next).toHaveBeenCalled();
     });
 
     it('should return 401 if no user is found', () => {
-      // Setup: Mock passport to return no user
+      // --- Arrange ---
+      // Simulate passport failing to resolve a user
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, false);
         },
       );
 
+      // --- Act ---
       authMiddleware.isAuthenticated(req, res, next);
 
-      // Verify: Request blocked with unauthorized status
+      // --- Assert ---
+      // Ensure the request is blocked with unauthorized status
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({ message: 'Please log in first' });
     });
@@ -60,6 +65,8 @@ describe('authMiddleware module', () => {
 
   describe('isAdmin()', () => {
     it('should allow access if user is admin', () => {
+      // --- Arrange ---
+      // Define a user with the admin flag set to true
       const adminUser = { id: 1, admin: true };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -67,13 +74,17 @@ describe('authMiddleware module', () => {
         },
       );
 
+      // --- Act ---
       authMiddleware.isAdmin(req, res, next);
 
-      // Verify: Admin check passes
+      // --- Assert ---
+      // Confirm the request proceeds for admins
       expect(next).toHaveBeenCalled();
     });
 
     it('should return 403 if user is not admin', () => {
+      // --- Arrange ---
+      // Define a standard user lacking admin privileges
       const regularUser = { id: 2, admin: false };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -81,15 +92,19 @@ describe('authMiddleware module', () => {
         },
       );
 
+      // --- Act ---
       authMiddleware.isAdmin(req, res, next);
 
-      // Verify: Access forbidden
+      // --- Assert ---
+      // Ensure access is forbidden for non-admins
       expect(res.status).toHaveBeenCalledWith(403);
     });
   });
 
   describe('isNotAuthenticated()', () => {
     it('should return 400 if user is already logged in', () => {
+      // --- Arrange ---
+      // Simulate an active session during a guest-only route request
       const existingUser = { id: 1 };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -97,9 +112,11 @@ describe('authMiddleware module', () => {
         },
       );
 
+      // --- Act ---
       authMiddleware.isNotAuthenticated(req, res, next);
 
-      // Verify: Prevent duplicate login/signup sessions
+      // --- Assert ---
+      // Block the request to prevent duplicate sessions
       expect(res.status).toHaveBeenCalledWith(400);
     });
   });

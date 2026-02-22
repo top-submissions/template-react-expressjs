@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import express from 'express';
 import * as appMiddleware from './app.js';
 
-// Mock external configurations and passport to avoid side effects
+// Isolate app setup by mocking external dependencies
 vi.mock('../../config/corsOptions.js', () => ({
   default: { origin: '*' },
 }));
@@ -14,30 +14,32 @@ vi.mock('passport', () => ({
 describe('app middleware module', () => {
   let app;
 
-  // Initialize a fresh express instance before each test
   beforeEach(() => {
+    // --- Arrange ---
+    // Create a fresh express instance and track its middleware registration
     app = express();
-    // Spy on the app.use method to track middleware registration
     vi.spyOn(app, 'use');
   });
 
   describe('configureMiddleware()', () => {
     it('should register essential global middlewares', () => {
+      // --- Act ---
       appMiddleware.configureMiddleware(app);
 
-      // Verify: check for CORS, Static, JSON, URLencoded, CookieParser, and Passport
-      // Express middleware registration order matters for the request cycle
+      // --- Assert ---
+      // Check that multiple middlewares were attached to the express stack
       expect(app.use).toHaveBeenCalled();
 
-      // Verify: specifically check that Passport initialize was called
+      // Verify Passport initialization specifically
       const passport = import('passport');
       passport.then((m) => expect(m.default.initialize).toHaveBeenCalled());
     });
 
     it('should set res.locals.currentUser from req.user', () => {
+      // --- Arrange ---
       appMiddleware.configureMiddleware(app);
 
-      // Extract the custom identity middleware (usually the last one registered)
+      // Retrieve the specific identity injection middleware from the app stack
       const identityMiddleware = app.use.mock.calls.find((call) =>
         call[0].toString().includes('res.locals.currentUser'),
       )[0];
@@ -46,9 +48,11 @@ describe('app middleware module', () => {
       const res = { locals: {} };
       const next = vi.fn();
 
+      // --- Act ---
       identityMiddleware(req, res, next);
 
-      // Verify: identity injection into response locals
+      // --- Assert ---
+      // Verify that the user from req is correctly exposed to view locals
       expect(res.locals.currentUser).toEqual(req.user);
       expect(next).toHaveBeenCalled();
     });
@@ -56,9 +60,10 @@ describe('app middleware module', () => {
 
   describe('configureErrorHandling()', () => {
     it('should register an error-handling middleware with 4 arguments', () => {
+      // --- Arrange ---
       appMiddleware.configureErrorHandling(app);
 
-      // Verify: error handlers are identified by having exactly 4 parameters (err, req, res, next)
+      // Find the middleware that matches the (err, req, res, next) signature
       const errorHandler = app.use.mock.calls.find(
         (call) => call[0].length === 4,
       )[0];
@@ -71,14 +76,16 @@ describe('app middleware module', () => {
       };
       const next = vi.fn();
 
-      // Spy on console to prevent log pollution during tests
+      // Prevent log pollution by mocking console.error
       const consoleSpy = vi
         .spyOn(console, 'error')
         .mockImplementation(() => {});
 
+      // --- Act ---
       errorHandler(err, req, res, next);
 
-      // Verify: status code and message delivery
+      // --- Assert ---
+      // Verify status code propagation and error response body
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.send).toHaveBeenCalledWith('Unauthorized');
 
