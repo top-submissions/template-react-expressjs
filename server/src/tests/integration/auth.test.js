@@ -81,7 +81,7 @@ describe('Auth Integration Tests', () => {
       // --- Arrange ---
       // Define admin credentials and mock profile
       const credentials = { username: 'admin', password: 'password' };
-      const mockAdmin = { id: 99, username: 'admin', admin: true };
+      const mockAdmin = { id: 99, username: 'admin', role: 'ADMIN' };
 
       // Force passport to return the mock admin user
       passport.authenticate.mockImplementation(
