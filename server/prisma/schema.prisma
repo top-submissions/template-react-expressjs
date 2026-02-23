@@ -13,11 +13,20 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
 model User {
   id         Int       @id @default(autoincrement())
   username   String    @unique @db.VarChar(255)
   password   String    @db.VarChar(255)
-  admin      Boolean   @default(false)
+  
+  admin      Boolean   @default(false) 
+  role       Role      @default(USER)  
+  
   createdAt  DateTime  @default(now()) @map("created_at")
   lastLogin  DateTime? @map("last_login")
 
