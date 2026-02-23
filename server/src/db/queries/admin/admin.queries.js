@@ -1,18 +1,16 @@
 import { prisma } from '../../../lib/prisma.js';
 
 /**
- * Fetches all users from the database for the management table.
- * * Retrieves essential profile fields: id, username, admin status, and creation date.
- * * Results are sorted by ID in ascending order for consistent list rendering.
- * @returns {Promise<Array>} List of user objects tailored for management UI.
+ * Fetches all users for management UI.
+ * @returns {Promise<Array>}
  */
 export const getAllUsersForManagement = async () => {
-  // Query users with specific field selection
+  // Query specifically for ID, username, role, and creation date
   return await prisma.user.findMany({
     select: {
       id: true,
       username: true,
-      admin: true,
+      role: true,
       createdAt: true,
     },
     orderBy: { id: 'asc' },
@@ -20,15 +18,14 @@ export const getAllUsersForManagement = async () => {
 };
 
 /**
- * Promotes a specific user to admin status.
- * * Updates the 'admin' boolean flag to true for the specified record.
- * @param {number} userId - The unique database ID of the user to update.
- * @returns {Promise<Object>} The updated user record.
+ * Promotes a specific user to ADMIN role.
+ * @param {number} userId
+ * @returns {Promise<Object>}
  */
 export const promoteUserToAdmin = async (userId) => {
-  // Update admin flag for targeted user ID
+  // Set the enum value to ADMIN
   return await prisma.user.update({
     where: { id: userId },
-    data: { admin: true },
+    data: { role: 'ADMIN' },
   });
 };

@@ -2,7 +2,6 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as adminQueries from './admin.queries.js';
 import { prisma } from '../../../lib/prisma.js';
 
-// Isolate DB calls by mocking the Prisma client
 vi.mock('../../../lib/prisma.js', () => ({
   prisma: {
     user: {
@@ -13,31 +12,27 @@ vi.mock('../../../lib/prisma.js', () => ({
 }));
 
 describe('adminQueries module', () => {
-  // Clear mock history before each execution
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('getAllUsersForManagement()', () => {
-    it('should query specific user fields sorted by id', async () => {
-      // --- Arrange ---
-      // Define a standard user list for the UI
+    it('should query specific user fields including role', async () => {
+      // Arrange
       const mockUsers = [
-        { id: 1, username: 'user1', admin: false, createdAt: new Date() },
+        { id: 1, username: 'user1', role: 'USER', createdAt: new Date() },
       ];
-      // Inject the mock data into the findMany call
       prisma.user.findMany.mockResolvedValue(mockUsers);
 
-      // --- Act ---
+      // Act
       const result = await adminQueries.getAllUsersForManagement();
 
-      // --- Assert ---
-      // Verify specific field selection and ascending sort order
+      // Assert
       expect(prisma.user.findMany).toHaveBeenCalledWith({
         select: {
           id: true,
           username: true,
-          admin: true,
+          role: true, // Verify role is selected
           createdAt: true,
         },
         orderBy: { id: 'asc' },
@@ -47,23 +42,21 @@ describe('adminQueries module', () => {
   });
 
   describe('promoteUserToAdmin()', () => {
-    it('should update the admin flag for a specific user id', async () => {
-      // --- Arrange ---
+    it('should update the role to ADMIN for a specific user id', async () => {
+      // Arrange
       const userId = 42;
-      const mockUpdatedUser = { id: 42, admin: true };
-      // Inject the successful update response
+      const mockUpdatedUser = { id: 42, role: 'ADMIN' };
       prisma.user.update.mockResolvedValue(mockUpdatedUser);
 
-      // --- Act ---
+      // Act
       const result = await adminQueries.promoteUserToAdmin(userId);
 
-      // --- Assert ---
-      // Verify the query targets the correct ID and sets admin to true
+      // Assert
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: userId },
-        data: { admin: true },
+        data: { role: 'ADMIN' }, // Verify role update
       });
-      expect(result.admin).toBe(true);
+      expect(result.role).toBe('ADMIN');
     });
   });
 });
