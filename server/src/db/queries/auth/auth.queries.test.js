@@ -2,7 +2,6 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as authQueries from './auth.queries.js';
 import { prisma } from '../../../lib/prisma.js';
 
-// Setup Vitest mocks for Prisma client operations
 vi.mock('../../../lib/prisma.js', () => ({
   prisma: {
     user: {
@@ -14,63 +13,60 @@ vi.mock('../../../lib/prisma.js', () => ({
 }));
 
 describe('authQueries module', () => {
-  // Reset mock state between tests
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('registerUser()', () => {
-    it('should create a user with mapped data and default admin to false', async () => {
-      // --- Arrange ---
-      // Define input without admin flag and expected mock return
+    it('should create a user with default USER role', async () => {
+      // Arrange
       const input = { username: 'testuser', password: 'hashed_password' };
-      const mockUser = { id: 1, ...input, admin: false };
+      const mockUser = { id: 1, ...input, role: 'USER' };
       prisma.user.create.mockResolvedValue(mockUser);
 
-      // --- Act ---
+      // Act
       const result = await authQueries.registerUser(input);
 
-      // --- Assert ---
-      // Verify prisma mapping and explicit admin default
+      // Assert
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: {
           username: 'testuser',
           password: 'hashed_password',
-          admin: false,
+          role: 'USER',
         },
       });
-      expect(result).toEqual(mockUser);
+      expect(result.role).toBe('USER');
     });
 
-    it('should respect the admin flag when provided in userData', async () => {
-      // --- Arrange ---
-      // Define input with explicit admin status
+    it('should map admin: true input to ADMIN role', async () => {
+      // Arrange
       const input = { username: 'admin', password: 'pw', admin: true };
-      prisma.user.create.mockResolvedValue({ id: 2, ...input });
+      prisma.user.create.mockResolvedValue({
+        id: 2,
+        username: 'admin',
+        role: 'ADMIN',
+      });
 
-      // --- Act ---
+      // Act
       await authQueries.registerUser(input);
 
-      // --- Assert ---
-      // Check that admin: true was passed to prisma
+      // Assert
       expect(prisma.user.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({ admin: true }),
+        data: expect.objectContaining({ role: 'ADMIN' }),
       });
     });
   });
 
   describe('getUserById()', () => {
     it('should fetch a unique user by primary key', async () => {
-      // --- Arrange ---
-      // Define target ID and mock user
+      // Arrange
       const userId = 101;
       prisma.user.findUnique.mockResolvedValue({ id: userId, username: 'dev' });
 
-      // --- Act ---
+      // Act
       const result = await authQueries.getUserById(userId);
 
-      // --- Assert ---
-      // Verify correct 'where' clause usage
+      // Assert
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: userId },
       });
@@ -79,20 +75,18 @@ describe('authQueries module', () => {
   });
 
   describe('updateLastLogin()', () => {
-    it('should update the lastLogin field with a current timestamp', async () => {
-      // --- Arrange ---
-      // Define user ID and mock update response
+    it('should update the lastLogin field', async () => {
+      // Arrange
       const userId = 5;
       prisma.user.update.mockResolvedValue({
         id: userId,
         lastLogin: new Date(),
       });
 
-      // --- Act ---
+      // Act
       await authQueries.updateLastLogin(userId);
 
-      // --- Assert ---
-      // Verify update payload contains any valid Date object
+      // Assert
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: userId },
         data: { lastLogin: expect.any(Date) },
