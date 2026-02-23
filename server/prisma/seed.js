@@ -27,17 +27,16 @@ async function main() {
 
   // Define initial account dataset
   const seedUsers = [
-    { username: 'Bryan', password: hashedPassword, admin: false },
-    { username: 'Odin', password: hashedPassword, admin: true },
-    { username: 'Damon', password: hashedPassword, admin: false },
+    { username: 'Bryan', password: hashedPassword, role: 'USER' },
+    { username: 'Odin', password: hashedPassword, role: 'ADMIN' },
+    { username: 'Damon', password: hashedPassword, role: 'USER' },
+    { username: 'Boss', password: hashedPassword, role: 'SUPER_ADMIN' },
   ];
 
   // Persist each user and log result
   for (const user of seedUsers) {
     const createdUser = await prisma.user.create({ data: user });
-    console.log(
-      `+ Created ${user.admin ? 'Admin' : 'User'}: ${createdUser.username}`,
-    );
+    console.log(`+ Created ${createdUser.role}: ${createdUser.username}`);
   }
 
   console.log('--- Seed Completed Successfully! ---');
