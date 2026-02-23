@@ -66,8 +66,8 @@ describe('authMiddleware module', () => {
   describe('isAdmin()', () => {
     it('should allow access if user is admin', () => {
       // --- Arrange ---
-      // Define a user with the admin flag set to true
-      const adminUser = { id: 1, admin: true };
+      // Define a user with role set to ADMIN
+      const adminUser = { id: 1, role: 'ADMIN' };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, adminUser);
@@ -85,7 +85,7 @@ describe('authMiddleware module', () => {
     it('should return 403 if user is not admin', () => {
       // --- Arrange ---
       // Define a standard user lacking admin privileges
-      const regularUser = { id: 2, admin: false };
+      const regularUser = { id: 2, role: 'USER' };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, regularUser);

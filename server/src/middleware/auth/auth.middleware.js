@@ -66,8 +66,11 @@ export const isAdmin = (req, res, next) => {
   resolveJwtUser(req, res, (err, user) => {
     if (err) return next(err);
 
-    // Verify admin privileges
-    if (!user || user.admin !== true) {
+    // Allow access for all administrative roles
+    const hasPrivileges =
+      user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+
+    if (!hasPrivileges) {
       return res
         .status(403)
         .json({ message: 'Access denied: Administrator privileges required' });
@@ -89,8 +92,10 @@ export const isAdmin = (req, res, next) => {
 export const isNotAdmin = (req, res, next) => {
   // Check if current user has admin role
   resolveJwtUser(req, res, (err, user) => {
-    // Redirect if admin is in the wrong area
-    if (user?.admin === true) return res.redirect('/admin/dashboard');
+    // Redirect any admin-tier user
+    const isAdminTier = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+    if (isAdminTier) return res.redirect('/admin/dashboard');
+
     return next();
   });
 };
