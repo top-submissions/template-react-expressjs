@@ -40,8 +40,8 @@ describe('Admin Integration Tests', () => {
     it('should fetch users and render the management view', async () => {
       // --- Arrange ---
       const mockUsers = [
-        { id: 1, username: 'test1', admin: false },
-        { id: 2, username: 'test2', admin: true },
+        { id: 1, username: 'test1', role: 'USER' },
+        { id: 2, username: 'test2', role: 'ADMIN' },
       ];
       adminQueries.getAllUsersForManagement.mockResolvedValue(mockUsers);
 
