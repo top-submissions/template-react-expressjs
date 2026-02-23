@@ -19,7 +19,7 @@ export const landingGet = (req, res) => {
   resolveJwtUser(req, res, (err, user) => {
     if (user) {
       // Redirect to specific dashboard based on role
-      return user.admin
+      return user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
         ? res.redirect('/admin/dashboard')
         : res.redirect('/dashboard');
     }
@@ -114,7 +114,7 @@ export const loginPost = (req, res, next) => {
       const payload = {
         id: user.id,
         username: user.username,
-        admin: user.admin,
+        role: user.role,
       };
 
       // Issue 30-day token
@@ -131,7 +131,8 @@ export const loginPost = (req, res, next) => {
       });
 
       // Send user to appropriate dashboard
-      return user.admin
+      const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
+      return isAdmin
         ? res.redirect('/admin/dashboard')
         : res.redirect('/dashboard');
     },
