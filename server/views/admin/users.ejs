@@ -34,12 +34,15 @@
                             <td><%= user.id %></td>
                             <td><%= user.username %></td>
                             <td>
-                                <span class="badge <%= user.admin ? 'admin' : 'user' %>">
-                                    <%= user.admin ? 'Admin' : 'Standard User' %>
+                                <%# Use the role string to determine the CSS class and Label %>
+                                <span class="badge <%= user.role.toLowerCase() %>">
+                                    <%= user.role === 'ADMIN' ? 'Admin' : 
+                                        user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Standard User' %>
                                 </span>
                             </td>
                             <td>
-                                <% if (!user.admin) { %>
+                                <%# Only show promote button if the role is exactly 'USER' %>
+                                <% if (user.role === 'USER') { %>
                                     <form action="/admin/users/<%= user.id %>/promote" method="POST" style="display:inline;">
                                         <button type="submit" class="btn-promote" onclick="return confirm('Promote <%= user.username %> to Admin?')">
                                             Promote to Admin
