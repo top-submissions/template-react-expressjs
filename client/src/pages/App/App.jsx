@@ -1,39 +1,22 @@
-import { useState } from 'react';
-import reactLogo from '../../assets/react.svg';
-import viteLogo from '/vite.svg';
+import { Outlet } from 'react-router';
 import styles from './App.module.css';
 import '../../styles/index.css';
 
+/**
+ * Main Application Layout.
+ * * Acts as the root wrapper for all routed pages.
+ * * Uses Outlet to render child components (like LandingPage).
+ * @returns {JSX.Element} The base application layout.
+ */
 function App() {
-  const [count, setCount] = useState(0);
-
+  // Define application shell and rendering slot for routes
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className={styles.logo} alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img
-            src={reactLogo}
-            className={`${styles.logo} ${styles.react}`}
-            alt="React logo"
-          />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className={styles.card}>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/pages/App/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className={styles.readTheDocs}>
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className={styles.appContainer}>
+      <main>
+        {/* Slot for nested routes defined in routes.jsx */}
+        <Outlet />
+      </main>
+    </div>
   );
 }
 
