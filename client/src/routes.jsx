@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import LandingPage from './pages/LandingPage/LandingPage';
+import SignupForm from './components/SignupForm/SignupForm';
 
 /**
  * Global application router configuration.
@@ -19,6 +20,10 @@ const routes = createBrowserRouter([
         // Index: true renders this when the parent path ('/') is matched exactly
         index: true,
         element: <LandingPage />,
+      },
+      {
+        path: 'sign-up',
+        element: <SignupForm />,
       },
     ],
   },
