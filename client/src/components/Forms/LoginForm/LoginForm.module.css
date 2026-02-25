@@ -1,45 +1,63 @@
+/* client\src\components\forms\LoginForm\LoginForm.module.css */
 .formContainer {
   max-width: 400px;
   margin: 2rem auto;
   padding: 2rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
+  background-color: var(--bg-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .errorMessage {
-  color: #d9534f;
-  background-color: #f2dede;
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.1);
   padding: 0.5rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
+  text-align: left;
   gap: 0.5rem;
 }
 
-.submitBtn {
+.inputGroup input {
   padding: 0.75rem;
-  background-color: #007bff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .submitBtn:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-hover);
 }
 
 .footerText {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-color);
 }
