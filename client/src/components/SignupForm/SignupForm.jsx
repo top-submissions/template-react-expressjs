@@ -1,13 +1,13 @@
-// client\src\components\SignupForm\SignupForm.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { signupSchema } from '../../modules/validators/auth/auth.validator.js';
 import styles from './SignupForm.module.css';
 
 /**
  * Signup form component for user registration.
  * * Manages local form state for username, password, and confirmation.
+ * * Uses Zod schema for client-side validation logic.
  * * Handles submission to the backend API.
- * * Performs basic client-side validation for password matching.
  * @returns {JSX.Element} The rendered signup form.
  */
 const SignupForm = () => {
@@ -34,9 +34,12 @@ const SignupForm = () => {
     e.preventDefault();
     setError('');
 
-    // Check password matching before API call
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+    // Validate form data against Zod schema
+    const validation = signupSchema.safeParse(formData);
+
+    // If validation fails, set the first error message and stop
+    if (!validation.success) {
+      setError(validation.error.issues[0].message);
       return;
     }
 

@@ -1,4 +1,3 @@
-// client\src\components\SignupForm\SignupForm.test.jsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
