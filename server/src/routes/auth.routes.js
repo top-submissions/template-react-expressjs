@@ -12,7 +12,6 @@ const authRouter = Router();
 authRouter.post('/sign-up', validateSignup, authController.signupPost);
 
 // Authentication flow
-authRouter.get('/log-in', isNotAuthenticated, authController.loginGet);
 authRouter.post('/log-in', validateLogin, authController.loginPost);
 
 // Identity termination

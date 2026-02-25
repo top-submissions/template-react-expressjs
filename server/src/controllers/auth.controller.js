@@ -6,22 +6,6 @@ import * as authQueries from '../db/queries/auth/auth.queries.js';
 import { resolveJwtUser } from '../middleware/auth/auth.middleware.js';
 
 /**
- * Renders the user registration (sign-up) form.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void}
- */
-export const signupGet = (req, res) => res.render('auth/sign-up-form');
-
-/**
- * Renders the login form.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void}
- */
-export const loginGet = (req, res) => res.render('auth/log-in-form');
-
-/**
  * Handles user registration via JSON API.
  * * Validates form input and returns JSON error arrays if necessary.
  * * Hashes password and persists user to DB.
@@ -59,21 +43,20 @@ export const signupPost = async (req, res, next) => {
 /**
  * Handles login and JWT issuance.
  * * Authenticates credentials via Passport local strategy.
- * * Updates the user's last login timestamp in the database.
- * * Generates a signed JWT valid for 30 days.
- * * Sets an HttpOnly cookie containing the token for stateless auth.
+ * * Updates the user's last login timestamp.
+ * * Issues a 30-day HttpOnly cookie token.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
- * @returns {void}
  */
 export const loginPost = (req, res, next) => {
   // Validate login input
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).render('auth/log-in-form', {
+    // Return validation errors as JSON
+    return res.status(400).json({
+      message: 'Validation failed',
       errors: errors.array(),
-      formData: req.body,
     });
   }
 
@@ -82,8 +65,15 @@ export const loginPost = (req, res, next) => {
     'local',
     { session: false },
     async (err, user, info) => {
+      // Handle server or database errors
       if (err) return next(err);
-      if (!user) return res.redirect('/log-in');
+
+      // Handle invalid credentials
+      if (!user) {
+        return res.status(401).json({
+          message: info?.message || 'Invalid username or password',
+        });
+      }
 
       // Refresh last login timestamp
       await authQueries.updateLastLogin(user.id);
@@ -107,15 +97,17 @@ export const loginPost = (req, res, next) => {
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
-      // Send user to appropriate dashboard
-      const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
-      return isAdmin
-        ? res.redirect('/admin/dashboard')
-        : res.redirect('/dashboard');
+      // Return success and user data for frontend state
+      return res.status(200).json({
+        message: 'Login successful',
+        user: {
+          username: user.username,
+          role: user.role,
+        },
+      });
     },
   )(req, res, next);
 };
-
 /**
  * Handles user logout.
  * * Clears the 'token' cookie from the client's browser.
