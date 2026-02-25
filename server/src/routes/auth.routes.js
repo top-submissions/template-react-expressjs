@@ -8,9 +8,6 @@ import {
 
 const authRouter = Router();
 
-// Public entry point
-authRouter.get('/', authController.landingGet);
-
 // Registration flow
 authRouter.get('/sign-up', isNotAuthenticated, authController.signupGet);
 authRouter.post('/sign-up', validateSignup, authController.signupPost);

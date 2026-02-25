@@ -6,28 +6,6 @@ import * as authQueries from '../db/queries/auth/auth.queries.js';
 import { resolveJwtUser } from '../middleware/auth/auth.middleware.js';
 
 /**
- * Handles the landing page request.
- * * Uses JWT resolution to check for an existing token.
- * * Redirects authenticated users to their specific dashboard based on role.
- * * Renders the public landing page for unauthenticated visitors.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void}
- */
-export const landingGet = (req, res) => {
-  // Identify user status from token
-  resolveJwtUser(req, res, (err, user) => {
-    if (user) {
-      // Redirect to specific dashboard based on role
-      return user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'
-        ? res.redirect('/admin/dashboard')
-        : res.redirect('/dashboard');
-    }
-    res.render('landing');
-  });
-};
-
-/**
  * Renders the user registration (sign-up) form.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
