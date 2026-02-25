@@ -1,8 +1,10 @@
+// client\src\routes.jsx
 import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import LandingPage from './pages/LandingPage/LandingPage';
 import SignupForm from './components/forms/SignupForm/SignupForm';
+import LoginForm from './components/forms/LoginForm/LoginForm';
 
 /**
  * Global application router configuration.
@@ -24,6 +26,10 @@ const routes = createBrowserRouter([
       {
         path: 'sign-up',
         element: <SignupForm />,
+      },
+      {
+        path: 'log-in',
+        element: <LoginForm />,
       },
     ],
   },
