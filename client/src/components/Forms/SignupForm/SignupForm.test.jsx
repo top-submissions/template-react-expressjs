@@ -11,8 +11,6 @@ import SignupForm from './SignupForm';
  */
 describe('SignupForm', () => {
   it('displays error if passwords do not match', async () => {
-    // --- Arrange ---
-    // Prepare the component within a router context
     render(
       <MemoryRouter>
         <SignupForm />
@@ -20,23 +18,23 @@ describe('SignupForm', () => {
     );
 
     // --- Act ---
-    // Fill in mismatched password fields
     fireEvent.change(screen.getByLabelText(/Username/i), {
       target: { value: 'testuser' },
     });
+    // Use a password that passes the "Uppercase" rule
     fireEvent.change(screen.getByLabelText(/^Password/i), {
-      target: { value: 'password123' },
+      target: { value: 'Password123' },
     });
     fireEvent.change(screen.getByLabelText(/Confirm Password/i), {
-      target: { value: 'different' },
+      target: { value: 'Different123' },
     });
 
-    // Submit the form
     fireEvent.click(screen.getByRole('button', { name: /Register/i }));
 
     // --- Assert ---
-    // Verify visibility of error message
-    expect(await screen.findByText(/Passwords do not match/i)).toBeDefined();
+    // Match the actual Zod message: "Passwords don't match"
+    const errorMsg = await screen.findByText(/Passwords don't match/i);
+    expect(errorMsg).toBeDefined();
   });
 
   it('updates input values on change', () => {

@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import LandingPage from './pages/LandingPage/LandingPage';
-import SignupForm from './components/SignupForm/SignupForm';
+import SignupForm from './components/forms/SignupForm/SignupForm';
 
 /**
  * Global application router configuration.

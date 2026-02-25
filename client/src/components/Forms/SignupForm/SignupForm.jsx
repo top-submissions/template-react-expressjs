@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { signupSchema } from '../../modules/validators/auth/auth.validator.js';
+import { signupSchema } from '../../../modules/validators/auth/auth.validator.js';
 import styles from './SignupForm.module.css';
 
 /**
