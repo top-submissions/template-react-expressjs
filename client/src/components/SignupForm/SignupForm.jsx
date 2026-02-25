@@ -43,14 +43,17 @@ const SignupForm = () => {
       return;
     }
 
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
     try {
       // Execute post request to backend signup route
-      const response = await fetch('/api/auth/sign-up', {
+      const response = await fetch(`${baseUrl}/api/auth/sign-up`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: formData.username,
           password: formData.password,
+          confirmPassword: formData.confirmPassword,
         }),
       });
 
@@ -61,7 +64,7 @@ const SignupForm = () => {
         setError(data.message || 'Signup failed');
       }
     } catch (err) {
-      setError(`An error occurred: ${err}`);
+      setError(`An error occurred: ${err.message}`);
     }
   };
 
