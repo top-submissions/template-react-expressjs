@@ -9,7 +9,6 @@ import {
 const authRouter = Router();
 
 // Registration flow
-authRouter.get('/sign-up', isNotAuthenticated, authController.signupGet);
 authRouter.post('/sign-up', validateSignup, authController.signupPost);
 
 // Authentication flow

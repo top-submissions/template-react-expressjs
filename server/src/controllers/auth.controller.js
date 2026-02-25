@@ -22,23 +22,21 @@ export const signupGet = (req, res) => res.render('auth/sign-up-form');
 export const loginGet = (req, res) => res.render('auth/log-in-form');
 
 /**
- * Handles user registration.
- * * Validates form input and returns errors if necessary.
- * * Hashes the user password using bcrypt (10 salt rounds).
- * * Persists the new user record to the database via authQueries.
+ * Handles user registration via JSON API.
+ * * Validates form input and returns JSON error arrays if necessary.
+ * * Hashes password and persists user to DB.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
- * @param {Function} next - Express next middleware function.
- * @returns {Promise<void>}
+ * @param {Function} next - Express next middleware.
  */
 export const signupPost = async (req, res, next) => {
   try {
-    // Validate form inputs
+    // Validate inputs using server-side rules
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).render('auth/sign-up-form', {
+      return res.status(400).json({
+        message: 'Validation failed',
         errors: errors.array(),
-        formData: req.body,
       });
     }
 
@@ -51,7 +49,8 @@ export const signupPost = async (req, res, next) => {
       password: hashedPassword,
     });
 
-    res.redirect('/log-in');
+    // Return success status for React to handle navigation
+    res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     next(error);
   }

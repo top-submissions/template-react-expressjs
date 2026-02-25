@@ -5,8 +5,8 @@ import adminRouter from './admin.routes.js';
 
 const indexRouter = Router();
 
-// Mounting public and identity routes at root
-indexRouter.use('/', authRouter);
+// Mount auth routes
+indexRouter.use('/api/auth', authRouter);
 
 // Mounting authenticated user routes at root
 indexRouter.use('/', userRouter);
