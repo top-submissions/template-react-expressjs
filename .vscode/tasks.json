@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Start Full Stack",
+      "type": "npm",
+      "script": "dev",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "terminalProfile": "Main",
+        "group": "dev-env",
+        "focus": true
+      }
+    },
+    {
+      "label": "🧪 Client: Tests",
+      "type": "npm",
+      "script": "test",
+      "path": "client",
+      "presentation": {
+        "terminalProfile": "Client/Tests"
+      }
+    },
+    {
+      "label": "🧪 Server: Tests",
+      "type": "npm",
+      "script": "test:watch",
+      "path": "server",
+      "presentation": {
+        "terminalProfile": "Server/Tests"
+      }
+    },
+    {
+      "label": "🗄️ Database: Studio",
+      "type": "npm",
+      "script": "db:studio",
+      "path": "server",
+      "presentation": {
+        "terminalProfile": "Database"
+      }
+    },
+    {
+      "label": "🛠️ Setup Environment",
+      "type": "npm",
+      "script": "install:all",
+      "presentation": {
+        "terminalProfile": "Main"
+      }
+    }
+  ]
+}
