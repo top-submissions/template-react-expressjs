@@ -68,7 +68,7 @@ const LoginForm = () => {
       <h2>Log In</h2>
       {error && <p className={styles.errorMessage}>{error}</p>}
 
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <div className={styles.inputGroup}>
           <label htmlFor="username">Username</label>
           <input
