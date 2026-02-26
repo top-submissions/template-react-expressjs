@@ -2,25 +2,46 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "🚀 Start Full Stack",
+      "label": "💻 Client: Dev",
       "type": "npm",
       "script": "dev",
+      "path": "client",
       "runOptions": {
         "runOn": "folderOpen"
       },
       "presentation": {
-        "terminalProfile": "Main",
         "group": "dev-env",
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "🖥️ Server: Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "server",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "group": "dev-env",
+        "reveal": "always",
+        "panel": "dedicated",
         "focus": true
       }
     },
     {
       "label": "🧪 Client: Tests",
       "type": "npm",
-      "script": "test",
+      "script": "test:watch",
       "path": "client",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
       "presentation": {
-        "terminalProfile": "Client/Tests"
+        "group": "testing",
+        "panel": "dedicated"
       }
     },
     {
@@ -28,8 +49,12 @@
       "type": "npm",
       "script": "test:watch",
       "path": "server",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
       "presentation": {
-        "terminalProfile": "Server/Tests"
+        "group": "testing",
+        "panel": "dedicated"
       }
     },
     {
@@ -38,7 +63,8 @@
       "script": "db:studio",
       "path": "server",
       "presentation": {
-        "terminalProfile": "Database"
+        "group": "database",
+        "panel": "dedicated"
       }
     },
     {
@@ -46,7 +72,8 @@
       "type": "npm",
       "script": "install:all",
       "presentation": {
-        "terminalProfile": "Main"
+        "reveal": "silent",
+        "panel": "shared"
       }
     }
   ]
