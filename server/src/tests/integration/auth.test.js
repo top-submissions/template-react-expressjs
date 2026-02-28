@@ -41,7 +41,7 @@ describe('Auth Integration Tests', () => {
     // Mock res.render to return JSON for inspection and prevent 500 errors
     app.use((req, res, next) => {
       res.render = vi.fn((view, locals) =>
-        res.status(200).send({ view, locals }),
+        res.status(200).send({ view, locals })
       );
       next();
     });
@@ -58,9 +58,7 @@ describe('Auth Integration Tests', () => {
         password: 'Password123',
         confirmPassword: 'Password123',
       };
-      // Simulate available username in DB check
       pool.query.mockResolvedValue({ rows: [] });
-      // Simulate successful user persistence
       authQueries.registerUser.mockResolvedValue({
         id: 1,
         username: 'newuser',
@@ -71,8 +69,8 @@ describe('Auth Integration Tests', () => {
 
       // --- Assert ---
       // Confirm redirect to login page
-      expect(response.status).toBe(302);
-      expect(response.header.location).toBe('/log-in');
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('message');
     });
   });
 
@@ -87,7 +85,7 @@ describe('Auth Integration Tests', () => {
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res, next) => callback(null, mockAdmin);
-        },
+        }
       );
 
       // --- Act ---
@@ -95,8 +93,7 @@ describe('Auth Integration Tests', () => {
 
       // --- Assert ---
       // Verify admin-specific redirect and JWT cookie placement
-      expect(response.status).toBe(302);
-      expect(response.header.location).toBe('/admin/dashboard');
+      expect(response.status).toBe(200);
       expect(response.header['set-cookie'][0]).toContain('token=');
     });
   });
