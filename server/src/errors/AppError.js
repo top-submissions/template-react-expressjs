@@ -1,5 +1,3 @@
-// server/src/utils/errors/AppError.js
-
 /**
  * Base class for all operational errors.
  * * Captures stack traces automatically.
@@ -15,7 +13,7 @@ export class AppError extends Error {
     super(message);
     this.statusCode = statusCode;
     this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-    this.isOperational = true; // Distinguishes known app errors from system crashes
+    this.isOperational = true;
 
     Error.captureStackTrace(this, this.constructor);
   }
@@ -38,5 +36,21 @@ export class AuthenticationError extends AppError {
 export class NotFoundError extends AppError {
   constructor(resource = 'Resource') {
     super(`${resource} not found`, 404);
+  }
+}
+
+/**
+ * Specific error for input validation failures.
+ * * Holds an array of specific field errors (e.g. from express-validator).
+ * @extends AppError
+ */
+export class ValidationError extends AppError {
+  /**
+   * @param {string} message - General error message.
+   * @param {Array} errors - Array of validation error objects.
+   */
+  constructor(message = 'Validation failed', errors = []) {
+    super(message, 400);
+    this.errors = errors;
   }
 }
