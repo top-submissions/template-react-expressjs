@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
 import * as authQueries from '../db/queries/auth/auth.queries.js';
 import { resolveJwtUser } from '../middleware/auth/auth.middleware.js';
+import { AuthenticationError, ValidationError } from '../errors/AppError.js';
 
 /**
  * Handles user registration via JSON API.
@@ -18,10 +19,7 @@ export const signupPost = async (req, res, next) => {
     // Validate inputs using server-side rules
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
+      return next(new ValidationError('Registration failed', errors.array()));
     }
 
     // Encrypt password
@@ -54,10 +52,7 @@ export const loginPost = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     // Return validation errors as JSON
-    return res.status(400).json({
-      message: 'Validation failed',
-      errors: errors.array(),
-    });
+    return next(new ValidationError('Login validation failed', errors.array()));
   }
 
   // Verify credentials via Local Strategy
@@ -70,9 +65,11 @@ export const loginPost = (req, res, next) => {
 
       // Handle invalid credentials
       if (!user) {
-        return res.status(401).json({
-          message: info?.message || 'Invalid username or password',
-        });
+        return next(
+          new AuthenticationError(
+            info?.message || 'Invalid username or password'
+          )
+        );
       }
 
       // Refresh last login timestamp
@@ -105,9 +102,10 @@ export const loginPost = (req, res, next) => {
           role: user.role,
         },
       });
-    },
+    }
   )(req, res, next);
 };
+
 /**
  * Handles user logout.
  * * Clears the 'token' cookie from the client's browser.
