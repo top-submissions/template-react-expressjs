@@ -1,4 +1,5 @@
 import passport from 'passport';
+import { AppError, AuthenticationError } from '../../errors/AppError.js';
 
 /**
  * Resolves the current user from the JWT, if present.
@@ -29,7 +30,7 @@ export const isAuthenticated = (req, res, next) => {
     if (err) return next(err);
 
     // Block unauthorized access
-    if (!user) return res.status(401).json({ message: 'Please log in first' });
+    if (!user) return next(new AuthenticationError('Please log in first'));
 
     // Attach identity to request
     req.user = user;
@@ -48,7 +49,7 @@ export const isAuthenticated = (req, res, next) => {
 export const isNotAuthenticated = (req, res, next) => {
   // Ensure no user is currently logged in
   resolveJwtUser(req, res, (err, user) => {
-    if (user) return res.status(400).json({ message: 'Already authenticated' });
+    if (user) return next(new AppError('Already authenticated', 400));
     return next();
   });
 };
@@ -71,9 +72,7 @@ export const isAdmin = (req, res, next) => {
       user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 
     if (!hasPrivileges) {
-      return res
-        .status(403)
-        .json({ message: 'Access denied: Administrator privileges required' });
+      return next(new ForbiddenError('Administrator privileges required'));
     }
 
     req.user = user;
@@ -94,7 +93,9 @@ export const isNotAdmin = (req, res, next) => {
   resolveJwtUser(req, res, (err, user) => {
     // Redirect any admin-tier user
     const isAdminTier = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
-    if (isAdminTier) return res.redirect('/admin/dashboard');
+    if (isAdminTier) {
+      return next(new AppError('Admins cannot access this route', 400));
+    }
 
     return next();
   });
