@@ -55,3 +55,17 @@ export class ValidationError extends AppError {
     this.errors = errors;
   }
 }
+
+/**
+ * Specific error for insufficient permissions or roles.
+ * * Used for 403 Forbidden scenarios.
+ * @extends AppError
+ */
+export class ForbiddenError extends AppError {
+  /**
+   * @param {string} message - Detailed reason for denial.
+   */
+  constructor(message = 'Access denied: insufficient privileges') {
+    super(message, 403);
+  }
+}
