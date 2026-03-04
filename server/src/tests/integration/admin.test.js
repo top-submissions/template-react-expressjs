@@ -32,7 +32,19 @@ describe('Admin Integration Tests', () => {
 
     // Initialize express app with router under test
     app = express();
-    app.set('view engine', 'ejs'); // Mock view engine setup
+
+    // Enable JSON parsing for incoming test payloads
+    app.use(express.json());
+
+    // Intercept render calls to return JSON and avoid missing template errors
+    app.use((req, res, next) => {
+      res.render = vi.fn((view, locals) =>
+        res.status(200).json({ view, locals })
+      );
+      next();
+    });
+
+    // Mount the router
     app.use('/admin', adminRouter);
   });
 
@@ -49,7 +61,9 @@ describe('Admin Integration Tests', () => {
       const response = await request(app).get('/admin/users');
 
       // --- Assert ---
+      // Check for success and that the returned JSON contains our mock data
       expect(response.status).toBe(200);
+      expect(response.body.locals.users).toEqual(mockUsers);
       expect(adminQueries.getAllUsersForManagement).toHaveBeenCalled();
     });
   });
@@ -65,7 +79,7 @@ describe('Admin Integration Tests', () => {
 
       // --- Act ---
       const response = await request(app).post(
-        `/admin/users/${targetUserId}/promote`,
+        `/admin/users/${targetUserId}/promote`
       );
 
       // --- Assert ---
@@ -75,7 +89,7 @@ describe('Admin Integration Tests', () => {
 
       // Ensure the query received the parsed integer ID
       expect(adminQueries.promoteUserToAdmin).toHaveBeenCalledWith(
-        targetUserId,
+        targetUserId
       );
     });
 
