@@ -1,5 +1,9 @@
 import passport from 'passport';
-import { AppError, AuthenticationError } from '../../errors/AppError.js';
+import {
+  AppError,
+  AuthenticationError,
+  ForbiddenError,
+} from '../../errors/AppError.js';
 
 /**
  * Resolves the current user from the JWT, if present.

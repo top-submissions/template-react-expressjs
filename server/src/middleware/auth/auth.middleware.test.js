@@ -32,7 +32,7 @@ describe('authMiddleware module', () => {
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, mockUser);
-        },
+        }
       );
 
       // --- Act ---
@@ -50,16 +50,19 @@ describe('authMiddleware module', () => {
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, false);
-        },
+        }
       );
 
       // --- Act ---
       authMiddleware.isAuthenticated(req, res, next);
 
       // --- Assert ---
-      // Ensure the request is blocked with unauthorized status
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Please log in first' });
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 401,
+          message: 'Please log in first',
+        })
+      );
     });
   });
 
@@ -71,7 +74,7 @@ describe('authMiddleware module', () => {
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, adminUser);
-        },
+        }
       );
 
       // --- Act ---
@@ -89,15 +92,18 @@ describe('authMiddleware module', () => {
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, regularUser);
-        },
+        }
       );
 
       // --- Act ---
       authMiddleware.isAdmin(req, res, next);
 
       // --- Assert ---
-      // Ensure access is forbidden for non-admins
-      expect(res.status).toHaveBeenCalledWith(403);
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 403,
+        })
+      );
     });
   });
 
@@ -109,15 +115,18 @@ describe('authMiddleware module', () => {
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, existingUser);
-        },
+        }
       );
 
       // --- Act ---
       authMiddleware.isNotAuthenticated(req, res, next);
 
       // --- Assert ---
-      // Block the request to prevent duplicate sessions
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: 400,
+        })
+      );
     });
   });
 });
