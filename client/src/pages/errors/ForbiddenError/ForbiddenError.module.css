@@ -1,0 +1,42 @@
+.container {
+  /* Ensure the error page fills the viewport for centering */
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 450px;
+}
+
+.errorCode {
+  /* Large display for the 403 status code */
+  font-size: 8rem;
+  margin-bottom: -1rem;
+  opacity: 0.6;
+  color: var(--primary-color);
+}
+
+.message {
+  line-height: 1.6;
+  /* Mute slightly to distinguish from headings */
+  filter: opacity(0.9);
+}
+
+.homeLink {
+  /* Emulate global button styling for the navigation link */
+  display: inline-block;
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  align-self: center;
+  font-weight: 600;
+}
+
+.homeLink:hover {
+  border-color: var(--primary-color);
+}
