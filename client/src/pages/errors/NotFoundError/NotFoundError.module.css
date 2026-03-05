@@ -1,1 +1,41 @@
-  
+.container {
+  /* Take up full viewport height to center content vertically */
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 500px;
+}
+
+.errorCode {
+  /* Override global h1 slightly for emphasis */
+  font-size: 8rem;
+  margin-bottom: -1rem;
+  opacity: 0.5;
+}
+
+.message {
+  margin-bottom: 2rem;
+  /* Use the global text color but slightly muted */
+  filter: opacity(0.8);
+}
+
+.homeLink {
+  /* Style the link to look like a button using global button tokens */
+  display: inline-block;
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  align-self: center;
+}
+
+/* Maintain consistency with global button hover logic */
+.homeLink:hover {
+  border-color: var(--primary-color);
+}

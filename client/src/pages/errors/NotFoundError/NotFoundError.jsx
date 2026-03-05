@@ -1,4 +1,5 @@
 import { useRouteError, Link } from 'react-router';
+import styles from './NotFoundError.module.css';
 
 /**
  * Fallback page for 404 Not Found scenarios.
@@ -16,11 +17,15 @@ const NotFoundError = () => {
     "We couldn't find the page you're looking for.";
 
   return (
-    <main>
-      <h1>404</h1>
-      <h2>Page Not Found</h2>
-      <p>{errorMessage}</p>
-      <Link to="/">Return to Home</Link>
+    <main className={`${styles.container} flex-center`}>
+      <div className={styles.content}>
+        <h1 className={styles.errorCode}>404</h1>
+        <h2>Page Not Found</h2>
+        <p className={styles.message}>{errorMessage}</p>
+        <Link to="/" className={styles.homeLink}>
+          Return to Home
+        </Link>
+      </div>
     </main>
   );
 };
