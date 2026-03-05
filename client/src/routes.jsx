@@ -1,10 +1,10 @@
-// client\src\routes.jsx
 import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
-import NotFoundError from './pages/errors/NotFoundError/NotFoundError';
 import LandingPage from './pages/LandingPage/LandingPage';
 import SignupForm from './components/forms/SignupForm/SignupForm';
 import LoginForm from './components/forms/LoginForm/LoginForm';
+import NotFoundError from './pages/errors/NotFoundError/NotFoundError';
+import ForbiddenError from './pages/errors/ForbiddenError/ForbiddenError';
 
 /**
  * Global application router configuration.
@@ -30,6 +30,10 @@ const routes = createBrowserRouter([
       {
         path: 'log-in',
         element: <LoginForm />,
+      },
+      {
+        path: 'forbidden',
+        element: <ForbiddenError />,
       },
       {
         // Catch-all route for any undefined paths within the root layout
