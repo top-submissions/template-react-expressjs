@@ -1,0 +1,38 @@
+/* client\src\pages\errors\ServerError\ServerError.module.css */
+
+.container {
+  /* Ensure the error page takes up the full screen to center content */
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 500px;
+}
+
+.errorCode {
+  /* Hero typography for the status code */
+  font-size: 8rem;
+  margin-bottom: -1rem;
+  opacity: 0.6;
+  /* Visual cue: using primary color to indicate it's an app-level event */
+  color: var(--primary-color);
+}
+
+.message {
+  line-height: 1.6;
+  /* Slight transparency for the description text */
+  filter: opacity(0.85);
+}
+
+.homeLink {
+  /* Note: This is a button element, but styled to match our link navigation actions */
+  align-self: center;
+  margin-top: 1rem;
+  /* Button reset handled by global styles, specific padding added here */
+  padding: 0.8rem 2rem;
+}
