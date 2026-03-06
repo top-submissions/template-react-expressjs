@@ -5,6 +5,7 @@ import SignupForm from './components/forms/SignupForm/SignupForm';
 import LoginForm from './components/forms/LoginForm/LoginForm';
 import NotFoundError from './pages/errors/NotFoundError/NotFoundError';
 import ForbiddenError from './pages/errors/ForbiddenError/ForbiddenError';
+import ServerError from './pages/errors/ServerError/ServerError';
 
 /**
  * Global application router configuration.
@@ -15,7 +16,7 @@ const routes = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-    errorElement: <ErrorPage />,
+    errorElement: <ServerError />,
     // Define nested routes for the application
     children: [
       {
