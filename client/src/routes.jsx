@@ -6,6 +6,7 @@ import LoginForm from './components/forms/LoginForm/LoginForm';
 import NotFoundError from './pages/errors/NotFoundError/NotFoundError';
 import ForbiddenError from './pages/errors/ForbiddenError/ForbiddenError';
 import InternalServerError from './pages/errors/InternalServerError/InternalServerError';
+import ExternalServiceError from './pages/errors/ExternalServiceError/ExternalServiceError';
 
 /**
  * Global application router configuration.
@@ -35,6 +36,10 @@ const routes = createBrowserRouter([
       {
         path: 'forbidden',
         element: <ForbiddenError />,
+      },
+      {
+        path: 'service-error',
+        element: <ExternalServiceError />,
       },
       {
         // Catch-all route for any undefined paths within the root layout
