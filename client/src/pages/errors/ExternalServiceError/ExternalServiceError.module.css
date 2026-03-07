@@ -1,0 +1,87 @@
+/* Container styles for full-screen centering */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  /* Use theme variables from colors.css */
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Icon styling with pulse animation to signal connection state */
+.iconWrapper {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Pulse keyframes for visual feedback */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.icon {
+  display: inline-block;
+}
+
+/* Heading styles following typography scale */
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+/* Message body with optimized readability width */
+.message {
+  max-width: 450px;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Button group layout */
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Primary action button styling */
+.retryButton {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  /* Ensure padding matches index.css buttons but adds emphasis */
+  padding: 0.8rem 1.6rem;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s active;
+}
+
+.retryButton:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Secondary/Neutral action button styling */
+.homeButton {
+  /* Inherit standard button styles from index.css via local overrides */
+  padding: 0.8rem 1.6rem;
+  font-weight: 500;
+}
