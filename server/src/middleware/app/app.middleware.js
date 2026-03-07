@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import corsOptions from '../../config/corsOptions.js';
+import { globalErrorHandler } from '../error/error.middleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,8 +50,5 @@ export const configureMiddleware = (app) => {
  */
 export const configureErrorHandling = (app) => {
   // Final middleware to catch and format application errors
-  app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(err.statusCode || 500).send(err.message);
-  });
+  app.use(globalErrorHandler);
 };
