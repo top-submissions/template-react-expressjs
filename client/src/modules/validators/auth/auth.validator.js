@@ -1,4 +1,3 @@
-// client\src\modules\validators\auth.validator.js
 import { z } from 'zod';
 
 /**
@@ -16,7 +15,7 @@ export const signupSchema = z
       .max(20, 'Username must be under 20 characters.')
       .regex(
         /^[a-zA-Z0-9_]+$/,
-        'Only letters, numbers, and underscores allowed.',
+        'Only letters, numbers, and underscores allowed.'
       ),
 
     // Matches server password complexity

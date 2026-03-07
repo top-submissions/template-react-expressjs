@@ -1,4 +1,3 @@
-// server\src\tests\integration\admin.test.js
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';

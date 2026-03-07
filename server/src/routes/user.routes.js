@@ -1,4 +1,3 @@
-// server\src\routes\user.routes.js
 import { Router } from 'express';
 import * as userController from '../controllers/user.controller.js';
 import {

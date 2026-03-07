@@ -1,4 +1,3 @@
-// client\src\pages\App\App.test.jsx
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { describe, it, expect } from 'vitest';
@@ -16,7 +15,7 @@ describe('App Component', () => {
     const { container } = render(
       <MemoryRouter>
         <App />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     // --- Act ---

@@ -1,4 +1,3 @@
-// client\src\components\Forms\LoginForm\LoginForm.test.jsx
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
@@ -18,7 +17,7 @@ describe('LoginForm', () => {
     render(
       <MemoryRouter>
         <LoginForm />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     // --- Act ---
@@ -35,7 +34,7 @@ describe('LoginForm', () => {
     render(
       <MemoryRouter>
         <LoginForm />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     // --- Act ---

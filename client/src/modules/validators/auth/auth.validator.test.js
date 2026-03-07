@@ -1,4 +1,3 @@
-// client\src\modules\validators\auth.validator.test.js
 import { describe, it, expect } from 'vitest';
 import { signupSchema } from './auth.validator';
 
@@ -22,7 +21,7 @@ describe('Auth Client Validators', () => {
     expect(result.success).toBe(false);
     // Check if the specific regex error message is returned
     expect(result.error.issues[0].message).toContain(
-      'Only letters, numbers, and underscores',
+      'Only letters, numbers, and underscores'
     );
   });
 
