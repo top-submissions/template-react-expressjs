@@ -69,3 +69,17 @@ export class ForbiddenError extends AppError {
     super(message, 403);
   }
 }
+
+/**
+ * Specific error for resource conflicts.
+ * * Used for 409 Conflict scenarios (e.g. duplicate username).
+ * @extends AppError
+ */
+export class ConflictError extends AppError {
+  /**
+   * @param {string} message - Human readable conflict description.
+   */
+  constructor(message = 'Resource already exists') {
+    super(message, 409);
+  }
+}
