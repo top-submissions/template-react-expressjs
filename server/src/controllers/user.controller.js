@@ -1,35 +1,25 @@
-/**
- * Renders the primary user dashboard.
- * * Injects the current authenticated user data into the view.
- * * Access restricted via JWT authentication middleware.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void}
- */
-export const dashboardGet = (req, res) => {
-  // Render dashboard with user context
-  res.render('dashboard', { currentUser: req.user });
-};
+import { InternalServerError } from '../errors/ServerError.js';
+import { AuthenticationError } from '../errors/AppError.js';
 
 /**
- * Renders the account upgrade page.
- * * Provides information on gaining administrative privileges.
+ * Provides account details for the current user.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware.
  * @returns {void}
  */
-export const upgradeGet = (req, res) => {
-  res.render('upgrade-account');
-};
+export const profileGet = (req, res, next) => {
+  // Ensure user exists in request from auth middleware
+  if (!req.user) {
+    return next(new AuthenticationError('User session not found'));
+  }
 
-/**
- * Renders the user settings page.
- * * Allows users to view or modify their account details.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void}
- */
-export const settingsGet = (req, res) => {
-  // Fetch profile data from request user
-  res.render('settings', { user: req.user });
+  // Return user details as JSON
+  res.status(200).json({
+    user: {
+      id: req.user.id,
+      username: req.user.username,
+      role: req.user.role,
+    },
+  });
 };

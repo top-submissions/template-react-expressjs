@@ -1,3 +1,4 @@
+// server\src\routes\user.routes.js
 import { Router } from 'express';
 import * as userController from '../controllers/user.controller.js';
 import {
@@ -7,14 +8,10 @@ import {
 
 const userRouter = Router();
 
-// Enforce authentication for all sub-routes
+// Apply authentication safety net to all routes
 userRouter.use(isAuthenticated);
 
-// Standard user entry point
-userRouter.get('/dashboard', userController.dashboardGet);
-
-// Feature routes restricted to standard users
-userRouter.get('/upgrade-account', isNotAdmin, userController.upgradeGet);
-userRouter.get('/settings', isNotAdmin, userController.settingsGet);
+// Identity and Settings Endpoints
+userRouter.get('/profile', userController.profileGet);
 
 export default userRouter;
