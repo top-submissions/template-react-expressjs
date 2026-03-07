@@ -71,7 +71,7 @@ describe('User Integration Tests', () => {
 
       // --- Assert ---
       expect(response.status).toBe(401);
-      expect(response.body.message).toMatch(/session expired/i);
+      expect(response.body.message).toMatch(/User session not found/i);
     });
   });
 });
