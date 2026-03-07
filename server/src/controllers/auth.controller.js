@@ -5,6 +5,7 @@ import { validationResult } from 'express-validator';
 import * as authQueries from '../db/queries/auth/auth.queries.js';
 import { resolveJwtUser } from '../middleware/auth/auth.middleware.js';
 import { AuthenticationError, ValidationError } from '../errors/AppError.js';
+import { InternalServerError } from '../errors/ServerError.js';
 
 /**
  * Handles user registration via JSON API.
@@ -26,10 +27,18 @@ export const signupPost = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     // Save user to DB
-    await authQueries.registerUser({
-      username: req.body.username,
-      password: hashedPassword,
-    });
+    try {
+      await authQueries.registerUser({
+        username: req.body.username,
+        password: hashedPassword,
+      });
+    } catch (dbError) {
+      return next(
+        new InternalServerError(
+          'Failed to persist user to database during signup'
+        )
+      );
+    }
 
     // Return success status for React to handle navigation
     res.status(201).json({ message: 'User registered successfully' });
@@ -61,7 +70,12 @@ export const loginPost = (req, res, next) => {
     { session: false },
     async (err, user, info) => {
       // Handle server or database errors
-      if (err) return next(err);
+      if (err)
+        return next(
+          new InternalServerError(
+            'Authentication service encountered a database error'
+          )
+        );
 
       // Handle invalid credentials
       if (!user) {
