@@ -1,3 +1,4 @@
+// server\src\tests\integration\admin.test.js
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
@@ -19,10 +20,10 @@ vi.mock('../../middleware/auth/auth.middleware.js', () => ({
 }));
 
 /**
- * Integration Tests for Admin Routes.
- * - Validates the flow from Router to Controller to Query Mock.
- * - Ensures correct view rendering and redirection logic.
- * - Tests HTTP status codes and parameter handling.
+ * Integration tests for Administrative API endpoints.
+ * - Validates JSON response structures.
+ * - Verifies custom error class propagation (404, 500, etc.).
+ * - Ensures correct interaction between controllers and query mocks.
  */
 describe('Admin Integration Tests', () => {
   let app;
@@ -30,26 +31,24 @@ describe('Admin Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Initialize express app with router under test
+    // Initialize express app for testing
     app = express();
-
-    // Enable JSON parsing for incoming test payloads
     app.use(express.json());
 
-    // Intercept render calls to return JSON and avoid missing template errors
-    app.use((req, res, next) => {
-      res.render = vi.fn((view, locals) =>
-        res.status(200).json({ view, locals })
-      );
-      next();
-    });
-
-    // Mount the router
+    // Mount the admin router
     app.use('/admin', adminRouter);
+
+    // Global error handler mock to catch custom Error classes
+    app.use((err, req, res, next) => {
+      res.status(err.statusCode || 500).json({
+        message: err.message,
+        status: err.status,
+      });
+    });
   });
 
   describe('GET /admin/users', () => {
-    it('should fetch users and render the management view', async () => {
+    it('should fetch users and return a JSON list', async () => {
       // --- Arrange ---
       const mockUsers = [
         { id: 1, username: 'test1', role: 'USER' },
@@ -61,21 +60,32 @@ describe('Admin Integration Tests', () => {
       const response = await request(app).get('/admin/users');
 
       // --- Assert ---
-      // Check for success and that the returned JSON contains our mock data
       expect(response.status).toBe(200);
-      expect(response.body.locals.users).toEqual(mockUsers);
+      expect(response.body.users).toEqual(mockUsers);
       expect(adminQueries.getAllUsersForManagement).toHaveBeenCalled();
+    });
+
+    it('should return 500 when database retrieval fails', async () => {
+      // --- Arrange ---
+      adminQueries.getAllUsersForManagement.mockRejectedValue(
+        new Error('Connection failure')
+      );
+
+      // --- Act ---
+      const response = await request(app).get('/admin/users');
+
+      // --- Assert ---
+      expect(response.status).toBe(500);
+      expect(response.body.message).toMatch(/failed to retrieve/i);
     });
   });
 
   describe('POST /admin/users/:id/promote', () => {
-    it('should promote user and redirect to users list', async () => {
+    it('should return 200 and updated user on successful promotion', async () => {
       // --- Arrange ---
       const targetUserId = 5;
-      adminQueries.promoteUserToAdmin.mockResolvedValue({
-        id: targetUserId,
-        admin: true,
-      });
+      const updatedUser = { id: targetUserId, role: 'ADMIN' };
+      adminQueries.promoteUserToAdmin.mockResolvedValue(updatedUser);
 
       // --- Act ---
       const response = await request(app).post(
@@ -83,29 +93,50 @@ describe('Admin Integration Tests', () => {
       );
 
       // --- Assert ---
-      // Check for 302 redirect status
-      expect(response.status).toBe(302);
-      expect(response.header.location).toBe('/admin/users');
-
-      // Ensure the query received the parsed integer ID
+      expect(response.status).toBe(200);
+      expect(response.body.message).toMatch(/promoted successfully/i);
+      expect(response.body.user).toEqual(updatedUser);
       expect(adminQueries.promoteUserToAdmin).toHaveBeenCalledWith(
         targetUserId
       );
     });
 
-    it('should propagate errors to the next middleware', async () => {
+    it('should return 404 error if user does not exist', async () => {
       // --- Arrange ---
-      adminQueries.promoteUserToAdmin.mockRejectedValue(new Error('DB Error'));
+      adminQueries.promoteUserToAdmin.mockResolvedValue(null);
 
-      // Add a dummy error handler to catch the next(error) call
-      app.use((err, req, res, next) => res.status(500).send(err.message));
+      // --- Act ---
+      const response = await request(app).post('/admin/users/999/promote');
+
+      // --- Assert ---
+      expect(response.status).toBe(404);
+      expect(response.body.message).toMatch(/not found/i);
+    });
+
+    it('should return 400 error if ID is not a number', async () => {
+      // --- Arrange ---
+      // No specific arrangement needed for invalid params
+
+      // --- Act ---
+      const response = await request(app).post('/admin/users/abc/promote');
+
+      // --- Assert ---
+      expect(response.status).toBe(400);
+      expect(response.body.message).toMatch(/invalid user id/i);
+    });
+
+    it('should return 500 error if promote operation crashes', async () => {
+      // --- Arrange ---
+      adminQueries.promoteUserToAdmin.mockRejectedValue(
+        new Error('Unexpected Crash')
+      );
 
       // --- Act ---
       const response = await request(app).post('/admin/users/1/promote');
 
       // --- Assert ---
       expect(response.status).toBe(500);
-      expect(response.text).toBe('DB Error');
+      expect(response.body.message).toMatch(/error occurred while promoting/i);
     });
   });
 });

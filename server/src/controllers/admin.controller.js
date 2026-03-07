@@ -1,6 +1,6 @@
 import * as adminQueries from '../db/queries/admin/admin.queries.js';
 import { InternalServerError } from '../errors/ServerError.js';
-import { NotFoundError } from '../errors/AppError.js';
+import { NotFoundError, ValidationError } from '../errors/AppError.js';
 
 /**
  * Fetches all users for administrative management.
@@ -34,6 +34,10 @@ export const usersGet = async (req, res, next) => {
 export const promotePost = async (req, res, next) => {
   try {
     const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      return next(new ValidationError('Invalid user ID format'));
+    }
 
     // Perform the update in the database */
     const updatedUser = await adminQueries.promoteUserToAdmin(userId);
