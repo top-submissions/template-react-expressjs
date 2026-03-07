@@ -7,9 +7,6 @@ const adminRouter = Router();
 // Secure all sub-routes with administrator check
 adminRouter.use(isAdmin);
 
-// Dashboard route
-adminRouter.get('/dashboard', adminController.dashboardGet);
-
 // User management routes
 adminRouter.get('/users', adminController.usersGet);
 adminRouter.post('/users/:id/promote', adminController.promotePost);

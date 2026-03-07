@@ -1,58 +1,54 @@
 import * as adminQueries from '../db/queries/admin/admin.queries.js';
+import { InternalServerError } from '../errors/ServerError.js';
+import { NotFoundError } from '../errors/AppError.js';
 
 /**
- * Renders the primary administrator dashboard.
- * * Passes the current authenticated user object to the view.
- * * Used for high-level admin overviews.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void}
- */
-export const dashboardGet = (req, res) => {
-  res.render('admin/dashboard', { user: req.user });
-};
-
-/**
- * Fetches the user list and renders the management page.
- * * Queries the database for all registered users.
- * * Handles asynchronous data retrieval and error propagation.
+ * Fetches all users for administrative management.
+ * * Returns users as a JSON array.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
- * @returns {Promise<void>}
  */
 export const usersGet = async (req, res, next) => {
   try {
-    // Get users from database
+    // Attempt to retrieve user management list from DB
     const users = await adminQueries.getAllUsersForManagement();
 
-    // Render user management list
-    res.render('admin/users', { users });
+    // Return JSON payload for frontend state management
+    res.status(200).json({ users });
   } catch (error) {
-    next(error);
+    // Wrap unexpected DB failures in InternalServerError (500)
+    next(
+      new InternalServerError('Failed to retrieve user list for management')
+    );
   }
 };
 
 /**
  * Promotes a specific user to administrator status.
- * * Extracts user ID from route parameters.
- * * Updates the user's role and redirects back to the management list.
- * @param {Object} req - Express request object with ID parameter.
+ * * Updates user role and returns the updated user object.
+ * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
- * @returns {Promise<void>}
  */
 export const promotePost = async (req, res, next) => {
   try {
-    // Convert string ID to number
     const userId = parseInt(req.params.id);
 
-    // Update user role in DB
-    await adminQueries.promoteUserToAdmin(userId);
+    // Perform the update in the database */
+    const updatedUser = await adminQueries.promoteUserToAdmin(userId);
 
-    // Refresh the user list
-    res.redirect('/admin/users');
+    // If the query returns nothing, the ID was likely invalid */
+    if (!updatedUser) {
+      return next(new NotFoundError(`User with ID ${userId}`));
+    }
+
+    // Return success status and updated data instead of redirecting */
+    res.status(200).json({
+      message: 'User promoted successfully',
+      user: updatedUser,
+    });
   } catch (error) {
-    next(error);
+    next(new InternalServerError('An error occurred while promoting the user'));
   }
 };
