@@ -1,14 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useRouteError } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ServerError from './ServerError';
+import InternalServerError from './InternalServerError';
 
 // Mock react-router to simulate a component crash
 vi.mock('react-router', () => ({
   useRouteError: vi.fn(),
 }));
 
-describe('ServerError Component', () => {
+describe('InternalServerError Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -17,7 +17,7 @@ describe('ServerError Component', () => {
     // --- Arrange ---
     useRouteError.mockReturnValue(new Error('Critical System Failure'));
 
-    render(<ServerError />);
+    render(<InternalServerError />);
 
     // --- Act ---
     const code = screen.getByText('500');
@@ -35,7 +35,7 @@ describe('ServerError Component', () => {
     const assignMock = vi.fn();
     vi.stubGlobal('location', { assign: assignMock });
 
-    render(<ServerError />);
+    render(<InternalServerError />);
 
     // --- Act ---
     const refreshBtn = screen.getByRole('button', { name: /try refreshing/i });

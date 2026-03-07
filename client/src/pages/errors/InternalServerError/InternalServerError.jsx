@@ -7,7 +7,7 @@ import styles from './ServerError.module.css';
  * * Prevents application "white screens" by providing a fallback UI.
  * @returns {JSX.Element}
  */
-const ServerError = () => {
+const InternalServerError = () => {
   const error = useRouteError();
 
   // Log error for developers in non-production environments
@@ -35,4 +35,4 @@ const ServerError = () => {
   );
 };
 
-export default ServerError;
+export default InternalServerError;
