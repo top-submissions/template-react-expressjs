@@ -1,5 +1,5 @@
 import { useRouteError } from 'react-router';
-import styles from './ServerError.module.css';
+import styles from './InternalServerError.module.css';
 
 /**
  * Global Error Boundary page for the application.
