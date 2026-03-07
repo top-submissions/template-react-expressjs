@@ -1,0 +1,28 @@
+/* Component container with semantic error background */
+.container {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--error-border);
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  font-size: 0.9rem;
+}
+
+/* Bold summary text for high-level error context */
+.summary {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* List styling for multiple validation failures */
+.errorList {
+  list-style: disc;
+  margin-left: 1.5rem;
+}
+
+/* Individual list items for specific field errors */
+.errorItem {
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
