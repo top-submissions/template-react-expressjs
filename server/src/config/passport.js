@@ -19,7 +19,7 @@ passport.use(
     try {
       // Find user in database
       const user = await userQueries.getUserByUsername(username);
-      if (!user) return done(null, false, { message: 'Incorrect username' });
+      if (!user) return done(null, false, { message: 'User does not exist' });
 
       // Check if password is valid
       const match = await bcrypt.compare(password, user.password);
@@ -29,7 +29,7 @@ passport.use(
     } catch (err) {
       return done(err);
     }
-  }),
+  })
 );
 
 /**
@@ -70,6 +70,6 @@ passport.use(
       } catch (err) {
         return done(err);
       }
-    },
-  ),
+    }
+  )
 );
