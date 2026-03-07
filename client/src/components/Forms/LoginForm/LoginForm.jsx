@@ -1,25 +1,26 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { loginSchema } from '../../../modules/validators/auth/auth.validator.js';
+import ValidationError from '../../errors/ValidationError/ValidationError';
 import styles from './LoginForm.module.css';
 
 /**
  * Login form component for user authentication.
- * * Manages local form state for credentials.
- * * Validates inputs against Zod loginSchema.
- * * Handles API submission and navigation on success.
- * @returns {JSX.Element} The rendered login form.
+ * - Manages credentials state.
+ * - Handles client and server validation via ValidationError component.
+ * @returns {JSX.Element}
  */
 const LoginForm = () => {
-  // Define form state
+  // Define form state and structured error state
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+  const [errorData, setErrorData] = useState({ message: '', errors: [] });
   const navigate = useNavigate();
 
-  // Handle text input changes
+  // Update data and reset errors on interaction
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errorData.message) setErrorData({ message: '', errors: [] });
   };
 
   /**
@@ -31,12 +32,15 @@ const LoginForm = () => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setErrorData({ message: '', errors: [] });
 
     // Perform client-side validation
     const validation = loginSchema.safeParse(formData);
     if (!validation.success) {
-      setError(validation.error.issues[0].message);
+      setErrorData({
+        message: 'Invalid credentials format',
+        errors: validation.error.issues.map((i) => ({ msg: i.message })),
+      });
       return;
     }
 
@@ -51,22 +55,28 @@ const LoginForm = () => {
         body: JSON.stringify(formData),
       });
 
-      // Navigate to home on success or display server error
+      const data = await response.json();
+
+      // Navigate home on 200 OK or show specific errors
       if (response.ok) {
         navigate('/');
       } else {
-        const data = await response.json();
-        setError(data.message || 'Login failed');
+        setErrorData({
+          message: data.message || 'Login failed',
+          errors: data.errors || [],
+        });
       }
     } catch (err) {
-      setError(`An error occurred: ${err.message}`);
+      setErrorData({ message: `Connection error: ${err.message}`, errors: [] });
     }
   };
 
   return (
     <div className={styles.formContainer}>
       <h2>Log In</h2>
-      {error && <p className={styles.errorMessage}>{error}</p>}
+
+      {/* Structured error display for both general and field-specific issues */}
+      <ValidationError message={errorData.message} errors={errorData.errors} />
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <div className={styles.inputGroup}>

@@ -1,29 +1,31 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { signupSchema } from '../../../modules/validators/auth/auth.validator.js';
+import ValidationError from '../../errors/ValidationError/ValidationError';
 import styles from './SignupForm.module.css';
 
 /**
  * Signup form component for user registration.
- * * Manages local form state for username, password, and confirmation.
- * * Uses Zod schema for client-side validation logic.
- * * Handles submission to the backend API.
- * @returns {JSX.Element} The rendered signup form.
+ * - Manages local form state for username, password, and confirmation.
+ * - Uses Zod schema for client-side validation logic.
+ * - Integrates ValidationError component for detailed feedback.
+ * @returns {JSX.Element}
  */
 const SignupForm = () => {
-  // Initialize form state
+  // Initialize form state and error object structure
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState('');
+  const [errorData, setErrorData] = useState({ message: '', errors: [] });
   const navigate = useNavigate();
 
-  // Track input changes
+  // Track input changes and clear errors on type
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errorData.message) setErrorData({ message: '', errors: [] });
   };
 
   /**
@@ -32,14 +34,19 @@ const SignupForm = () => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setErrorData({ message: '', errors: [] });
 
     // Validate form data against Zod schema
     const validation = signupSchema.safeParse(formData);
 
-    // If validation fails, set the first error message and stop
+    // Set client-side validation error if schema check fails
     if (!validation.success) {
-      setError(validation.error.issues[0].message);
+      setErrorData({
+        message: 'Validation failed',
+        errors: validation.error.issues.map((issue) => ({
+          msg: issue.message,
+        })),
+      });
       return;
     }
 
@@ -50,28 +57,34 @@ const SignupForm = () => {
       const response = await fetch(`${baseUrl}/api/auth/sign-up`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-        }),
+        body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+
+      // Navigate to login on success or populate error state from server response
       if (response.ok) {
         navigate('/log-in');
       } else {
-        const data = await response.json();
-        setError(data.message || 'Signup failed');
+        setErrorData({
+          message: data.message || 'Signup failed',
+          errors: data.errors || [],
+        });
       }
     } catch (err) {
-      setError(`An error occurred: ${err.message}`);
+      setErrorData({
+        message: `An error occurred: ${err.message}`,
+        errors: [],
+      });
     }
   };
 
   return (
     <div className={styles.formContainer}>
       <h2>Sign Up</h2>
-      {error && <p className={styles.errorMessage}>{error}</p>}
+
+      {/* Component for displaying rich validation feedback */}
+      <ValidationError message={errorData.message} errors={errorData.errors} />
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
         <div className={styles.inputGroup}>
