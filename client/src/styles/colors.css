@@ -14,6 +14,11 @@
   --btn-bg: #f9f9f9;
   --border-color: #d1d1d1;
 
+  /* Semantic status colors */
+  --error-bg: #fff5f5;
+  --error-text: #d32f2f;
+  --error-border: #ffcdd2;
+
   /* Typography settings */
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -36,5 +41,8 @@
     --btn-bg: #1a1a1a;
     --primary-hover: #535bf2;
     --border-color: transparent;
+    --error-bg: rgba(211, 47, 47, 0.1);
+    --error-text: #ff8a80;
+    --error-border: rgba(211, 47, 47, 0.5);
   }
 }
