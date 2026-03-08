@@ -1,26 +1,39 @@
 import { prisma } from '../../../lib/prisma.js';
 
 /**
- * Finds a single user by their username.
- * * Performs a unique lookup on the username field.
- * * Useful for credential verification during local login.
- * @param {string} username - The unique username to search for.
- * @returns {Promise<Object|null>} The user record if found, otherwise null.
+ * Finds a unique user record by its primary ID.
+ * @param {number} id - The unique identifier of the user.
+ * @returns {Promise<Object|null>} The user object if found, otherwise null.
+ */
+export const getUserById = async (id) => {
+  return await prisma.user.findUnique({ where: { id } });
+};
+
+/**
+ * Finds a single user by their unique username.
+ * @param {string} username - The username to search for.
+ * @returns {Promise<Object|null>} The user object if found, otherwise null.
  */
 export const getUserByUsername = async (username) => {
-  // Query database for a unique username match
-  return await prisma.user.findUnique({
-    where: { username },
-  });
+  return await prisma.user.findUnique({ where: { username } });
+};
+
+/**
+ * Finds a single user by their unique email address.
+ * @param {string} email - The email address to search for.
+ * @returns {Promise<Object|null>} The user object if found, otherwise null.
+ */
+export const getUserByEmail = async (email) => {
+  return await prisma.user.findUnique({ where: { email } });
 };
 
 /**
  * Creates a new user in the database.
- * * Persists a new user record using the provided data object.
+ * - Persists a new user record using the provided data object.
  * @param {Object} userData - Object containing account details.
  * @param {string} userData.username - The chosen username.
  * @param {string} userData.password - The hashed password.
- * @param {boolean} [userData.admin] - Optional administrative flag.
+ * @param {string} [userData.role] - Optional role assignment.
  * @returns {Promise<Object>} The newly created user record.
  */
 export const createUser = async (userData) => {
