@@ -1,0 +1,26 @@
+/* Container leveraging semantic color tokens from colors.css */
+.container {
+  display: flex;
+  gap: 0.4rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--error-border);
+  background-color: var(--error-bg);
+  color: var(--error-text);
+  font-size: 0.9rem;
+}
+
+/* Bold prefix label to draw attention to the status */
+.label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  flex-shrink: 0;
+}
+
+/* Main message body inheriting global line height */
+.message {
+  font-weight: 500;
+  margin: 0;
+}
