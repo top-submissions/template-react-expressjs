@@ -1,12 +1,11 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as authValidator from './auth.validator.js';
-import pool from '../../db/pool.js';
+import * as userQueries from '../../db/queries/user/user.queries.js';
 
-// Intercept DB pool to bypass real network calls
-vi.mock('../../db/pool.js', () => ({
-  default: {
-    query: vi.fn(),
-  },
+// Mock userQueries to bypass real database logic and isolation validator testing
+vi.mock('../../db/queries/user/user.queries.js', () => ({
+  getUserByUsername: vi.fn(),
+  getUserByEmail: vi.fn(),
 }));
 
 /**
@@ -47,9 +46,8 @@ describe('authValidator module', () => {
       const errors = await runValidation(authValidator.validateSignup, data);
 
       // --- Assert ---
-      // Confirm the regex pattern identified the invalid format
       expect(
-        errors.some((e) => e.msg.includes('letters, numbers, and underscores')),
+        errors.some((e) => e.msg.includes('letters, numbers, and underscores'))
       ).toBe(true);
     });
 
@@ -60,16 +58,21 @@ describe('authValidator module', () => {
         password: 'Password1',
         confirmPassword: 'Password1',
       };
-      // Simulate database finding a matching record
-      pool.query.mockResolvedValue({ rows: [{ id: 1 }] });
+      // Mock the query to return an existing user object
+      vi.mocked(userQueries.getUserByUsername).mockResolvedValue({
+        id: 1,
+        username: 'existingUser',
+      });
 
       // --- Act ---
       const errors = await runValidation(authValidator.validateSignup, data);
 
       // --- Assert ---
-      // Verify custom async validator caught the conflict
       expect(errors.some((e) => e.msg === 'Username already taken.')).toBe(
-        true,
+        true
+      );
+      expect(userQueries.getUserByUsername).toHaveBeenCalledWith(
+        'existingUser'
       );
     });
 
@@ -81,15 +84,14 @@ describe('authValidator module', () => {
         password: 'Password1',
         confirmPassword: 'Mismatch1',
       };
-      pool.query.mockResolvedValue({ rows: [] });
+      vi.mocked(userQueries.getUserByUsername).mockResolvedValue(null);
 
       // --- Act ---
       const errors = await runValidation(authValidator.validateSignup, data);
 
       // --- Assert ---
-      // Verify cross-field equality check failed
       expect(
-        errors.some((e) => e.msg.includes('confirmation does not match')),
+        errors.some((e) => e.msg.includes('confirmation does not match'))
       ).toBe(true);
     });
   });
@@ -122,19 +124,47 @@ describe('authValidator module', () => {
         confirmPassword: 'Password1',
         email: 'not-an-email',
       };
-      pool.query.mockResolvedValue({ rows: [] });
+      vi.mocked(userQueries.getUserByUsername).mockResolvedValue(null);
 
       // --- Act ---
       const errors = await runValidation(
         authValidator.validateSignupWithEmail,
-        data,
+        data
       );
 
       // --- Assert ---
-      // Verify the isEmail() validator caught the format error
       expect(
-        errors.some((e) => e.msg.includes('must be a valid email address')),
+        errors.some((e) => e.msg.includes('must be a valid email address'))
       ).toBe(true);
+    });
+
+    it('should fail if email is already registered', async () => {
+      // --- Arrange ---
+      const data = {
+        username: 'validUser',
+        password: 'Password1',
+        confirmPassword: 'Password1',
+        email: 'taken@example.com',
+      };
+      vi.mocked(userQueries.getUserByUsername).mockResolvedValue(null);
+      vi.mocked(userQueries.getUserByEmail).mockResolvedValue({
+        id: 1,
+        email: 'taken@example.com',
+      });
+
+      // --- Act ---
+      const errors = await runValidation(
+        authValidator.validateSignupWithEmail,
+        data
+      );
+
+      // --- Assert ---
+      expect(errors.some((e) => e.msg === 'Email already registered.')).toBe(
+        true
+      );
+      expect(userQueries.getUserByEmail).toHaveBeenCalledWith(
+        'taken@example.com'
+      );
     });
   });
 });

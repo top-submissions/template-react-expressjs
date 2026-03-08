@@ -19,6 +19,24 @@ describe('userQueries module', () => {
     vi.clearAllMocks();
   });
 
+  describe('getUserById()', () => {
+    it('should retrieve a user matching the provided ID', async () => {
+      // --- Arrange ---
+      const id = 1;
+      const mockUser = { id, username: 'testuser' };
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+
+      // --- Act ---
+      const result = await userQueries.getUserById(id);
+
+      // --- Assert ---
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+      expect(result).toEqual(mockUser);
+    });
+  });
+
   describe('getUserByUsername()', () => {
     it('should retrieve a user matching the provided username', async () => {
       // --- Arrange ---
@@ -31,9 +49,26 @@ describe('userQueries module', () => {
       const result = await userQueries.getUserByUsername(username);
 
       // --- Assert ---
-      // Verify: Prisma called with correct unique filter
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { username },
+      });
+      expect(result).toEqual(mockUser);
+    });
+  });
+
+  describe('getUserByEmail()', () => {
+    it('should retrieve a user matching the provided email', async () => {
+      // --- Arrange ---
+      const email = 'test@example.com';
+      const mockUser = { id: 1, email };
+      prisma.user.findUnique.mockResolvedValue(mockUser);
+
+      // --- Act ---
+      const result = await userQueries.getUserByEmail(email);
+
+      // --- Assert ---
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email },
       });
       expect(result).toEqual(mockUser);
     });
@@ -51,7 +86,6 @@ describe('userQueries module', () => {
       const result = await userQueries.createUser(userData);
 
       // --- Assert ---
-      // Verify: Prisma called with the raw data object
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: userData,
       });
@@ -73,7 +107,6 @@ describe('userQueries module', () => {
       const result = await userQueries.getAllUsers();
 
       // --- Assert ---
-      // Verify: Correct ordering parameter used in query
       expect(prisma.user.findMany).toHaveBeenCalledWith({
         orderBy: { id: 'asc' },
       });
