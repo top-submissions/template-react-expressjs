@@ -2,7 +2,7 @@ import styles from './AuthenticationError.module.css';
 
 /**
  * Inline component for displaying authentication failure feedback.
- * - Handles 401 and 403 responses from the backend.
+ * - Handles 401 from the backend.
  * - Displays a text-based "Error:" prefix
  * @param {Object} props
  * @param {string} props.message - The specific error string from the server.
