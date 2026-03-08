@@ -14,7 +14,7 @@ const ValidationError = ({ message, errors = [] }) => {
   if (!message) return null;
 
   return (
-    <div className={styles.container} role="alert">
+    <div className={styles.container} role="alert" aria-live="assertive">
       <p className={styles.summary}>{message}</p>
 
       {/* Map through specific field errors if provided by the server */}
