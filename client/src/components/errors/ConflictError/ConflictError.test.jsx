@@ -30,6 +30,6 @@ describe('ConflictError', () => {
     render(<ConflictError message="Email already registered." />);
 
     // --- Assert ---
-    expect(screen.getByText('Conflict')).toBeInTheDocument();
+    expect(screen.getByText('Error:')).toBeInTheDocument();
   });
 });
