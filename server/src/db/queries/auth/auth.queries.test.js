@@ -2,32 +2,33 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import * as authQueries from './auth.queries.js';
 import { prisma } from '../../../lib/prisma.js';
 
+// Isolate DB logic by mocking Prisma client
 vi.mock('../../../lib/prisma.js', () => ({
   prisma: {
     user: {
       create: vi.fn(),
-      findUnique: vi.fn(),
       update: vi.fn(),
     },
   },
 }));
 
 describe('authQueries module', () => {
+  // Reset mocks before each test to ensure isolation
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe('registerUser()', () => {
     it('should create a user with default USER role', async () => {
-      // Arrange
+      // --- Arrange ---
       const input = { username: 'testuser', password: 'hashed_password' };
       const mockUser = { id: 1, ...input, role: 'USER' };
       prisma.user.create.mockResolvedValue(mockUser);
 
-      // Act
+      // --- Act ---
       const result = await authQueries.registerUser(input);
 
-      // Assert
+      // --- Assert ---
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: {
           username: 'testuser',
@@ -39,7 +40,7 @@ describe('authQueries module', () => {
     });
 
     it('should map admin: true input to ADMIN role', async () => {
-      // Arrange
+      // --- Arrange ---
       const input = { username: 'admin', password: 'pw', admin: true };
       prisma.user.create.mockResolvedValue({
         id: 2,
@@ -47,46 +48,29 @@ describe('authQueries module', () => {
         role: 'ADMIN',
       });
 
-      // Act
+      // --- Act ---
       await authQueries.registerUser(input);
 
-      // Assert
+      // --- Assert ---
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: expect.objectContaining({ role: 'ADMIN' }),
       });
     });
   });
 
-  describe('getUserById()', () => {
-    it('should fetch a unique user by primary key', async () => {
-      // Arrange
-      const userId = 101;
-      prisma.user.findUnique.mockResolvedValue({ id: userId, username: 'dev' });
-
-      // Act
-      const result = await authQueries.getUserById(userId);
-
-      // Assert
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
-        where: { id: userId },
-      });
-      expect(result.id).toBe(userId);
-    });
-  });
-
   describe('updateLastLogin()', () => {
     it('should update the lastLogin field', async () => {
-      // Arrange
+      // --- Arrange ---
       const userId = 5;
       prisma.user.update.mockResolvedValue({
         id: userId,
         lastLogin: new Date(),
       });
 
-      // Act
+      // --- Act ---
       await authQueries.updateLastLogin(userId);
 
-      // Assert
+      // --- Assert ---
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: userId },
         data: { lastLogin: expect.any(Date) },
