@@ -24,12 +24,12 @@ describe('AuthenticationError', () => {
     expect(screen.getByText(message)).toBeInTheDocument();
   });
 
-  it('renders the lock icon alongside the message', () => {
+  it('renders the error label alongside the message', () => {
     // --- Arrange ---
     // Confirm visual context icon is present for auth-specific errors
     render(<AuthenticationError message="Session expired" />);
 
     // --- Assert ---
-    expect(screen.getByText('🔒')).toBeInTheDocument();
+    expect(screen.getByText('Error:')).toBeInTheDocument();
   });
 });
