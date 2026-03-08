@@ -4,7 +4,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import authRouter from '../../routes/auth.routes.js';
-import * as authQueries from '../../db/queries/auth/auth.queries.js';
+import * as userQueries from '../../db/queries/user/user.queries.js'; // Updated import
 import pool from '../../db/pool.js';
 
 // Define environment for JWT generation
@@ -15,10 +15,12 @@ vi.mock('../../db/pool.js', () => ({
   default: { query: vi.fn() },
 }));
 
-// Mock query layer logic
-vi.mock('../../db/queries/auth/auth.queries.js', () => ({
-  registerUser: vi.fn(),
-  updateLastLogin: vi.fn(),
+// Mock normalized query layer
+vi.mock('../../db/queries/user/user.queries.js', () => ({
+  userEvent: {
+    create: vi.fn(),
+    updateLoginDate: vi.fn(),
+  },
 }));
 
 // Mock passport authentication middleware
@@ -38,7 +40,7 @@ describe('Auth Integration Tests', () => {
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
 
-    // Mock res.render to return JSON for inspection and prevent 500 errors
+    // Mock res.render
     app.use((req, res, next) => {
       res.render = vi.fn((view, locals) =>
         res.status(200).send({ view, locals })
@@ -58,8 +60,10 @@ describe('Auth Integration Tests', () => {
         password: 'Password123',
         confirmPassword: 'Password123',
       };
+
       pool.query.mockResolvedValue({ rows: [] });
-      authQueries.registerUser.mockResolvedValue({
+      // Using normalized userEvent.create
+      userQueries.userEvent.create.mockResolvedValue({
         id: 1,
         username: 'newuser',
       });
@@ -75,7 +79,7 @@ describe('Auth Integration Tests', () => {
   });
 
   describe('POST /log-in', () => {
-    it('should set an HttpOnly cookie and redirect admin to admin dashboard', async () => {
+    it('should set an HttpOnly cookie and redirect admin', async () => {
       // --- Arrange ---
       // Define admin credentials and mock profile
       const credentials = { username: 'admin', password: 'password' };
@@ -99,11 +103,7 @@ describe('Auth Integration Tests', () => {
   });
 
   describe('GET /log-out', () => {
-    it('should clear the token cookie and redirect to landing', async () => {
-      // --- Arrange ---
-      // No specific setup required for logout
-
-      // --- Act ---
+    it('should clear the token cookie and redirect', async () => {
       const response = await request(app).get('/log-out');
 
       // --- Assert ---
