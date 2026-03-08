@@ -4,9 +4,9 @@ import { defineConfig } from 'eslint/config';
 
 /**
  * ESLint configuration for the Node.js backend.
- * * Sets execution environment to Node.js (ECMA 2022).
- * * Includes Vitest/Jest globals for server-side testing.
- * * Configures rules for server-side logging and variable patterns.
+ * - Sets execution environment to Node.js (ECMA 2022).
+ * - Includes Vitest/Jest globals for server-side testing.
+ * - Configures rules for server-side logging and variable patterns.
  * @returns {Array} Flat configuration array for ESLint.
  */
 export default defineConfig([

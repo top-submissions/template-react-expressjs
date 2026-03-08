@@ -4,7 +4,7 @@ import { NotFoundError, ValidationError } from '../errors/AppError.js';
 
 /**
  * Fetches all users for administrative management.
- * * Returns users as a JSON array.
+ * - Returns users as a JSON array.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
@@ -26,7 +26,7 @@ export const usersGet = async (req, res, next) => {
 
 /**
  * Promotes a specific user to administrator status.
- * * Updates user role and returns the updated user object.
+ * - Updates user role and returns the updated user object.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.

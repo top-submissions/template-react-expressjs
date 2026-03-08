@@ -6,9 +6,9 @@ import bcrypt from 'bcryptjs';
 
 /**
  * Executes the database seeding routine.
- * * Purges existing user records to ensure a clean state.
- * * Hashes a default password for all seed accounts.
- * * Injects standard and administrative test accounts into the PostgreSQL database.
+ * - Purges existing user records to ensure a clean state.
+ * - Hashes a default password for all seed accounts.
+ * - Injects standard and administrative test accounts into the PostgreSQL database.
  * @async
  * @returns {Promise<void>}
  */

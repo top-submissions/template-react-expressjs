@@ -7,8 +7,8 @@ import {
 
 /**
  * Resolves the current user from the JWT, if present.
- * * Invokes the Passport JWT strategy in stateless mode.
- * * Executes a callback with the authenticated user or error.
+ * - Invokes the Passport JWT strategy in stateless mode.
+ * - Executes a callback with the authenticated user or error.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} callback - Execution hook receiving (err, user).
@@ -21,8 +21,8 @@ export const resolveJwtUser = (req, res, callback) => {
 
 /**
  * Route guard that allows only authenticated users.
- * * Verifies presence and validity of the JWT.
- * * Terminates request with 401 if authentication fails.
+ * - Verifies presence and validity of the JWT.
+ * - Terminates request with 401 if authentication fails.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
@@ -44,7 +44,7 @@ export const isAuthenticated = (req, res, next) => {
 
 /**
  * Route guard that allows only guest (unauthenticated) users.
- * * Prevents logged-in users from accessing login or signup pages.
+ * - Prevents logged-in users from accessing login or signup pages.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
@@ -60,7 +60,7 @@ export const isNotAuthenticated = (req, res, next) => {
 
 /**
  * Route guard that allows only authenticated administrators.
- * * Validates JWT and verifies the administrative flag in the database record.
+ * - Validates JWT and verifies the administrative flag in the database record.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
@@ -86,7 +86,7 @@ export const isAdmin = (req, res, next) => {
 
 /**
  * Prevents administrators from accessing standard user-only routes.
- * * Redirects logged-in admins to the admin dashboard.
+ * - Redirects logged-in admins to the admin dashboard.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.

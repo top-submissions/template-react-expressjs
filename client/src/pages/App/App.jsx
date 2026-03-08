@@ -4,8 +4,8 @@ import '../../styles/index.css';
 
 /**
  * Main Application Layout.
- * * Acts as the root wrapper for all routed pages.
- * * Uses Outlet to render child components (like LandingPage).
+ * - Acts as the root wrapper for all routed pages.
+ * - Uses Outlet to render child components (like LandingPage).
  * @returns {JSX.Element} The base application layout.
  */
 function App() {

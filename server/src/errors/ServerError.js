@@ -2,7 +2,7 @@ import { AppError } from './AppError.js';
 
 /**
  * Generic internal server error (500).
- * * Used in controllers to wrap uncaught exceptions or DB failures.
+ * - Used in controllers to wrap uncaught exceptions or DB failures.
  * @extends AppError
  */
 export class InternalServerError extends AppError {
@@ -16,7 +16,7 @@ export class InternalServerError extends AppError {
 
 /**
  * Specific error for external API failures (Google Auth, 2FA).
- * * Useful for the Capstone's external integrations.
+ * - Useful for the Capstone's external integrations.
  * @extends AppError
  */
 export class ExternalServiceError extends AppError {

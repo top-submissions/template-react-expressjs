@@ -1,7 +1,7 @@
 /**
  * Global Design Tokens.
- * * Defaults to Light Theme.
- * * Automatically switches based on user system preference.
+ * - Defaults to Light Theme.
+ * - Automatically switches based on user system preference.
  */
 :root {
   /* Brand colors */

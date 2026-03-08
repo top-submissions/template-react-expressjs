@@ -25,9 +25,9 @@ const LoginForm = () => {
 
   /**
    * Processes the login submission.
-   * * Validates schema.
-   * * Posts to /api/auth/log-in.
-   * * Redirects to home on 200 OK.
+   * - Validates schema.
+   * - Posts to /api/auth/log-in.
+   * - Redirects to home on 200 OK.
    * @param {React.FormEvent} e - The form event.
    */
   const handleSubmit = async (e) => {

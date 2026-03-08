@@ -3,8 +3,8 @@ import styles from './NotFoundError.module.css';
 
 /**
  * Fallback page for 404 Not Found scenarios.
- * * Automatically triggered by React Router's errorElement.
- * * Extracts error details from the routing context.
+ * - Automatically triggered by React Router's errorElement.
+ * - Extracts error details from the routing context.
  * @returns {JSX.Element}
  */
 const NotFoundError = () => {

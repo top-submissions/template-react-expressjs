@@ -6,9 +6,9 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 
 /**
  * ESLint configuration for the React client.
- * * Configures browser-based globals and ECMA 2020.
- * * Integrates React Hooks and Refresh plugins for Vite.
- * * Sets custom rules for unused variables and JSX support.
+ * - Configures browser-based globals and ECMA 2020.
+ * - Integrates React Hooks and Refresh plugins for Vite.
+ * - Sets custom rules for unused variables and JSX support.
  * @returns {Array} Flat configuration array for ESLint.
  */
 export default defineConfig([

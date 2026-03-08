@@ -1,7 +1,7 @@
 /**
  * Configuration for Cross-Origin Resource Sharing.
- * * Pulls allowed origins from environment variables.
- * * Configured to support credentialed requests (cookies/headers).
+ * - Pulls allowed origins from environment variables.
+ * - Configured to support credentialed requests (cookies/headers).
  * @type {import('cors').CorsOptions}
  */
 const corsOptions = {

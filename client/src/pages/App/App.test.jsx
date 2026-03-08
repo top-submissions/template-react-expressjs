@@ -5,8 +5,8 @@ import App from './App';
 
 /**
  * Unit tests for the App root layout.
- * * Ensures the component renders without crashing.
- * * Validates that the application shell exists.
+ * - Ensures the component renders without crashing.
+ * - Validates that the application shell exists.
  */
 describe('App Component', () => {
   it('renders the application shell', () => {

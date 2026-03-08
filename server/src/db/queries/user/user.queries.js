@@ -45,8 +45,8 @@ export const createUser = async (userData) => {
 
 /**
  * Retrieves all users from the database.
- * * Fetches the complete list of registered users.
- * * Results are sorted by ID in ascending order.
+ * - Fetches the complete list of registered users.
+ * - Results are sorted by ID in ascending order.
  * @returns {Promise<Array>} A list of all user objects.
  */
 export const getAllUsers = async () => {

@@ -5,9 +5,9 @@ const AuthContext = createContext(null);
 
 /**
  * Provider component for authentication state and actions.
- * * Manages the 'user' object and 'loading' status.
- * * Provides login, logout, and signup wrappers.
- * * Syncs auth state with the backend on mount.
+ * - Manages the 'user' object and 'loading' status.
+ * - Provides login, logout, and signup wrappers.
+ * - Syncs auth state with the backend on mount.
  * @param {Object} props - Component props.
  * @param {React.ReactNode} props.children - Child components to wrap.
  * @returns {JSX.Element} The provider wrapper.

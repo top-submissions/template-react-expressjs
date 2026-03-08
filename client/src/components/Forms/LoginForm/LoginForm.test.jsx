@@ -7,8 +7,8 @@ import LoginForm from './LoginForm';
 
 /**
  * Integration tests for LoginForm.
- * * Verifies input state synchronization via userEvent.
- * * Validates form submission error rendering.
+ * - Verifies input state synchronization via userEvent.
+ * - Validates form submission error rendering.
  */
 describe('LoginForm', () => {
   it('updates input values on change', async () => {

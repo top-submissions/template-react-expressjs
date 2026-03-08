@@ -1,7 +1,7 @@
 /**
  * Base class for all operational errors.
- * * Captures stack traces automatically.
- * * Supports custom HTTP status codes.
+ * - Captures stack traces automatically.
+ * - Supports custom HTTP status codes.
  * @extends Error
  */
 export class AppError extends Error {
@@ -42,7 +42,7 @@ export class NotFoundError extends AppError {
 
 /**
  * Specific error for input validation failures.
- * * Holds an array of specific field errors (e.g. from express-validator).
+ * - Holds an array of specific field errors (e.g. from express-validator).
  * @extends AppError
  */
 export class ValidationError extends AppError {
@@ -58,7 +58,7 @@ export class ValidationError extends AppError {
 
 /**
  * Specific error for insufficient permissions or roles.
- * * Used for 403 Forbidden scenarios.
+ * - Used for 403 Forbidden scenarios.
  * @extends AppError
  */
 export class ForbiddenError extends AppError {
@@ -72,7 +72,7 @@ export class ForbiddenError extends AppError {
 
 /**
  * Specific error for resource conflicts.
- * * Used for 409 Conflict scenarios (e.g. duplicate username).
+ * - Used for 409 Conflict scenarios (e.g. duplicate username).
  * @extends AppError
  */
 export class ConflictError extends AppError {

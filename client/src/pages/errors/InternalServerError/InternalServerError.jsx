@@ -3,8 +3,8 @@ import styles from './InternalServerError.module.css';
 
 /**
  * Global Error Boundary page for the application.
- * * Catches uncaught JavaScript exceptions and 500 server responses.
- * * Prevents application "white screens" by providing a fallback UI.
+ * - Catches uncaught JavaScript exceptions and 500 server responses.
+ * - Prevents application "white screens" by providing a fallback UI.
  * @returns {JSX.Element}
  */
 const InternalServerError = () => {

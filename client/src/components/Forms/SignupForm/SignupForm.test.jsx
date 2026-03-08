@@ -7,9 +7,9 @@ import SignupForm from './SignupForm';
 
 /**
  * Integration tests for SignupForm.
- * * Verifies input capture using userEvent for realistic simulation.
- * * Validates password mismatch handling and Zod integration.
- * * Ensures submission triggers fetch.
+ * - Verifies input capture using userEvent for realistic simulation.
+ * - Validates password mismatch handling and Zod integration.
+ * - Ensures submission triggers fetch.
  */
 describe('SignupForm', () => {
   it('displays error if passwords do not match', async () => {

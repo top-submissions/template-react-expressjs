@@ -3,7 +3,7 @@ import { signupSchema } from './auth.validator';
 
 /**
  * Unit tests for client-side auth validation schemas.
- * * Validates that Zod correctly identifies malformed input.
+ * - Validates that Zod correctly identifies malformed input.
  */
 describe('Auth Client Validators', () => {
   it('should invalidate a username with special characters', () => {

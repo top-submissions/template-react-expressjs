@@ -3,8 +3,8 @@ const { Pool } = pkg;
 
 /**
  * PostgreSQL Connection Pool.
- * * Manages reusable database connections.
- * * Dynamically switches between Main and Test databases based on environment.
+ * - Manages reusable database connections.
+ * - Dynamically switches between Main and Test databases based on environment.
  * @type {Pool}
  */
 const pool = new Pool({

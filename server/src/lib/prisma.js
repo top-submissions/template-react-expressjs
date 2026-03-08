@@ -5,8 +5,8 @@ import pool from '../db/pool.js';
 
 /**
  * Shared PrismaClient instance.
- * * Utilizes the @prisma/adapter-pg to connect via an existing pg pool.
- * * Maintains connection efficiency by reusing the node-postgres pool.
+ * - Utilizes the @prisma/adapter-pg to connect via an existing pg pool.
+ * - Maintains connection efficiency by reusing the node-postgres pool.
  * @type {PrismaClient}
  */
 

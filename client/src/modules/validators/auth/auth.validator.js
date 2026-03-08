@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 /**
  * Zod schema for User Signup.
- * * Mirrors server requirements for length and character types.
- * * Handles cross-field validation for password matching.
+ * - Mirrors server requirements for length and character types.
+ * - Handles cross-field validation for password matching.
  * @type {z.ZodType}
  */
 export const signupSchema = z
