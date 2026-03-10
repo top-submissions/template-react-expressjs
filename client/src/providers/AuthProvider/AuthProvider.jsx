@@ -1,39 +1,48 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 
-// Create context for auth data
 const AuthContext = createContext(null);
 
 /**
  * Provider component for authentication state and actions.
- * - Manages the 'user' object and 'loading' status.
- * - Provides login, logout, and signup wrappers.
+ * - Manages the 'user' object, 'loading' status, and global 'authError'.
  * - Syncs auth state with the backend on mount.
- * @param {Object} props - Component props.
- * @param {React.ReactNode} props.children - Child components to wrap.
- * @returns {JSX.Element} The provider wrapper.
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ * @returns {JSX.Element}
  */
 export const AuthProvider = ({ children }) => {
-  // Initialize state
+  // Initialize user and loading states
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Sync session with server on refresh
+  // Track global authentication errors (e.g., session timeouts)
+  const [authError, setAuthError] = useState(null);
+
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
   /**
    * Pings the server to verify if a valid session cookie exists.
+   * - Clears error on success.
+   * - Sets error message on 401/failure.
    */
   const checkAuthStatus = async () => {
     try {
       const response = await fetch('/api/auth/me');
+
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
+        setAuthError(null);
+      } else if (response.status === 401) {
+        // Handle explicit unauthorized status during sync
+        setUser(null);
+        setAuthError('Your session has expired. Please log in again.');
       }
     } catch (err) {
       setUser(null);
+      setAuthError('Unable to connect to authentication server.');
     } finally {
       setLoading(false);
     }
@@ -41,10 +50,11 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * Updates global state after successful login.
-   * @param {Object} userData - The user profile returned from the API.
+   * @param {Object} userData
    */
   const login = (userData) => {
     setUser(userData);
+    setAuthError(null);
   };
 
   /**
@@ -52,10 +62,27 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = () => {
     setUser(null);
+    setAuthError(null);
+  };
+
+  /**
+   * Manually clear the global auth error.
+   */
+  const clearAuthError = () => {
+    setAuthError(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        authError,
+        login,
+        logout,
+        clearAuthError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -63,7 +90,7 @@ export const AuthProvider = ({ children }) => {
 
 /**
  * Custom hook to access authentication context.
- * @returns {Object} { user, loading, login, logout }
+ * @returns {Object} { user, loading, authError, login, logout, clearAuthError }
  */
 export const useAuth = () => {
   const context = useContext(AuthContext);

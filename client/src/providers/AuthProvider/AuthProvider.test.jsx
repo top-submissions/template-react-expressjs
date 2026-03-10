@@ -5,68 +5,109 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthProvider';
 
 /**
- * Helper component to test hook consumption.
+ * Enhanced helper component to test error state consumption.
  */
 const TestComponent = () => {
-  const { user, login } = useAuth();
+  const { user, login, authError, clearAuthError } = useAuth();
   return (
     <div>
       <span data-testid="user-status">{user ? user.username : 'Guest'}</span>
+      <span data-testid="auth-error">{authError || 'No Error'}</span>
       <button onClick={() => login({ username: 'tester' })}>Mock Login</button>
+      <button onClick={clearAuthError}>Clear Error</button>
     </div>
   );
 };
 
 describe('AuthProvider', () => {
-  // Mock global fetch
   beforeEach(() => {
     global.fetch = vi.fn();
+    vi.clearAllMocks();
   });
 
   it('provides guest status by default and updates on login', async () => {
     // --- Arrange ---
-    // Mock failing auth check to start as Guest
     fetch.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
 
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>,
+      </AuthProvider>
     );
 
     // --- Act ---
-    // Check initial state then trigger mock login
-    const status = screen.getByTestId('user-status');
     const loginBtn = screen.getByText('Mock Login');
     await user.click(loginBtn);
 
     // --- Assert ---
-    // Ensure state transition occurred
-    expect(status).toHaveTextContent('tester');
+    expect(screen.getByTestId('user-status')).toHaveTextContent('tester');
+    expect(screen.getByTestId('auth-error')).toHaveTextContent('No Error');
   });
 
-  it('hydrates user state if checkAuthStatus succeeds', async () => {
+  it('sets an error message when a 401 unauthorized response occurs', async () => {
     // --- Arrange ---
-    // Mock successful session check
     fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ user: { username: 'persistent_user' } }),
+      ok: false,
+      status: 401,
     });
 
     // --- Act ---
     render(
       <AuthProvider>
         <TestComponent />
-      </AuthProvider>,
+      </AuthProvider>
     );
 
     // --- Assert ---
-    // Wait for the useEffect to finish hydration
     await waitFor(() => {
-      expect(screen.getByTestId('user-status')).toHaveTextContent(
-        'persistent_user',
+      expect(screen.getByTestId('auth-error')).toHaveTextContent(
+        /session has expired/i
+      );
+      expect(screen.getByTestId('user-status')).toHaveTextContent('Guest');
+    });
+  });
+
+  it('sets a connection error message when the fetch fails', async () => {
+    // --- Arrange ---
+    fetch.mockRejectedValueOnce(new Error('Network Down'));
+
+    // --- Act ---
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    // --- Assert ---
+    await waitFor(() => {
+      expect(screen.getByTestId('auth-error')).toHaveTextContent(
+        /unable to connect/i
       );
     });
+  });
+
+  it('clears the error message when clearAuthError is called', async () => {
+    // --- Arrange ---
+    fetch.mockResolvedValueOnce({ ok: false, status: 401 });
+    const user = userEvent.setup();
+
+    render(
+      <AuthProvider>
+        <TestComponent />
+      </AuthProvider>
+    );
+
+    // Wait for error to appear
+    await waitFor(() =>
+      expect(screen.getByTestId('auth-error')).not.toHaveTextContent('No Error')
+    );
+
+    // --- Act ---
+    const clearBtn = screen.getByText('Clear Error');
+    await user.click(clearBtn);
+
+    // --- Assert ---
+    expect(screen.getByTestId('auth-error')).toHaveTextContent('No Error');
   });
 });
