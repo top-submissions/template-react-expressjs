@@ -12,5 +12,6 @@ userRouter.use(isAuthenticated);
 
 // Identity and Settings Endpoints
 userRouter.get('/profile', userController.profileGet);
+userRouter.get('/profile/:id', userController.getUserById);
 
 export default userRouter;
