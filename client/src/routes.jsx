@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
+import { AuthProvider } from './providers/AuthProvider/AuthProvider';
 import MainLayout from './layouts/MainLayout/MainLayout';
 import AuthRoute from './routes/AuthRoute/AuthRoute';
 import AdminRoute from './routes/AdminRoute/AdminRoute';
@@ -25,7 +26,11 @@ import ExternalServiceError from './pages/errors/ExternalServiceError/ExternalSe
 const routes = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: (
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    ),
     errorElement: <InternalServerError />,
     children: [
       // Standalone public entry points
