@@ -132,4 +132,67 @@ describe('UserRow Component', () => {
     // Verify the UI triggers a refresh on success
     expect(reloadMock).toHaveBeenCalled();
   });
+
+  it('calls the demote API when a Super Admin clicks demote on an Admin', async () => {
+    // --- Arrange ---
+    const user = userEvent.setup();
+    const adminUser = { ...mockUser, role: 'ADMIN' };
+    useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
+    fetch.mockResolvedValueOnce({ ok: true });
+
+    const reloadMock = vi.fn();
+    Object.defineProperty(window, 'location', {
+      value: { reload: reloadMock },
+      writable: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <table>
+          <tbody>
+            <UserRow user={adminUser} />
+          </tbody>
+        </table>
+      </MemoryRouter>
+    );
+
+    // --- Act ---
+    // Trigger menu and click demote
+    await user.click(screen.getByLabelText(/open actions menu/i));
+    await user.click(screen.getByText(/demote to user/i));
+
+    // --- Assert ---
+    // Verify demote endpoint is hit with correct method and credentials
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining(`/api/admin/users/${adminUser.id}/demote`),
+      expect.objectContaining({
+        method: 'POST',
+        credentials: 'include',
+      })
+    );
+    expect(reloadMock).toHaveBeenCalled();
+  });
+
+  it('hides demote option when a Super Admin views a regular User', async () => {
+    // --- Arrange ---
+    const user = userEvent.setup();
+    useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
+
+    render(
+      <MemoryRouter>
+        <table>
+          <tbody>
+            <UserRow user={mockUser} />
+          </tbody>
+        </table>
+      </MemoryRouter>
+    );
+
+    // --- Act ---
+    await user.click(screen.getByLabelText(/open actions menu/i));
+
+    // --- Assert ---
+    // Super Admins can only demote Admins, not regular Users
+    expect(screen.queryByText(/demote to user/i)).not.toBeInTheDocument();
+  });
 });

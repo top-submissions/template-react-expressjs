@@ -16,10 +16,13 @@ const UserRow = ({ user }) => {
   const { user: currentUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Define authority to promote based on role hierarchy
+  // Restrict promotion authority strictly to Super Admins targeting standard users
   const canPromote =
-    currentUser?.role === 'SUPER_ADMIN' ||
-    (currentUser?.role === 'ADMIN' && user.role === 'USER');
+    currentUser?.role === 'SUPER_ADMIN' && user.role === 'USER';
+
+  // Restrict demotion authority strictly to Super Admins targeting Admins
+  const canDemote =
+    currentUser?.role === 'SUPER_ADMIN' && user.role === 'ADMIN';
 
   // Toggle the visibility of the actions dropdown
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -30,15 +33,6 @@ const UserRow = ({ user }) => {
     setIsMenuOpen(false);
   };
 
-  /**
-   * Triggers the promotion workflow.
-   * - Sends POST request to admin promotion endpoint.
-   * - Reloads window on success to sync data.
-   */
-  /**
-   * Triggers the promotion workflow.
-   * - Includes credentials to ensure the session cookie is sent.
-   */
   /**
    * Triggers the promotion workflow.
    * - Includes credentials to ensure the session cookie is sent.
@@ -66,6 +60,37 @@ const UserRow = ({ user }) => {
       }
     } catch (err) {
       console.error('Network error during promotion:', err);
+    }
+  };
+
+  /**
+   * Reverts an administrative user back to standard status.
+   * - Sends POST request to the demotion endpoint.
+   * - Cleans up UI state and refreshes data on success.
+   */
+  const handleDemote = async () => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+    try {
+      // Dispatch demotion request to secure admin route
+      const response = await fetch(
+        `${baseUrl}/api/admin/users/${user.id}/demote`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        }
+      );
+
+      if (response.ok) {
+        setIsMenuOpen(false);
+        window.location.reload();
+      } else {
+        const data = await response.json();
+        console.error('Demotion denied:', data.message);
+      }
+    } catch (err) {
+      console.error('Network error during demotion:', err);
     }
   };
 
@@ -109,6 +134,16 @@ const UserRow = ({ user }) => {
                 onClick={handlePromote}
               >
                 Promote to Admin
+              </button>
+            )}
+
+            {/* Display demotion option for eligible administrators */}
+            {canDemote && (
+              <button
+                className={`${styles.dropdownItem} ${styles.demoteAction}`}
+                onClick={handleDemote}
+              >
+                Demote to User
               </button>
             )}
           </div>
