@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
-import { isNotAuthenticated } from '../middleware/auth/auth.middleware.js';
+import * as userController from '../controllers/user.controller.js';
+import {
+  isNotAuthenticated,
+  isAuthenticated,
+} from '../middleware/auth/auth.middleware.js';
 import {
   validateSignup,
   validateLogin,
@@ -8,13 +12,22 @@ import {
 
 const authRouter = Router();
 
-// Registration flow
-authRouter.post('/sign-up', validateSignup, authController.signupPost);
+// Public: registration and login
+authRouter.post(
+  '/sign-up',
+  isNotAuthenticated,
+  validateSignup,
+  authController.signupPost
+);
+authRouter.post(
+  '/log-in',
+  isNotAuthenticated,
+  validateLogin,
+  authController.loginPost
+);
 
-// Authentication flow
-authRouter.post('/log-in', validateLogin, authController.loginPost);
-
-// Identity termination
-authRouter.get('/log-out', authController.logoutGet);
+// Protected: identity and session management
+authRouter.get('/me', isAuthenticated, userController.getCurrentUser);
+authRouter.get('/log-out', isAuthenticated, authController.logoutGet);
 
 export default authRouter;
