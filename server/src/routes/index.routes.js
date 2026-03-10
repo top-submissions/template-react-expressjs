@@ -12,6 +12,6 @@ indexRouter.use('/api/auth', authRouter);
 indexRouter.use('/', userRouter);
 
 // Mounting administrative routes under prefix
-indexRouter.use('/admin', adminRouter);
+indexRouter.use('/api/admin', adminRouter);
 
 export default indexRouter;

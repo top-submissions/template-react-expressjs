@@ -5,37 +5,36 @@ import styles from './UserManagementPage.module.css';
 
 /**
  * Administrative User Management Page.
- * - Fetches all registered users from the backend.
+ * - Synchronizes with /api/admin/users.
  * - Handles asynchronous states: loading, error, and success.
  * - Provides navigation back to the Admin Dashboard.
  * @returns {JSX.Element}
  */
 const UserManagementPage = () => {
-  // State for storing the list of users
   const [users, setUsers] = useState([]);
-  // UI state for asynchronous feedback
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   /**
    * Fetches user data from the server.
-   * - Resets error state before retry.
-   * - Finalizes by disabling the loading spinner.
+   * - Extracts the users array from the wrapped response object.
+   * - Manages loading and error states during the request lifecycle.
    */
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Request user directory from the API
-      const response = await fetch('/api/users');
+      // Request users
+      const response = await fetch('/api/admin/users');
 
       if (!response.ok) {
         throw new Error('Failed to retrieve user directory.');
       }
 
       const data = await response.json();
-      setUsers(data);
+      // Extract users array
+      setUsers(data.users || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -56,7 +55,8 @@ const UserManagementPage = () => {
             Back to Dashboard
           </Link>
           <h1 className={styles.title}>User Management</h1>
-          <p className={styles.stats}>Total Users: {users.length}</p>
+          {/* Ensure length check safe-guard for the user count */}
+          <p className={styles.stats}>Total Users: {users?.length || 0}</p>
         </div>
       </header>
 
