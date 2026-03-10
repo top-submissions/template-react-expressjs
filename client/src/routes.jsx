@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage/LandingPage';
 import SignupForm from './components/forms/SignupForm/SignupForm';
 import LoginForm from './components/forms/LoginForm/LoginForm';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
+import UserDashboard from './pages/user/UserDashboard/UserDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard/AdminDashboard';
 import UserManagementPage from './pages/admin/UserManagementPage/UserManagementPage';
 import NotFoundError from './pages/errors/NotFoundError/NotFoundError';
@@ -49,7 +50,11 @@ const routes = createBrowserRouter([
           {
             element: <AuthRoute />,
             children: [
-              // User's own profile
+              // Default landing for standard users
+              {
+                path: 'dashboard',
+                element: <UserDashboard />,
+              },
               {
                 path: 'profile',
                 element: <ProfilePage />,
