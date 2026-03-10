@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
+import MainLayout from './layouts/MainLayout/MainLayout';
 import LandingPage from './pages/LandingPage/LandingPage';
 import SignupForm from './components/forms/SignupForm/SignupForm';
 import LoginForm from './components/forms/LoginForm/LoginForm';
@@ -10,18 +11,18 @@ import ExternalServiceError from './pages/errors/ExternalServiceError/ExternalSe
 
 /**
  * Global application router configuration.
- * - Root path renders the App layout with LandingPage as default child.
- * - ErrorElement handles all routing-level exceptions.
+ * - Root level uses App for global providers and state.
+ * - MainLayout wraps pages that require a consistent Navbar/UI shell.
+ * - Login and Signup are kept outside MainLayout for a clean focus.
  */
 const routes = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     errorElement: <InternalServerError />,
-    // Define nested routes for the application
     children: [
+      // Pages WITHOUT the Global Navbar
       {
-        // Index: true renders this when the parent path ('/') is matched exactly
         index: true,
         element: <LandingPage />,
       },
@@ -41,8 +42,17 @@ const routes = createBrowserRouter([
         path: 'service-error',
         element: <ExternalServiceError />,
       },
+
+      // Pages WITH the Global Navbar (Wrapped in MainLayout)
       {
-        // Catch-all route for any undefined paths within the root layout
+        element: <MainLayout />,
+        children: [
+          // Future routes like Dashboard, Profile, etc.
+        ],
+      },
+
+      // Catch-all for undefined paths
+      {
         path: '*',
         element: <NotFoundError />,
       },
