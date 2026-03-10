@@ -63,7 +63,7 @@ describe('AdminDashboard Component', () => {
     // --- Assert ---
     // Verify that the critical (red/danger) style is not applied to the settings card
     const settingsCard = container.querySelector(
-      'a[href="/admin-panel/settings"]'
+      'a[href="/admin-dashboard/settings"]'
     );
     expect(settingsCard).not.toHaveClass(/criticalCard/);
   });

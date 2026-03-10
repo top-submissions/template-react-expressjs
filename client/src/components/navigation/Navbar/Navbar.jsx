@@ -33,8 +33,8 @@ const Navbar = () => {
 
         {/* Guarded UI: Only render if user role is ADMIN or SUPER_ADMIN */}
         {isAdmin && (
-          <Link to="/admin-panel" className={styles.adminLink}>
-            🛡️ Admin Panel
+          <Link to="/admin-dashboard" className={styles.adminLink}>
+            Admin Dashboard
           </Link>
         )}
       </div>

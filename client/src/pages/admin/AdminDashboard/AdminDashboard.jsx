@@ -28,7 +28,7 @@ const AdminDashboard = () => {
 
       <div className={styles.grid}>
         {/* User Management Card: The primary tool for Admins */}
-        <Link to="/admin-panel/users" className={styles.card}>
+        <Link to="/admin-dashboard/users" className={styles.card}>
           <h2 className={styles.cardTitle}>User Management</h2>
           <p className={styles.cardDescription}>
             View registered users, promote members to admin roles, or manage
@@ -37,7 +37,7 @@ const AdminDashboard = () => {
         </Link>
 
         {/* Audit Logs Card: Example of a standard Admin tool */}
-        <Link to="/admin-panel/logs" className={styles.card}>
+        <Link to="/admin-dashboard/logs" className={styles.card}>
           <h2 className={styles.cardTitle}>System Logs</h2>
           <p className={styles.cardDescription}>
             Monitor application activity, security events, and server-side
@@ -47,7 +47,7 @@ const AdminDashboard = () => {
 
         {/* High-Level Settings: Use 'criticalCard' style if role is SUPER_ADMIN */}
         <Link
-          to="/admin-panel/settings"
+          to="/admin-dashboard/settings"
           className={`${styles.card} ${isSuperAdmin ? styles.criticalCard : ''}`}
         >
           <h2 className={styles.cardTitle}>Global Settings</h2>
