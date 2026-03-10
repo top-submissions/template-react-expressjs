@@ -7,12 +7,13 @@ import styles from './LoginForm.module.css';
 
 /**
  * Login form component for user authentication.
- * - Manages credentials state.
- * - Dynamically switches error components based on backend status codes.
+ * - Manages credentials state and interaction.
+ * - Validates input against Zod schema.
+ * - Redirects based on user role (Admin vs User).
  * @returns {JSX.Element}
  */
 const LoginForm = () => {
-  // Define form state and status-aware error state
+  // state for credentials and status-aware error handling
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errorData, setErrorData] = useState({
     message: '',
@@ -21,7 +22,7 @@ const LoginForm = () => {
   });
   const navigate = useNavigate();
 
-  // Update data and reset errors on interaction
+  // update local state and clear errors on keystroke
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -32,15 +33,14 @@ const LoginForm = () => {
   /**
    * Processes the login submission.
    * - Validates schema.
-   * - Handles 401 via AuthenticationError.
-   * - Handles 400 via ValidationError.
+   * - Performs role-based redirection logic.
    * @param {React.FormEvent} e - The form event.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorData({ message: '', errors: [], status: null });
 
-    // Perform client-side schema check
+    // perform client-side schema check
     const validation = loginSchema.safeParse(formData);
     if (!validation.success) {
       setErrorData({
@@ -51,11 +51,10 @@ const LoginForm = () => {
       return;
     }
 
-    // Determine target URL
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // Execute post request to backend login route
+      // execute login request
       const response = await fetch(`${baseUrl}/api/auth/log-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,9 +63,17 @@ const LoginForm = () => {
 
       const data = await response.json();
 
-      // Handle successful login or dispatch to correct error component
       if (response.ok) {
-        navigate('/');
+        // check user role to determine routing destination
+        const isAdmin =
+          data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN';
+
+        // dispatch to appropriate dashboard
+        if (isAdmin) {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setErrorData({
           message: data.message || 'Login failed',
@@ -87,11 +94,9 @@ const LoginForm = () => {
     <div className={styles.formContainer}>
       <h2>Log In</h2>
 
-      {/* Conditionally render AuthenticationError for identity issues (401/403) */}
       {errorData.status === 401 ? (
         <AuthenticationError message={errorData.message} />
       ) : (
-        /* Render ValidationError for malformed data or server crashes */
         <ValidationError
           message={errorData.message}
           errors={errorData.errors}
