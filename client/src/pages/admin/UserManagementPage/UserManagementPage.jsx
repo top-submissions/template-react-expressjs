@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
+import UserList from '../../../components/admin/UserList/UserList';
 import styles from './UserManagementPage.module.css';
 
 /**
@@ -60,14 +61,14 @@ const UserManagementPage = () => {
       </header>
 
       <div className={styles.listWrapper}>
-        {/* Branch: Display spinner during network request */}
+        {/* Render loading feedback during active request */}
         {isLoading && (
           <div className={styles.loadingState}>
             <p>Loading user records...</p>
           </div>
         )}
 
-        {/* Branch: Display error message and retry action on failure */}
+        {/* Render error feedback with retry capability on failure */}
         {error && (
           <div className={styles.errorState}>
             <p>{error}</p>
@@ -77,11 +78,10 @@ const UserManagementPage = () => {
           </div>
         )}
 
-        {/* Branch: Render data table if fetch succeeds and is not loading */}
+        {/* Render the actual UserList once data is available */}
         {!isLoading && !error && (
           <div className={styles.listArea}>
-            {/* UserList component will be injected here next */}
-            <p style={{ padding: '2rem' }}>User List component placeholder.</p>
+            <UserList users={users} />
           </div>
         )}
       </div>

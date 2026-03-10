@@ -1,6 +1,6 @@
 import styles from './UserList.module.css';
 // UserRow will be created in the next step to handle individual row logic
-import UserRow from './UserRow';
+import UserRow from '../UserRow/UserRow';
 
 /**
  * Tabular display for user directory.
