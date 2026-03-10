@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { loginSchema } from '../../../modules/validators/auth/auth.validator.js';
 import ValidationError from '../../errors/ValidationError/ValidationError';
 import AuthenticationError from '../../errors/AuthenticationError/AuthenticationError';
@@ -8,21 +9,24 @@ import styles from './LoginForm.module.css';
 /**
  * Login form component for user authentication.
  * - Manages credentials state and interaction.
- * - Validates input against Zod schema.
+ * - Synchronizes global auth state via useAuth on success.
  * - Redirects based on user role (Admin vs User).
  * @returns {JSX.Element}
  */
 const LoginForm = () => {
-  // state for credentials and status-aware error handling
+  // initialize form and error states
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errorData, setErrorData] = useState({
     message: '',
     errors: [],
     status: null,
   });
-  const navigate = useNavigate();
 
-  // update local state and clear errors on keystroke
+  // access navigation and global login action
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  // sync input changes to state and clear active errors
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -33,14 +37,15 @@ const LoginForm = () => {
   /**
    * Processes the login submission.
    * - Validates schema.
-   * - Performs role-based redirection logic.
+   * - Updates global auth state.
+   * - Performs role-based redirection.
    * @param {React.FormEvent} e - The form event.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorData({ message: '', errors: [], status: null });
 
-    // perform client-side schema check
+    // validate input against zod schema
     const validation = loginSchema.safeParse(formData);
     if (!validation.success) {
       setErrorData({
@@ -54,7 +59,7 @@ const LoginForm = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // execute login request
+      // execute login request to backend
       const response = await fetch(`${baseUrl}/api/auth/log-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,11 +69,13 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // check user role to determine routing destination
+        // sync user data to global provider state
+        login(data.user);
+
+        // determine redirection path by role
         const isAdmin =
           data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN';
 
-        // dispatch to appropriate dashboard
         if (isAdmin) {
           navigate('/admin-dashboard');
         } else {
