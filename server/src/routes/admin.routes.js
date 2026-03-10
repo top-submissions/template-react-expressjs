@@ -14,5 +14,6 @@ adminRouter.use(isAdmin);
 // User management routes
 adminRouter.get('/users', adminController.usersGet);
 adminRouter.post('/users/:id/promote', adminController.promotePost);
+adminRouter.post('/users/:id/demote', adminController.demotePost);
 
 export default adminRouter;

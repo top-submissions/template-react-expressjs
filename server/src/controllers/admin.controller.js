@@ -56,3 +56,36 @@ export const promotePost = async (req, res, next) => {
     next(new InternalServerError('An error occurred while promoting the user'));
   }
 };
+
+/**
+ * Demotes an administrator back to standard user status.
+ * - Validates ID format before database update.
+ * - Handles 404 scenarios if the user record does not exist.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @param {Function} next - Express next middleware.
+ */
+export const demotePost = async (req, res, next) => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      return next(new ValidationError('Invalid user ID format'));
+    }
+
+    // Execute the demotion query via Prisma
+    const updatedUser = await adminQueries.demoteAdminToUser(userId);
+
+    if (!updatedUser) {
+      return next(new NotFoundError(`User with ID ${userId}`));
+    }
+
+    // Respond with success confirmation and updated data
+    res.status(200).json({
+      message: 'User demoted successfully',
+      user: updatedUser,
+    });
+  } catch (error) {
+    next(new InternalServerError('An error occurred while demoting the user'));
+  }
+};
