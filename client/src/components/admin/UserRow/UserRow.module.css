@@ -1,0 +1,124 @@
+.row {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.row:hover {
+  /* Provide subtle feedback when hovering over a user record */
+  background-color: var(--btn-bg);
+}
+
+.cell {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.username {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-color);
+  text-transform: uppercase;
+}
+
+.date {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.actionsArea {
+  position: relative;
+  text-align: center;
+}
+
+.menuTrigger {
+  /* Simplified circular button for the '...' menu */
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuTrigger:hover {
+  background-color: var(--border-color);
+  border-color: transparent;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 10;
+  min-width: 160px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.dropdownItem {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dropdownItem:hover {
+  background-color: var(--btn-bg);
+  border-color: transparent;
+}
+
+.promoteAction {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Specific styling for mobile: hide overflow menu if it clips */
+@media (max-width: 600px) {
+  .cell:nth-child(3) {
+    display: none;
+  }
+}
