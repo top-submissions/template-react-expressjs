@@ -29,3 +29,16 @@ export const promoteUserToAdmin = async (userId) => {
     data: { role: 'ADMIN' },
   });
 };
+
+/**
+ * Updates an administrative user back to standard user status.
+ * @param {number} userId - The unique identifier of the user to demote.
+ * @returns {Promise<Object>}
+ */
+export const demoteAdminToUser = async (userId) => {
+  // Update the user record to have the standard USER role
+  return await prisma.user.update({
+    where: { id: userId },
+    data: { role: 'USER' },
+  });
+};
