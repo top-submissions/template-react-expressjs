@@ -116,6 +116,16 @@
   font-weight: 600;
 }
 
+.demoteAction {
+  /* Use global warning variables for consistent downgrade signaling */
+  color: var(--warning-text);
+  font-weight: 600;
+}
+
+.demoteAction:hover {
+  background-color: var(--warning-bg);
+}
+
 /* Specific styling for mobile: hide overflow menu if it clips */
 @media (max-width: 600px) {
   .cell:nth-child(3) {
