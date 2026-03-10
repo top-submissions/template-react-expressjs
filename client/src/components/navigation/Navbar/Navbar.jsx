@@ -4,17 +4,19 @@ import styles from './Navbar.module.css';
 
 /**
  * Global navigation component.
- * - Displays branding and core navigation links.
- * - Conditionally renders Administrative tools based on user role.
- * - Provides user session feedback (username/role) and logout trigger.
+ * - Manages branding and primary navigation links.
+ * - Dynamic "Home" link points to specific dashboards based on user role.
+ * - Displays session info (username/role) and handle logout.
  * @returns {JSX.Element}
  */
 const Navbar = () => {
-  // Access session data and actions from the provider
   const { user, logout } = useAuth();
 
-  // Logic: Check if the user has elevated privileges for the Admin Panel
+  // check if current user has administrative clearance
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+
+  // determine the dashboard destination based on role
+  const homePath = isAdmin ? '/admin-dashboard' : '/dashboard';
 
   return (
     <nav className={styles.navbar}>
@@ -23,23 +25,22 @@ const Navbar = () => {
       </div>
 
       <div className={styles.navLinks}>
-        {/* Render standard navigation for all users */}
+        {/* render dynamic home link if user is logged in */}
+        {user && (
+          <Link to={homePath} className={styles.homeLink}>
+            Home
+          </Link>
+        )}
+
         <Link to="/profile" title="View Profile">
           Profile
         </Link>
+
         <Link to="/settings" title="Account Settings">
           Settings
         </Link>
-
-        {/* Guarded UI: Only render if user role is ADMIN or SUPER_ADMIN */}
-        {isAdmin && (
-          <Link to="/admin-dashboard" className={styles.adminLink}>
-            Admin Dashboard
-          </Link>
-        )}
       </div>
 
-      {/* Session Section: Render user details if a session exists */}
       {user && (
         <div className={styles.userSection}>
           <div className={styles.info}>

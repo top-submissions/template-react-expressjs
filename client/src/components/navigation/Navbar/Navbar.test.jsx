@@ -4,7 +4,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import Navbar from './Navbar';
 
-// Mock the auth hook to control user state during testing
 vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
   useAuth: vi.fn(),
 }));
@@ -14,9 +13,8 @@ describe('Navbar Component', () => {
     vi.clearAllMocks();
   });
 
-  it('renders standard links for a regular USER', () => {
+  it('renders standard links and user dashboard home for a regular USER', () => {
     // --- Arrange ---
-    // Simulate a standard user session
     useAuth.mockReturnValue({
       user: { username: 'john_doe', role: 'USER' },
       logout: vi.fn(),
@@ -30,18 +28,14 @@ describe('Navbar Component', () => {
     );
 
     // --- Assert ---
-    // Verify visibility of standard links and hidden status of Admin link
-    expect(screen.getByText('Profile')).toBeInTheDocument();
+    // check for the dynamic Home link pointing to standard dashboard
+    const homeLink = screen.getByRole('link', { name: /home/i });
+    expect(homeLink).toHaveAttribute('href', '/dashboard');
     expect(screen.getByText('john_doe')).toBeInTheDocument();
-
-    // We use a specific selector to avoid matching text inside comments or partial matches
-    const adminLink = screen.queryByRole('link', { name: /admin panel/i });
-    expect(adminLink).not.toBeInTheDocument();
   });
 
-  it('renders Admin Panel link for an ADMIN role', () => {
+  it('renders Admin Dashboard home link for an ADMIN role', () => {
     // --- Arrange ---
-    // Simulate an administrator session
     useAuth.mockReturnValue({
       user: { username: 'admin_user', role: 'ADMIN' },
       logout: vi.fn(),
@@ -55,14 +49,13 @@ describe('Navbar Component', () => {
     );
 
     // --- Assert ---
-    // Verify elevated privilege link is visible specifically as a navigation link
-    const adminLink = screen.getByRole('link', { name: /admin panel/i });
-    expect(adminLink).toBeInTheDocument();
+    // check for the dynamic Home link pointing to admin dashboard
+    const homeLink = screen.getByRole('link', { name: /home/i });
+    expect(homeLink).toHaveAttribute('href', '/admin-dashboard');
   });
 
   it('renders nothing in user section when unauthenticated', () => {
     // --- Arrange ---
-    // Simulate no active session
     useAuth.mockReturnValue({ user: null, logout: vi.fn() });
 
     // --- Act ---
@@ -73,9 +66,9 @@ describe('Navbar Component', () => {
     );
 
     // --- Assert ---
-    // Verify logout button and username are absent
     expect(
       screen.queryByRole('button', { name: /log out/i })
     ).not.toBeInTheDocument();
+    expect(screen.queryByText(/home/i)).not.toBeInTheDocument();
   });
 });
