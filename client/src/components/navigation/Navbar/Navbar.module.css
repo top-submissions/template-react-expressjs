@@ -1,0 +1,83 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  /* Use theme background and border variables */
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo a {
+  font-weight: bold;
+  font-size: 1.25rem;
+  text-decoration: none;
+  /* Follow global text color */
+  color: var(--text-color);
+}
+
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.navLinks a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.navLinks a:hover {
+  opacity: 1;
+  color: var(--primary-color);
+}
+
+.adminLink {
+  /* Use semantic error color for administrative highlighting */
+  color: var(--error-text) !important;
+  font-weight: 600;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.username {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.roleLabel {
+  font-size: 0.75rem;
+  /* Use a secondary visual weight for roles */
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+.logoutBtn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  border-color: var(--primary-color);
+  background-color: var(--bg-color);
+}
