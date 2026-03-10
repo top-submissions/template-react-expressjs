@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import UserRow from './UserRow';
 
@@ -16,6 +17,13 @@ describe('UserRow Component', () => {
     role: 'USER',
     createdAt: '2023-01-01T00:00:00Z',
   };
+
+  beforeEach(() => {
+    // Reset global fetch mock before every test
+    global.fetch = vi.fn();
+    // Clear all mock history
+    vi.clearAllMocks();
+  });
 
   it('renders user details correctly', () => {
     // --- Arrange ---
@@ -37,8 +45,9 @@ describe('UserRow Component', () => {
     expect(screen.getByText('USER')).toBeInTheDocument();
   });
 
-  it('toggles the actions menu when the trigger is clicked', () => {
+  it('toggles the actions menu when the trigger is clicked', async () => {
     // --- Arrange ---
+    const user = userEvent.setup();
     useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
     render(
       <MemoryRouter>
@@ -52,15 +61,15 @@ describe('UserRow Component', () => {
 
     // --- Act ---
     const trigger = screen.getByLabelText(/open actions menu/i);
-    fireEvent.click(trigger);
+    await user.click(trigger);
 
     // --- Assert ---
     expect(screen.getByText(/view profile/i)).toBeInTheDocument();
   });
 
-  it('hides the promote option if the current admin lacks clearance', () => {
+  it('hides the promote option if the current admin lacks clearance', async () => {
     // --- Arrange ---
-    // A standard admin cannot promote another admin
+    const user = userEvent.setup();
     const targetAdmin = { ...mockUser, role: 'ADMIN' };
     useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
 
@@ -75,9 +84,52 @@ describe('UserRow Component', () => {
     );
 
     // --- Act ---
-    fireEvent.click(screen.getByLabelText(/open actions menu/i));
+    await user.click(screen.getByLabelText(/open actions menu/i));
 
     // --- Assert ---
     expect(screen.queryByText(/promote to admin/i)).not.toBeInTheDocument();
+  });
+
+  it('calls the promote API when the promote button is clicked', async () => {
+    // --- Arrange ---
+    const user = userEvent.setup();
+    // Allow promotion by mocking a SUPER_ADMIN user
+    useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
+    // Simulate a successful API response
+    fetch.mockResolvedValueOnce({ ok: true });
+    // Prevent window reload from crashing the test environment
+    const reloadMock = vi.fn();
+    Object.defineProperty(window, 'location', {
+      value: { reload: reloadMock },
+      writable: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <table>
+          <tbody>
+            <UserRow user={mockUser} />
+          </tbody>
+        </table>
+      </MemoryRouter>
+    );
+
+    // --- Act ---
+    // Open the dropdown menu
+    await user.click(screen.getByLabelText(/open actions menu/i));
+    // Click the promotion button
+    await user.click(screen.getByText(/promote to admin/i));
+
+    // --- Assert ---
+    // Confirm the API endpoint and method are correct
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining(`/api/admin/users/${mockUser.id}/promote`),
+      expect.objectContaining({
+        method: 'POST',
+        credentials: 'include',
+      })
+    );
+    // Verify the UI triggers a refresh on success
+    expect(reloadMock).toHaveBeenCalled();
   });
 });

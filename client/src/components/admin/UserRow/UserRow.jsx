@@ -6,8 +6,7 @@ import styles from './UserRow.module.css';
 /**
  * Atomic table row for user management.
  * - Displays user identity, role, and metadata.
- * - Implements an inline actions menu for profile viewing and role promotion.
- * - Enforces administrative hierarchy for sensitive actions.
+ * - Implements an inline actions menu with relative positioning.
  * @param {Object} props - Component properties.
  * @param {Object} props.user - The user object for the current row.
  * @returns {JSX.Element}
@@ -17,31 +16,57 @@ const UserRow = ({ user }) => {
   const { user: currentUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Determine if current admin has authority to promote this specific user
+  // Define authority to promote based on role hierarchy
   const canPromote =
     currentUser?.role === 'SUPER_ADMIN' ||
     (currentUser?.role === 'ADMIN' && user.role === 'USER');
 
-  /**
-   * Toggles the visibility of the actions dropdown.
-   */
+  // Toggle the visibility of the actions dropdown
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  /**
-   * Redirects to the detailed profile view for the row user.
-   */
+  // Redirect to the detailed profile view
   const handleViewProfile = () => {
     navigate(`/profile/${user.id}`);
     setIsMenuOpen(false);
   };
 
   /**
-   * Triggers the promotion workflow for the row user.
+   * Triggers the promotion workflow.
+   * - Sends POST request to admin promotion endpoint.
+   * - Reloads window on success to sync data.
    */
-  const handlePromote = () => {
-    // Logic for PATCH /api/users/:id will be implemented in the integration step
-    console.log(`Promoting user: ${user.username}`);
-    setIsMenuOpen(false);
+  /**
+   * Triggers the promotion workflow.
+   * - Includes credentials to ensure the session cookie is sent.
+   */
+  /**
+   * Triggers the promotion workflow.
+   * - Includes credentials to ensure the session cookie is sent.
+   */
+  const handlePromote = async () => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+    try {
+      // Execute request with credentials to bypass 401 Unauthorized
+      const response = await fetch(
+        `${baseUrl}/api/admin/users/${user.id}/promote`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include', // Ensure session cookies are sent
+        }
+      );
+
+      if (response.ok) {
+        setIsMenuOpen(false);
+        window.location.reload();
+      } else {
+        const data = await response.json();
+        console.error('Promotion denied:', data.message);
+      }
+    } catch (err) {
+      console.error('Network error during promotion:', err);
+    }
   };
 
   return (
@@ -62,7 +87,8 @@ const UserRow = ({ user }) => {
           {new Date(user.createdAt).toLocaleDateString()}
         </span>
       </td>
-      <td className={`${styles.cell} styles.actionsArea`}>
+      {/* Corrected the template literal for styles.actionsArea */}
+      <td className={`${styles.cell} ${styles.actionsArea}`}>
         <button
           className={styles.menuTrigger}
           onClick={toggleMenu}
@@ -77,7 +103,6 @@ const UserRow = ({ user }) => {
               View Profile
             </button>
 
-            {/* Conditional action based on admin clearance */}
             {canPromote && (
               <button
                 className={`${styles.dropdownItem} ${styles.promoteAction}`}
