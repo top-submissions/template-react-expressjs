@@ -60,9 +60,17 @@ export const AuthProvider = ({ children }) => {
   /**
    * Resets global state after logout.
    */
-  const logout = () => {
-    setUser(null);
-    setAuthError(null);
+  const logout = async () => {
+    try {
+      // Direct server to clear the HttpOnly token cookie
+      await fetch('/api/auth/log-out');
+    } catch (err) {
+      console.error('Remote logout failed, clearing local state only:', err);
+    } finally {
+      // Wipe local state
+      setUser(null);
+      setAuthError(null);
+    }
   };
 
   /**

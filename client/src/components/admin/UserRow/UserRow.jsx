@@ -5,49 +5,43 @@ import styles from './UserRow.module.css';
 
 /**
  * Atomic table row for user management.
- * - Displays user identity, role, and metadata.
- * - Implements an inline actions menu with relative positioning.
  * @param {Object} props - Component properties.
  * @param {Object} props.user - The user object for the current row.
  * @returns {JSX.Element}
  */
-const UserRow = ({ user }) => {
+const UserRow = ({ user: targetUser }) => {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Restrict promotion authority strictly to Super Admins targeting standard users
+  // Use explicit naming to prevent auth state confusion
   const canPromote =
-    currentUser?.role === 'SUPER_ADMIN' && user.role === 'USER';
+    currentUser?.role === 'SUPER_ADMIN' && targetUser.role === 'USER';
 
-  // Restrict demotion authority strictly to Super Admins targeting Admins
   const canDemote =
-    currentUser?.role === 'SUPER_ADMIN' && user.role === 'ADMIN';
+    currentUser?.role === 'SUPER_ADMIN' && targetUser.role === 'ADMIN';
 
-  // Toggle the visibility of the actions dropdown
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // Redirect to the detailed profile view
   const handleViewProfile = () => {
-    navigate(`/profile/${user.id}`);
+    navigate(`/profile/${targetUser.id}`);
     setIsMenuOpen(false);
   };
 
   /**
    * Triggers the promotion workflow.
-   * - Includes credentials to ensure the session cookie is sent.
    */
   const handlePromote = async () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // Execute request with credentials to bypass 401 Unauthorized
+      // Execute request targeting specific targetUser ID
       const response = await fetch(
-        `${baseUrl}/api/admin/users/${user.id}/promote`,
+        `${baseUrl}/api/admin/users/${targetUser.id}/promote`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', // Ensure session cookies are sent
+          credentials: 'include',
         }
       );
 
@@ -65,16 +59,14 @@ const UserRow = ({ user }) => {
 
   /**
    * Reverts an administrative user back to standard status.
-   * - Sends POST request to the demotion endpoint.
-   * - Cleans up UI state and refreshes data on success.
    */
   const handleDemote = async () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // Dispatch demotion request to secure admin route
+      // Execute request targeting specific targetUser ID
       const response = await fetch(
-        `${baseUrl}/api/admin/users/${user.id}/demote`,
+        `${baseUrl}/api/admin/users/${targetUser.id}/demote`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -99,20 +91,19 @@ const UserRow = ({ user }) => {
       <td className={styles.cell}>
         <div className={styles.userInfo}>
           <div className={styles.avatar}>
-            {user.username.charAt(0).toUpperCase()}
+            {targetUser.username.charAt(0).toUpperCase()}
           </div>
-          <span className={styles.username}>{user.username}</span>
+          <span className={styles.username}>{targetUser.username}</span>
         </div>
       </td>
       <td className={styles.cell}>
-        <span className={styles.roleBadge}>{user.role}</span>
+        <span className={styles.roleBadge}>{targetUser.role}</span>
       </td>
       <td className={styles.cell}>
         <span className={styles.date}>
-          {new Date(user.createdAt).toLocaleDateString()}
+          {new Date(targetUser.createdAt).toLocaleDateString()}
         </span>
       </td>
-      {/* Corrected the template literal for styles.actionsArea */}
       <td className={`${styles.cell} ${styles.actionsArea}`}>
         <button
           className={styles.menuTrigger}
@@ -137,7 +128,6 @@ const UserRow = ({ user }) => {
               </button>
             )}
 
-            {/* Display demotion option for eligible administrators */}
             {canDemote && (
               <button
                 className={`${styles.dropdownItem} ${styles.demoteAction}`}

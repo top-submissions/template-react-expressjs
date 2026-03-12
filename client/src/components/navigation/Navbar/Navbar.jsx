@@ -7,16 +7,26 @@ import styles from './Navbar.module.css';
  * - Manages branding and primary navigation links.
  * - Dynamic "Home" link points to specific dashboards based on user role.
  * - Displays session info (username/role) and handle logout.
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The rendered navigation bar.
  */
 const Navbar = () => {
   const { user, logout } = useAuth();
 
-  // check if current user has administrative clearance
+  // Determine administrative status
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
 
-  // determine the dashboard destination based on role
+  // Define dashboard route based on user privileges
   const homePath = isAdmin ? '/admin-dashboard' : '/dashboard';
+
+  /**
+   * Orchestrates the logout workflow.
+   * - Triggers asynchronous cookie clearing.
+   * @returns {Promise<void>}
+   */
+  const handleLogout = async () => {
+    // Clear server and local session
+    await logout();
+  };
 
   return (
     <nav className={styles.navbar}>
@@ -25,7 +35,7 @@ const Navbar = () => {
       </div>
 
       <div className={styles.navLinks}>
-        {/* render dynamic home link if user is logged in */}
+        {/* Render home link conditionally for authenticated users */}
         {user && (
           <Link to={homePath} className={styles.homeLink}>
             Home
@@ -48,7 +58,7 @@ const Navbar = () => {
             <span className={styles.roleLabel}>{user.role}</span>
           </div>
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className={styles.logoutBtn}
             aria-label="Log out"
           >

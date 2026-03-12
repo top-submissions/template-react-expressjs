@@ -128,7 +128,13 @@ export const loginPost = (req, res, next) => {
  * @param {Object} res - Express response.
  */
 export const logoutGet = (req, res) => {
-  // Remove token cookie and return to landing
-  res.clearCookie('token');
-  res.redirect('/');
+  // Clear the token cookie
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+
+  // Return JSON
+  res.status(200).json({ message: 'Logged out successfully' });
 };
