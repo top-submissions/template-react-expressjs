@@ -11,10 +11,10 @@ import styles from './LoginForm.module.css';
  * - Manages credentials state and interaction.
  * - Synchronizes global auth state via useAuth on success.
  * - Redirects based on user role (Admin vs User).
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The rendered login form.
  */
 const LoginForm = () => {
-  // initialize form and error states
+  // Initialize form and error states
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errorData, setErrorData] = useState({
     message: '',
@@ -22,11 +22,13 @@ const LoginForm = () => {
     status: null,
   });
 
-  // access navigation and global login action
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // sync input changes to state and clear active errors
+  /**
+   * Updates state on input change and clears existing errors.
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -36,16 +38,16 @@ const LoginForm = () => {
 
   /**
    * Processes the login submission.
-   * - Validates schema.
-   * - Updates global auth state.
-   * - Performs role-based redirection.
+   * - Validates input schema via Zod.
+   * - Requests session token from backend.
+   * - Updates global context and handles role-based routing.
    * @param {React.FormEvent} e - The form event.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorData({ message: '', errors: [], status: null });
 
-    // validate input against zod schema
+    // Validate Input Against Zod Schema
     const validation = loginSchema.safeParse(formData);
     if (!validation.success) {
       setErrorData({
@@ -59,20 +61,21 @@ const LoginForm = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // execute login request to backend
+      // Execute Login Request With Credentials To Ensure Cookie Is Saved
       const response = await fetch(`${baseUrl}/api/auth/log-in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Ensure the HttpOnly cookie is saved in the browser
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // sync user data to global provider state
+        // Update Global Auth State
         login(data.user);
 
-        // determine redirection path by role
+        // Perform Role-Based Redirection
         const isAdmin =
           data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN';
 
@@ -82,6 +85,7 @@ const LoginForm = () => {
           navigate('/dashboard');
         }
       } else {
+        // Handle Authentication Or Validation Failures From Server
         setErrorData({
           message: data.message || 'Login failed',
           errors: data.errors || [],
@@ -89,6 +93,7 @@ const LoginForm = () => {
         });
       }
     } catch (err) {
+      // Handle Network Failures
       setErrorData({
         message: `Connection error: ${err.message}`,
         errors: [],
@@ -101,6 +106,7 @@ const LoginForm = () => {
     <div className={styles.formContainer}>
       <h2>Log In</h2>
 
+      {/* Conditional Error Display */}
       {errorData.status === 401 ? (
         <AuthenticationError message={errorData.message} />
       ) : (
