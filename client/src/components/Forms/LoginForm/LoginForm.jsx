@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { loginSchema } from '../../../modules/validators/auth/auth.validator.js';
+import { authApi } from '../../../modules/api/auth/auth.api.js';
 import ValidationError from '../../errors/ValidationError/ValidationError';
 import AuthenticationError from '../../errors/AuthenticationError/AuthenticationError';
 import styles from './LoginForm.module.css';
@@ -14,7 +15,6 @@ import styles from './LoginForm.module.css';
  * @returns {JSX.Element} The rendered login form.
  */
 const LoginForm = () => {
-  // Initialize form and error states
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errorData, setErrorData] = useState({
     message: '',
@@ -25,10 +25,6 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  /**
-   * Updates state on input change and clears existing errors.
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -38,16 +34,12 @@ const LoginForm = () => {
 
   /**
    * Processes the login submission.
-   * - Validates input schema via Zod.
-   * - Requests session token from backend.
-   * - Updates global context and handles role-based routing.
    * @param {React.FormEvent} e - The form event.
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorData({ message: '', errors: [], status: null });
 
-    // Validate Input Against Zod Schema
     const validation = loginSchema.safeParse(formData);
     if (!validation.success) {
       setErrorData({
@@ -58,24 +50,14 @@ const LoginForm = () => {
       return;
     }
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-
     try {
-      // Execute Login Request With Credentials To Ensure Cookie Is Saved
-      const response = await fetch(`${baseUrl}/api/auth/log-in`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Ensure the HttpOnly cookie is saved in the browser
-        body: JSON.stringify(formData),
-      });
-
+      // Use authApi to execute the login request
+      const response = await authApi.login(formData);
       const data = await response.json();
 
       if (response.ok) {
-        // Update Global Auth State
         login(data.user);
 
-        // Perform Role-Based Redirection
         const isAdmin =
           data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN';
 
@@ -85,7 +67,6 @@ const LoginForm = () => {
           navigate('/dashboard');
         }
       } else {
-        // Handle Authentication Or Validation Failures From Server
         setErrorData({
           message: data.message || 'Login failed',
           errors: data.errors || [],
@@ -93,7 +74,6 @@ const LoginForm = () => {
         });
       }
     } catch (err) {
-      // Handle Network Failures
       setErrorData({
         message: `Connection error: ${err.message}`,
         errors: [],
@@ -106,7 +86,6 @@ const LoginForm = () => {
     <div className={styles.formContainer}>
       <h2>Log In</h2>
 
-      {/* Conditional Error Display */}
       {errorData.status === 401 ? (
         <AuthenticationError message={errorData.message} />
       ) : (
