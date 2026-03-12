@@ -51,9 +51,16 @@ export const isAuthenticated = (req, res, next) => {
  * @returns {void}
  */
 export const isNotAuthenticated = (req, res, next) => {
-  // Ensure no user is currently logged in
   resolveJwtUser(req, res, (err, user) => {
-    if (user) return next(new AppError('Already authenticated', 400));
+    if (user) {
+      // If a user is already logged in, clear the cookie
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+      return next();
+    }
     return next();
   });
 };
