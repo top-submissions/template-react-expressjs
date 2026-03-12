@@ -5,37 +5,50 @@ import styles from './UserRow.module.css';
 
 /**
  * Atomic table row for user management.
+ * - Displays identity, role, and metadata.
+ * - Provides conditional administrative actions.
  * @param {Object} props - Component properties.
- * @param {Object} props.user - The user object for the current row.
- * @returns {JSX.Element}
+ * @param {Object} props.user - The target user object for this specific row.
+ * @returns {JSX.Element} The rendered table row.
  */
 const UserRow = ({ user: targetUser }) => {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Use explicit naming to prevent auth state confusion
+  // Check If Current User Is Super Admin And Target Is A Standard User
   const canPromote =
     currentUser?.role === 'SUPER_ADMIN' && targetUser.role === 'USER';
 
+  // Check If Current User Is Super Admin And Target Is An Admin
   const canDemote =
     currentUser?.role === 'SUPER_ADMIN' && targetUser.role === 'ADMIN';
 
+  /**
+   * Toggles the visibility of the actions dropdown menu.
+   */
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  /**
+   * Navigates to the detailed profile view of the target user.
+   */
   const handleViewProfile = () => {
     navigate(`/profile/${targetUser.id}`);
     setIsMenuOpen(false);
   };
 
   /**
-   * Triggers the promotion workflow.
+   * Triggers the promotion workflow via backend API.
+   * - Sends POST request to the promotion endpoint.
+   * - Refreshes the page on success to sync global state.
+   * @returns {Promise<void>}
    */
   const handlePromote = async () => {
+    // Define API endpoint path
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // Execute request targeting specific targetUser ID
+      // Execute Promotion Request With Credentials To Send Session Cookie
       const response = await fetch(
         `${baseUrl}/api/admin/users/${targetUser.id}/promote`,
         {
@@ -45,6 +58,7 @@ const UserRow = ({ user: targetUser }) => {
         }
       );
 
+      // Refresh Data On Success
       if (response.ok) {
         setIsMenuOpen(false);
         window.location.reload();
@@ -59,12 +73,16 @@ const UserRow = ({ user: targetUser }) => {
 
   /**
    * Reverts an administrative user back to standard status.
+   * - Sends POST request to the demotion endpoint.
+   * - Refreshes the page on success to sync global state.
+   * @returns {Promise<void>}
    */
   const handleDemote = async () => {
+    // Define API endpoint path
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
-      // Execute request targeting specific targetUser ID
+      // Execute Demotion Request Targeting Specific Target User
       const response = await fetch(
         `${baseUrl}/api/admin/users/${targetUser.id}/demote`,
         {
@@ -74,6 +92,7 @@ const UserRow = ({ user: targetUser }) => {
         }
       );
 
+      // Refresh Data On Success
       if (response.ok) {
         setIsMenuOpen(false);
         window.location.reload();
@@ -90,6 +109,7 @@ const UserRow = ({ user: targetUser }) => {
     <tr className={styles.row}>
       <td className={styles.cell}>
         <div className={styles.userInfo}>
+          {/* Extract Initial For Avatar Display */}
           <div className={styles.avatar}>
             {targetUser.username.charAt(0).toUpperCase()}
           </div>
@@ -113,12 +133,14 @@ const UserRow = ({ user: targetUser }) => {
           ⋮
         </button>
 
+        {/* Conditional Dropdown Rendering */}
         {isMenuOpen && (
           <div className={styles.dropdown}>
             <button className={styles.dropdownItem} onClick={handleViewProfile}>
               View Profile
             </button>
 
+            {/* Display Promotion Option For Eligible Users */}
             {canPromote && (
               <button
                 className={`${styles.dropdownItem} ${styles.promoteAction}`}
@@ -128,6 +150,7 @@ const UserRow = ({ user: targetUser }) => {
               </button>
             )}
 
+            {/* Display Demotion Option For Eligible Admins */}
             {canDemote && (
               <button
                 className={`${styles.dropdownItem} ${styles.demoteAction}`}
