@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { signupSchema } from '../../../modules/validators/auth/auth.validator.js';
+import { authApi } from '../../../modules/api/auth/auth.api.js';
 import ValidationError from '../../errors/ValidationError/ValidationError';
 import styles from './SignupForm.module.css';
 
 /**
  * Signup form component for user registration.
  * - Manages local form state for username, password, and confirmation.
- * - Uses Zod schema for client-side validation logic.
- * - Integrates ValidationError component for detailed feedback.
+ * - Uses authApi service for network requests.
  * @returns {JSX.Element}
  */
 const SignupForm = () => {
@@ -50,16 +50,9 @@ const SignupForm = () => {
       return;
     }
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-
     try {
-      // Execute post request to backend signup route
-      const response = await fetch(`${baseUrl}/api/auth/sign-up`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
+      // Delegate Network Request To The Auth API Module
+      const response = await authApi.signup(formData);
       const data = await response.json();
 
       // Navigate to login on success or populate error state from server response
@@ -72,6 +65,7 @@ const SignupForm = () => {
         });
       }
     } catch (err) {
+      // Handle Unexpected Network Errors
       setErrorData({
         message: `An error occurred: ${err.message}`,
         errors: [],
