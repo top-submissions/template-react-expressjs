@@ -7,6 +7,11 @@ vi.mock('../../config/corsOptions.js', () => ({
   default: { origin: '*' },
 }));
 
+// Mock cookie utility to prevent reference errors when error handler is triggered
+vi.mock('../../utils/auth/cookie/cookie.js', () => ({
+  clearAuthCookie: vi.fn(),
+}));
+
 vi.mock('passport', () => ({
   default: { initialize: vi.fn(() => (req, res, next) => next()) },
 }));
@@ -79,7 +84,7 @@ describe('app middleware module', () => {
       const err = { statusCode: 401, status: 'fail', message: 'Unauthorized' };
       const req = {};
 
-      // FIX: Add json mock to match globalErrorHandler implementation
+      // Prepare response mock with JSON support
       const res = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),

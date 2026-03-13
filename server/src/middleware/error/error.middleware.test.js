@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { globalErrorHandler } from './error.middleware.js';
+import { clearAuthCookie } from '../../utils/auth/cookie/cookie.js';
+
+// Mock cookie utility to verify clearing behavior
+vi.mock('../../utils/auth/cookie/cookie.js', () => ({
+  clearAuthCookie: vi.fn(),
+}));
 
 /**
  * Unit tests for the Global Error Handling Middleware.
@@ -14,6 +20,7 @@ describe('Global Error Handler Middleware', () => {
 
   beforeEach(() => {
     // Initialize mock objects for Express request, response, and next function
+    vi.clearAllMocks();
     mockReq = {};
     mockRes = {
       status: vi.fn().mockReturnThis(),
@@ -59,6 +66,22 @@ describe('Global Error Handler Middleware', () => {
         message: 'Resource not found',
       })
     );
+  });
+
+  it('should clear auth cookie when a 401 error occurs', () => {
+    // --- Arrange ---
+    const authError = {
+      message: 'Unauthorized access',
+      statusCode: 401,
+    };
+
+    // --- Act ---
+    globalErrorHandler(authError, mockReq, mockRes, next);
+
+    // --- Assert ---
+    // Ensure safety net clears cookie on auth failure
+    expect(clearAuthCookie).toHaveBeenCalledWith(mockRes);
+    expect(mockRes.status).toHaveBeenCalledWith(401);
   });
 
   it('should include validation error arrays in the response', () => {
