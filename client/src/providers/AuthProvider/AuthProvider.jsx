@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { authApi } from '../../modules/api/auth/auth.api.js';
 
 const AuthContext = createContext(null);
 
@@ -29,16 +30,15 @@ export const AuthProvider = ({ children }) => {
    */
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      // Use authApi
+      const response = await authApi.checkStatus();
 
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
         setAuthError(null);
       } else if (response.status === 401) {
-        // Handle explicit unauthorized status during sync
         setUser(null);
-        setAuthError('Your session has expired. Please log in again.');
       }
     } catch (err) {
       setUser(null);
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       // Direct server to clear the HttpOnly token cookie
-      await fetch('/api/auth/log-out');
+      await authApi.logout();
     } catch (err) {
       console.error('Remote logout failed, clearing local state only:', err);
     } finally {
