@@ -5,6 +5,7 @@ import { validationResult } from 'express-validator';
 import * as authQueries from '../db/queries/auth/auth.queries.js';
 import { AuthenticationError, ValidationError } from '../errors/AppError.js';
 import { InternalServerError } from '../errors/ServerError.js';
+import { setAuthCookie, clearAuthCookie } from '../utils/auth/cookie/cookie.js';
 
 /**
  * Registers a new user.
@@ -101,13 +102,8 @@ export const loginPost = (req, res, next) => {
         expiresIn: '30d',
       });
 
-      // Attach secure cookie
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+      // Use utility to attach secure cookie
+      setAuthCookie(res, token);
 
       // Final success response
       return res.status(200).json({
@@ -128,13 +124,9 @@ export const loginPost = (req, res, next) => {
  * @param {Object} res - Express response.
  */
 export const logoutGet = (req, res) => {
-  // Clear the token cookie
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-  });
+  // Use utility to clear the token cookie
+  clearAuthCookie(res);
 
-  // Return JSON
+  // Return JSON status instead of redirect
   res.status(200).json({ message: 'Logged out successfully' });
 };
