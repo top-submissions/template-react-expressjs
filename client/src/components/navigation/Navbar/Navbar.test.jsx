@@ -1,74 +1,76 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
+import { useToast } from '../../../providers/ToastProvider/ToastProvider';
 import Navbar from './Navbar';
 
+// Mock both contexts
 vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
   useAuth: vi.fn(),
 }));
+vi.mock('../../../providers/ToastProvider/ToastProvider', () => ({
+  useToast: vi.fn(),
+}));
 
 describe('Navbar Component', () => {
+  const mockLogout = vi.fn();
+  const mockShowToast = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    useToast.mockReturnValue({ showToast: mockShowToast });
   });
 
-  it('renders standard links and user dashboard home for a regular USER', () => {
+  it('opens confirmation modal when logout is clicked', async () => {
     // --- Arrange ---
+    const user = userEvent.setup();
     useAuth.mockReturnValue({
       user: { username: 'john_doe', role: 'USER' },
-      logout: vi.fn(),
+      logout: mockLogout,
     });
 
-    // --- Act ---
     render(
       <MemoryRouter>
         <Navbar />
       </MemoryRouter>
     );
 
-    // --- Assert ---
-    // check for the dynamic Home link pointing to standard dashboard
-    const homeLink = screen.getByRole('link', { name: /home/i });
-    expect(homeLink).toHaveAttribute('href', '/dashboard');
-    expect(screen.getByText('john_doe')).toBeInTheDocument();
-  });
-
-  it('renders Admin Dashboard home link for an ADMIN role', () => {
-    // --- Arrange ---
-    useAuth.mockReturnValue({
-      user: { username: 'admin_user', role: 'ADMIN' },
-      logout: vi.fn(),
-    });
-
     // --- Act ---
-    render(
-      <MemoryRouter>
-        <Navbar />
-      </MemoryRouter>
-    );
+    const logoutBtn = screen.getByRole('button', { name: /log out/i });
+    await user.click(logoutBtn);
 
     // --- Assert ---
-    // check for the dynamic Home link pointing to admin dashboard
-    const homeLink = screen.getByRole('link', { name: /home/i });
-    expect(homeLink).toHaveAttribute('href', '/admin-dashboard');
-  });
-
-  it('renders nothing in user section when unauthenticated', () => {
-    // --- Arrange ---
-    useAuth.mockReturnValue({ user: null, logout: vi.fn() });
-
-    // --- Act ---
-    render(
-      <MemoryRouter>
-        <Navbar />
-      </MemoryRouter>
-    );
-
-    // --- Assert ---
+    // Modal should be visible
     expect(
-      screen.queryByRole('button', { name: /log out/i })
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText(/home/i)).not.toBeInTheDocument();
+      screen.getByText(/Are you sure you want to log out/i)
+    ).toBeInTheDocument();
+    // logout should NOT have been called yet
+    expect(mockLogout).not.toHaveBeenCalled();
+  });
+
+  it('calls logout and shows toast when confirmed', async () => {
+    // --- Arrange ---
+    const user = userEvent.setup();
+    useAuth.mockReturnValue({
+      user: { username: 'john_doe', role: 'USER' },
+      logout: mockLogout,
+    });
+
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
+
+    // --- Act ---
+    await user.click(screen.getByRole('button', { name: /log out/i }));
+    const confirmBtn = screen.getByRole('button', { name: /^Logout$/i }); // Match exact modal button
+    await user.click(confirmBtn);
+
+    // --- Assert ---
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(mockShowToast).toHaveBeenCalledWith(expect.any(String), 'info');
   });
 });

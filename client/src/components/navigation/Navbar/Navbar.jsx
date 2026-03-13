@@ -1,72 +1,106 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
+import { useToast } from '../../../providers/ToastProvider/ToastProvider';
 import styles from './Navbar.module.css';
 
 /**
  * Global navigation component.
  * - Manages branding and primary navigation links.
  * - Dynamic "Home" link points to specific dashboards based on user role.
- * - Displays session info (username/role) and handle logout.
+ * - Displays session info and handles secure logout with confirmation.
  * @returns {JSX.Element} The rendered navigation bar.
  */
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { showToast } = useToast();
 
-  // Determine administrative status
+  // Track visibility of the logout confirmation popup
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
-
-  // Define dashboard route based on user privileges
   const homePath = isAdmin ? '/admin-dashboard' : '/dashboard';
 
   /**
-   * Orchestrates the logout workflow.
-   * - Triggers asynchronous cookie clearing.
-   * @returns {Promise<void>}
+   * Finalizes the logout process.
+   * - Calls AuthProvider logout (clears cookies and state).
+   * - Notifies the user of success.
    */
-  const handleLogout = async () => {
-    // Clear server and local session
+  const handleConfirmLogout = async () => {
     await logout();
+    showToast('Logged out successfully', 'info');
+    setShowConfirm(false);
   };
 
   return (
-    <nav className={styles.navbar}>
-      <div className={styles.logo}>
-        <Link to="/">CapstoneApp</Link>
-      </div>
+    <>
+      <nav className={styles.navbar}>
+        <div className={styles.logo}>
+          <Link to="/">CapstoneApp</Link>
+        </div>
 
-      <div className={styles.navLinks}>
-        {/* Render home link conditionally for authenticated users */}
-        {user && (
-          <Link to={homePath} className={styles.homeLink}>
-            Home
+        <div className={styles.navLinks}>
+          {user && (
+            <Link to={homePath} className={styles.homeLink}>
+              Home
+            </Link>
+          )}
+          <Link to="/profile" title="View Profile">
+            Profile
           </Link>
-        )}
+          <Link to="/settings" title="Account Settings">
+            Settings
+          </Link>
+        </div>
 
-        <Link to="/profile" title="View Profile">
-          Profile
-        </Link>
-
-        <Link to="/settings" title="Account Settings">
-          Settings
-        </Link>
-      </div>
-
-      {user && (
-        <div className={styles.userSection}>
-          <div className={styles.info}>
-            <span className={styles.username}>{user.username}</span>
-            <span className={styles.roleLabel}>{user.role}</span>
+        {user && (
+          <div className={styles.userSection}>
+            <div className={styles.info}>
+              <span className={styles.username}>{user.username}</span>
+              <span className={styles.roleLabel}>{user.role}</span>
+            </div>
+            {/* Open confirmation modal instead of logging out immediately */}
+            <button
+              onClick={() => setShowConfirm(true)}
+              className={styles.logoutBtn}
+              aria-label="Log out"
+            >
+              Logout
+            </button>
           </div>
-          <button
-            onClick={handleLogout}
-            className={styles.logoutBtn}
-            aria-label="Log out"
+        )}
+      </nav>
+
+      {/* Animated Logout Confirmation Modal */}
+      {showConfirm && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowConfirm(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
           >
-            Logout
-          </button>
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to log out of your session?</p>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.confirmBtn}
+                onClick={handleConfirmLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       )}
-    </nav>
+    </>
   );
 };
 
