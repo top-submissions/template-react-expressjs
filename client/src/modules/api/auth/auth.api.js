@@ -12,10 +12,11 @@ export const authApi = {
    * @returns {Promise<Response>}
    */
   signup: async (userData) => {
-    // Execute Registration Request
+    // Execute Registration Request with credentials to allow guard clearance
     return fetch(`${BASE_URL}/api/auth/sign-up`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(userData),
     });
   },
