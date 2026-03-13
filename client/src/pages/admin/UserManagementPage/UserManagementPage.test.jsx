@@ -2,19 +2,20 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider } from '../../../providers/AuthProvider/AuthProvider';
+import { ToastProvider } from '../../../providers/ToastProvider/ToastProvider';
 import UserManagementPage from './UserManagementPage';
 
 /**
  * Integration tests for the User Management Page.
  * - Mocks global fetch for API simulation.
- * - Wraps component in AuthProvider to satisfy context requirements.
+ * - Wraps component in ToastProvider and AuthProvider to satisfy context requirements.
  */
 describe('UserManagementPage Component', () => {
   beforeEach(() => {
-    // Reset fetch mock and provide a default mock for the AuthProvider's /me call
+    // Reset fetch mock
     global.fetch = vi.fn();
 
-    // Mock the initial auth check to prevent AuthProvider from hanging
+    // Mock initial auth check to prevent AuthProvider from hanging
     fetch.mockImplementation((url) => {
       if (url.includes('/api/auth/me')) {
         return Promise.resolve({
@@ -28,31 +29,43 @@ describe('UserManagementPage Component', () => {
     });
   });
 
+  /**
+   * Helper to render the page with all necessary context providers.
+   */
+  const renderPage = () => {
+    return render(
+      <MemoryRouter>
+        <ToastProvider>
+          <AuthProvider>
+            <UserManagementPage />
+          </AuthProvider>
+        </ToastProvider>
+      </MemoryRouter>
+    );
+  };
+
   it('shows loading state initially', async () => {
     // --- Arrange ---
-    // Override the users fetch to stay pending
+    // Ensure the user fetch stays in a pending state
     fetch.mockImplementation((url) => {
       if (url.includes('/api/admin/users')) return new Promise(() => {});
-      return Promise.resolve({ ok: true, json: async () => ({}) });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ user: { id: 1, role: 'ADMIN' } }),
+      });
     });
 
     // --- Act ---
-    render(
-      <MemoryRouter>
-        <AuthProvider>
-          <UserManagementPage />
-        </AuthProvider>
-      </MemoryRouter>
-    );
+    renderPage();
 
     // --- Assert ---
-    // Verify visibility of loading indicator
+    // Locate the loading indicator
     expect(screen.getByText(/loading user records/i)).toBeInTheDocument();
   });
 
   it('renders user count after successful fetch', async () => {
     // --- Arrange ---
-    // Prepare mock response following the backend data shape { users: [] }
+    // Mock user data response shape
     const mockResponse = {
       users: [
         { id: 1, username: 'user1', role: 'USER' },
@@ -67,7 +80,6 @@ describe('UserManagementPage Component', () => {
           json: async () => mockResponse,
         });
       }
-      // Handle the AuthProvider's /me call
       return Promise.resolve({
         ok: true,
         json: async () => ({ user: { id: 99, role: 'ADMIN' } }),
@@ -75,16 +87,10 @@ describe('UserManagementPage Component', () => {
     });
 
     // --- Act ---
-    render(
-      <MemoryRouter>
-        <AuthProvider>
-          <UserManagementPage />
-        </AuthProvider>
-      </MemoryRouter>
-    );
+    renderPage();
 
     // --- Assert ---
-    // Check for total count after the async render completes
+    // Wait for the total count to update in the UI
     await waitFor(() => {
       const statsElement = screen.getByText(/total users:/i);
       expect(statsElement).toHaveTextContent('Total Users: 2');
@@ -93,25 +99,22 @@ describe('UserManagementPage Component', () => {
 
   it('displays error state on network failure', async () => {
     // --- Arrange ---
-    // Simulate an API error response for the users endpoint
+    // Force a 404 or failure for the user list endpoint
     fetch.mockImplementation((url) => {
       if (url.includes('/api/admin/users')) {
         return Promise.resolve({ ok: false });
       }
-      return Promise.resolve({ ok: true, json: async () => ({}) });
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ user: { id: 1, role: 'ADMIN' } }),
+      });
     });
 
     // --- Act ---
-    render(
-      <MemoryRouter>
-        <AuthProvider>
-          <UserManagementPage />
-        </AuthProvider>
-      </MemoryRouter>
-    );
+    renderPage();
 
     // --- Assert ---
-    // Ensure error message is visible to the user
+    // Check for specific error message defined in component
     await waitFor(() => {
       expect(
         screen.getByText(/failed to retrieve user directory/i)
