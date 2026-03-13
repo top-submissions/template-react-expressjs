@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
+import { useToast } from '../../../providers/ToastProvider/ToastProvider';
 import { loginSchema } from '../../../modules/validators/auth/auth.validator.js';
 import { authApi } from '../../../modules/api/auth/auth.api.js';
 import ValidationError from '../../errors/ValidationError/ValidationError';
@@ -15,6 +16,11 @@ import styles from './LoginForm.module.css';
  * @returns {JSX.Element} The rendered login form.
  */
 const LoginForm = () => {
+  // Access global toast and auth actions
+  const { showToast } = useToast();
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errorData, setErrorData] = useState({
     message: '',
@@ -22,9 +28,7 @@ const LoginForm = () => {
     status: null,
   });
 
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
+  // Handle field changes and clear stale errors
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -40,6 +44,7 @@ const LoginForm = () => {
     e.preventDefault();
     setErrorData({ message: '', errors: [], status: null });
 
+    // Validate inputs locally before hitting API
     const validation = loginSchema.safeParse(formData);
     if (!validation.success) {
       setErrorData({
@@ -51,13 +56,15 @@ const LoginForm = () => {
     }
 
     try {
-      // Use authApi to execute the login request
       const response = await authApi.login(formData);
       const data = await response.json();
 
       if (response.ok) {
+        // Update auth state and notify user
         login(data.user);
+        showToast('Login Successful!', 'success');
 
+        // Route based on role
         const isAdmin =
           data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN';
 
@@ -67,6 +74,7 @@ const LoginForm = () => {
           navigate('/dashboard');
         }
       } else {
+        // Handle server-side validation/auth errors
         setErrorData({
           message: data.message || 'Login failed',
           errors: data.errors || [],
