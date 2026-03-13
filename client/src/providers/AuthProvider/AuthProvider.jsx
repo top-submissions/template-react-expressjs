@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { authApi } from '../../modules/api/auth/auth.api.js';
+import { useToast } from '../ToastProvider/ToastProvider';
 
 const AuthContext = createContext(null);
 
@@ -12,11 +13,11 @@ const AuthContext = createContext(null);
  * @returns {JSX.Element}
  */
 export const AuthProvider = ({ children }) => {
-  // Initialize user and loading states
+  // Access toast system for notifications
+  const { showToast } = useToast();
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Track global authentication errors (e.g., session timeouts)
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
@@ -26,11 +27,10 @@ export const AuthProvider = ({ children }) => {
   /**
    * Pings the server to verify if a valid session cookie exists.
    * - Clears error on success.
-   * - Sets error message on 401/failure.
+   * - Sets error message and triggers toast on 401/failure.
    */
   const checkAuthStatus = async () => {
     try {
-      // Use authApi
       const response = await authApi.checkStatus();
 
       if (response.ok) {
@@ -39,6 +39,10 @@ export const AuthProvider = ({ children }) => {
         setAuthError(null);
       } else if (response.status === 401) {
         setUser(null);
+        // Apply session expiration message for test compliance
+        const msg = 'Your session has expired. Please log in again.';
+        setAuthError(msg);
+        showToast(msg, 'error');
       }
     } catch (err) {
       setUser(null);
@@ -62,12 +66,10 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = async () => {
     try {
-      // Direct server to clear the HttpOnly token cookie
       await authApi.logout();
     } catch (err) {
       console.error('Remote logout failed, clearing local state only:', err);
     } finally {
-      // Wipe local state
       setUser(null);
       setAuthError(null);
     }

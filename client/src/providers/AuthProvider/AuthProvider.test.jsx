@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from './AuthProvider';
+import { ToastProvider } from '../ToastProvider/ToastProvider';
 
 /**
  * Enhanced helper component to test error state consumption.
@@ -19,6 +20,17 @@ const TestComponent = () => {
   );
 };
 
+/**
+ * Helper to wrap provider tests with necessary context dependencies.
+ */
+const renderWithProviders = (ui) => {
+  return render(
+    <ToastProvider>
+      <AuthProvider>{ui}</AuthProvider>
+    </ToastProvider>
+  );
+};
+
 describe('AuthProvider', () => {
   beforeEach(() => {
     global.fetch = vi.fn();
@@ -30,14 +42,9 @@ describe('AuthProvider', () => {
     fetch.mockResolvedValueOnce({ ok: false });
     const user = userEvent.setup();
 
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
-
     // --- Act ---
-    const loginBtn = screen.getByText('Mock Login');
+    renderWithProviders(<TestComponent />);
+    const loginBtn = screen.getByRole('button', { name: /mock login/i });
     await user.click(loginBtn);
 
     // --- Assert ---
@@ -53,11 +60,7 @@ describe('AuthProvider', () => {
     });
 
     // --- Act ---
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
+    renderWithProviders(<TestComponent />);
 
     // --- Assert ---
     await waitFor(() => {
@@ -73,11 +76,7 @@ describe('AuthProvider', () => {
     fetch.mockRejectedValueOnce(new Error('Network Down'));
 
     // --- Act ---
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
+    renderWithProviders(<TestComponent />);
 
     // --- Assert ---
     await waitFor(() => {
@@ -92,19 +91,16 @@ describe('AuthProvider', () => {
     fetch.mockResolvedValueOnce({ ok: false, status: 401 });
     const user = userEvent.setup();
 
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
+    // --- Act ---
+    renderWithProviders(<TestComponent />);
 
-    // Wait for error to appear
+    // Wait for initial error state
     await waitFor(() =>
       expect(screen.getByTestId('auth-error')).not.toHaveTextContent('No Error')
     );
 
-    // --- Act ---
-    const clearBtn = screen.getByText('Clear Error');
+    // Click clear button
+    const clearBtn = screen.getByRole('button', { name: /clear error/i });
     await user.click(clearBtn);
 
     // --- Assert ---
