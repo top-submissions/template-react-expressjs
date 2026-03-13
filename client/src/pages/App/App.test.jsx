@@ -1,29 +1,46 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import App from './App';
+import { useAuth } from '../../providers/AuthProvider/AuthProvider';
+
+// Mock the auth hook to control loading states
+vi.mock('../../providers/AuthProvider/AuthProvider', () => ({
+  useAuth: vi.fn(),
+}));
 
 /**
  * Unit tests for the App root layout.
- * - Ensures the component renders without crashing.
- * - Validates that the application shell exists.
  */
 describe('App Component', () => {
-  it('renders the application shell', () => {
+  it('renders a loading state when initializing', () => {
     // --- Arrange ---
-    // Wrap App in MemoryRouter because it contains an <Outlet />
+    useAuth.mockReturnValue({ loading: true });
+
+    // --- Act ---
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+
+    // --- Assert ---
+    expect(screen.getByText(/Initializing session.../i)).toBeDefined();
+  });
+
+  it('renders the application shell after loading', () => {
+    // --- Arrange ---
+    useAuth.mockReturnValue({ loading: false });
+
+    // --- Act ---
     const { container } = render(
       <MemoryRouter>
         <App />
       </MemoryRouter>
     );
 
-    // --- Act ---
-    // Target the main container defined in App.jsx
-    const mainElement = container.querySelector('main');
-
     // --- Assert ---
-    // Confirm the layout structure is present
+    const mainElement = container.querySelector('main');
     expect(mainElement).toBeDefined();
   });
 });

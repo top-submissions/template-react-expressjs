@@ -1,14 +1,23 @@
-import { Link } from 'react-router';
+import { Link, Navigate } from 'react-router';
+import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 import styles from './LandingPage.module.css';
 
 /**
  * Public landing page component.
  * - Serves as the entry point for unauthenticated users.
- * - Provides navigation links to login and signup flows.
+ * - Redirects authenticated users to their respective dashboards.
  * @returns {JSX.Element} The rendered landing page.
  */
 const LandingPage = () => {
-  // Define page structure
+  const { user } = useAuth();
+
+  // Redirect authenticated users away from landing
+  if (user) {
+    const destination =
+      user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard';
+    return <Navigate to={destination} replace />;
+  }
+
   return (
     <div className={styles.container}>
       {/* Hero section */}
