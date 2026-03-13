@@ -4,6 +4,7 @@ import {
   AuthenticationError,
   ForbiddenError,
 } from '../../errors/AppError.js';
+import { clearAuthCookie } from '../../utils/auth/cookie/cookie.js';
 
 /**
  * Resolves the current user from the JWT, if present.
@@ -31,10 +32,11 @@ export const resolveJwtUser = (req, res, callback) => {
 export const isAuthenticated = (req, res, next) => {
   // Check for valid user identity
   resolveJwtUser(req, res, (err, user) => {
-    if (err) return next(err);
-
-    // Block unauthorized access
-    if (!user) return next(new AuthenticationError('Please log in first'));
+    // Wipe cookie if token is invalid or missing to prevent 401 loops
+    if (err || !user) {
+      clearAuthCookie(res);
+      return next(new AuthenticationError('Please log in first'));
+    }
 
     // Attach identity to request
     req.user = user;
@@ -51,14 +53,11 @@ export const isAuthenticated = (req, res, next) => {
  * @returns {void}
  */
 export const isNotAuthenticated = (req, res, next) => {
+  // Ensure no user is currently logged in
   resolveJwtUser(req, res, (err, user) => {
+    // Automatically clear session if an authenticated user hits guest routes
     if (user) {
-      // If a user is already logged in, clear the cookie
-      res.clearCookie('token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      });
+      clearAuthCookie(res);
       return next();
     }
     return next();

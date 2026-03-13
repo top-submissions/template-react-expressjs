@@ -1,12 +1,18 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import passport from 'passport';
 import * as authMiddleware from './auth.middleware.js';
+import { clearAuthCookie } from '../../utils/auth/cookie/cookie.js';
 
 // Mock passport to control authentication outcomes
 vi.mock('passport', () => ({
   default: {
     authenticate: vi.fn(),
   },
+}));
+
+// Mock cookie utility to verify clearing calls
+vi.mock('../../utils/auth/cookie/cookie.js', () => ({
+  clearAuthCookie: vi.fn(),
 }));
 
 describe('authMiddleware module', () => {
@@ -44,7 +50,7 @@ describe('authMiddleware module', () => {
       expect(next).toHaveBeenCalled();
     });
 
-    it('should return 401 if no user is found', () => {
+    it('should return 401 and clear cookie if no user is found', () => {
       // --- Arrange ---
       // Simulate passport failing to resolve a user
       passport.authenticate.mockImplementation(
@@ -57,6 +63,8 @@ describe('authMiddleware module', () => {
       authMiddleware.isAuthenticated(req, res, next);
 
       // --- Assert ---
+      // Ensure cookie is wiped on authentication failure
+      expect(clearAuthCookie).toHaveBeenCalledWith(res);
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
           statusCode: 401,
@@ -108,7 +116,7 @@ describe('authMiddleware module', () => {
   });
 
   describe('isNotAuthenticated()', () => {
-    it('should return 400 if user is already logged in', () => {
+    it('should clear cookie and call next if user is already logged in', () => {
       // --- Arrange ---
       // Simulate an active session during a guest-only route request
       const existingUser = { id: 1 };
@@ -122,11 +130,9 @@ describe('authMiddleware module', () => {
       authMiddleware.isNotAuthenticated(req, res, next);
 
       // --- Assert ---
-      expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          statusCode: 400,
-        })
-      );
+      // Confirm cookie is cleared to allow new session flow
+      expect(clearAuthCookie).toHaveBeenCalledWith(res);
+      expect(next).toHaveBeenCalled();
     });
   });
 });
