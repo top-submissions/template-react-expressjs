@@ -1,27 +1,32 @@
-@import './colors.css';
+/* Variables (Design Tokens) */
+@import './variables/colors.css';
+@import './variables/spacing.css';
+@import './variables/shadows.css';
 
-/* Initialize CSS Reset */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Base Styles (Reset & Layout) */
+@import './base/reset.css';
+@import './base/layout.css';
 
-/* Base body layout */
+/* Global Motion */
+@import './animations.css';
+
+/* --- Application Global Defaults --- */
 body {
-  min-width: 320px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
+  min-height: 100vh;
 }
 
-/* Standardized link behavior */
+h1 {
+  font-size: 3.2rem;
+  line-height: 1.1;
+  margin-bottom: var(--space-3);
+}
+
 a {
-  font-weight: 500;
   color: var(--primary-color);
-  text-decoration: inherit;
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 
@@ -29,41 +34,17 @@ a:hover {
   color: var(--primary-hover);
 }
 
-/* Typography scale */
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-  /* Ensure heading color follows theme */
-  color: var(--text-color);
-}
-
-/* Button interactive states */
+/* Base button styles for standard tags */
 button {
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
   padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  /* Apply theme variables to background and text */
+  border-radius: var(--space-1);
   background-color: var(--btn-bg);
-  color: var(--text-color);
-  cursor: pointer;
-  transition: border-color 0.25s;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
 button:hover {
   border-color: var(--primary-color);
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-/* Flexbox utility */
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-shadow: var(--shadow-md);
 }
