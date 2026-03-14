@@ -14,29 +14,32 @@ vi.mock('react-router', async () => {
   const actual = await vi.importActual('react-router');
   return {
     ...actual,
-    // Return null to avoid rendering actual navigation components
     Navigate: vi.fn(() => null),
   };
 });
 
 describe('LandingPage', () => {
-  it('renders welcome message and navigation links for guests', () => {
+  it('renders hero content and CTA links for guests', () => {
     // --- Arrange ---
     useAuth.mockReturnValue({ user: null });
 
+    // --- Act ---
     render(
       <MemoryRouter>
         <LandingPage />
       </MemoryRouter>
     );
 
-    // --- Act ---
-    const heading = screen.getByText(/Welcome to the App/i);
-    const loginLink = screen.getByRole('link', { name: /Log In/i });
-
     // --- Assert ---
-    expect(heading).toBeDefined();
-    expect(loginLink.getAttribute('href')).toBe('/log-in');
+    expect(screen.getByText(/Welcome to the App/i)).toBeDefined();
+    expect(screen.getByRole('link', { name: /Get Started/i })).toHaveAttribute(
+      'href',
+      '/sign-up'
+    );
+    expect(screen.getByRole('link', { name: /Log In/i })).toHaveAttribute(
+      'href',
+      '/log-in'
+    );
   });
 
   it('redirects to dashboard when user is already logged in', () => {
@@ -51,7 +54,6 @@ describe('LandingPage', () => {
     );
 
     // --- Assert ---
-    // Fix: expect one argument (props object) containing the 'to' property
     expect(Navigate).toHaveBeenCalledWith(
       expect.objectContaining({ to: '/dashboard' }),
       undefined
