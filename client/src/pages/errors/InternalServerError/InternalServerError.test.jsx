@@ -17,6 +17,7 @@ describe('InternalServerError Component', () => {
     // --- Arrange ---
     useRouteError.mockReturnValue(new Error('Critical System Failure'));
 
+    // --- Act ---
     render(<InternalServerError />);
 
     // --- Act ---

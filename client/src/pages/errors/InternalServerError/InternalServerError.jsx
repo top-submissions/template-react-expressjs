@@ -14,16 +14,15 @@ const InternalServerError = () => {
   console.error(error);
 
   return (
-    <main className={`${styles.container} flex-center`}>
+    <main className={`${styles.container} flex-center animate-fade-in`}>
       <div className={styles.content}>
         <h1 className={styles.errorCode}>500</h1>
-        <h2>Something went wrong</h2>
+        <h2 className={styles.title}>Something went wrong</h2>
         <p className={styles.message}>
           An unexpected error occurred. We've been notified and are working to
           fix it.
         </p>
 
-        {/* Reset button to clear state and try again */}
         <button
           onClick={() => window.location.assign('/')}
           className={styles.homeLink}

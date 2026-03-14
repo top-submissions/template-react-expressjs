@@ -1,36 +1,54 @@
 .container {
-  /* Ensure the error page takes up the full screen to center content */
   min-height: 100vh;
-  padding: 2rem;
+  padding: var(--space-4);
   text-align: center;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-3);
   max-width: 500px;
 }
 
 .errorCode {
-  /* Hero typography for the status code */
-  font-size: 8rem;
-  margin-bottom: -1rem;
+  font-size: var(--text-4xl);
+  margin-bottom: calc(var(--space-1) * -1);
   opacity: 0.6;
-  /* Visual cue: using primary color to indicate it's an app-level event */
-  color: var(--primary-color);
+  color: var(--error-text);
+  font-weight: var(--weight-bold);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
 }
 
 .message {
-  line-height: 1.6;
-  /* Slight transparency for the description text */
-  filter: opacity(0.85);
+  line-height: var(--lh-relaxed);
+  opacity: 0.9;
+  font-size: var(--text-base);
 }
 
 .homeLink {
-  /* Note: This is a button element, but styled to match our link navigation actions */
   align-self: center;
-  margin-top: 1rem;
-  /* Button reset handled by global styles, specific padding added here */
-  padding: 0.8rem 2rem;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--btn-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: var(--space-1);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.homeLink:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: white;
 }
