@@ -9,10 +9,10 @@ import styles from './ForbiddenError.module.css';
  */
 const ForbiddenError = () => {
   return (
-    <main className={`${styles.container} flex-center`}>
+    <main className={`${styles.container} flex-center animate-fade-in`}>
       <div className={styles.content}>
         <h1 className={styles.errorCode}>403</h1>
-        <h2>Access Denied</h2>
+        <h2 className={styles.title}>Access Denied</h2>
         <p className={styles.message}>
           You do not have the required permissions to view this resource. Please
           contact an administrator if you believe this is an error.

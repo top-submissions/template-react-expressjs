@@ -1,42 +1,53 @@
 .container {
-  /* Ensure the error page fills the viewport for centering */
   min-height: 100vh;
-  padding: 2rem;
+  padding: var(--space-4);
   text-align: center;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-3);
   max-width: 450px;
 }
 
 .errorCode {
-  /* Large display for the 403 status code */
-  font-size: 8rem;
-  margin-bottom: -1rem;
+  font-size: var(--text-4xl);
+  margin-bottom: calc(var(--space-1) * -1);
   opacity: 0.6;
-  color: var(--primary-color);
+  color: var(--error-text);
+  font-weight: var(--weight-bold);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
 }
 
 .message {
-  line-height: 1.6;
-  /* Mute slightly to distinguish from headings */
-  filter: opacity(0.9);
+  line-height: var(--lh-relaxed);
+  font-size: var(--text-base);
+  opacity: 0.9;
 }
 
 .homeLink {
-  /* Emulate global button styling for the navigation link */
   display: inline-block;
   background-color: var(--btn-bg);
   border: 1px solid var(--border-color);
-  padding: 0.8rem 1.8rem;
-  border-radius: 8px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--space-1);
   align-self: center;
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .homeLink:hover {
-  border-color: var(--primary-color);
+  border-color: var(--primary-hover);
+  background-color: var(--border-color);
 }
