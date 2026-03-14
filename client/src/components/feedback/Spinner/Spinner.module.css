@@ -1,0 +1,18 @@
+.spinnerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Uses your 32px global spacing token */
+  padding: var(--space-4);
+}
+
+.spinner {
+  /* Use global border color for the background ring */
+  border: 3px solid var(--border-color);
+  /* Use global primary color for the spinning indicator */
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  /* Fallback size; typically overridden by inline style prop in JSX */
+  width: var(--space-4);
+  height: var(--space-4);
+}
