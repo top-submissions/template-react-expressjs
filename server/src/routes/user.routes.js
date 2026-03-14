@@ -11,6 +11,7 @@ const userRouter = Router();
 userRouter.use(isAuthenticated);
 
 // Identity and Settings Endpoints
+userRouter.get('/me', userController.getCurrentUser);
 userRouter.get('/profile', userController.profileGet);
 userRouter.get('/profile/:id', userController.getUserById);
 
