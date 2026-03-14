@@ -1,41 +1,38 @@
 .container {
-  max-width: 1200px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
-  /* Ensure the content doesn't hit the screen edges on mobile */
-  padding: 2rem;
+  padding: var(--space-4);
 }
 
 .header {
-  margin-bottom: 3rem;
-  /* Align title and subtitle */
+  margin-bottom: var(--space-6);
   text-align: left;
 }
 
 .title {
-  /* Use global h1 styling logic via text-color variable */
   color: var(--text-color);
-  margin-bottom: 0.5rem;
-  font-size: 2.5rem;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--lh-tight);
 }
 
 .subtitle {
-  /* De-emphasize subtitle using opacity for theme consistency */
   opacity: 0.7;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
+  line-height: var(--lh-base);
 }
 
 .grid {
   display: grid;
-  /* Responsive grid: 1 column on mobile, up to 3 on desktop */
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: var(--space-4);
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  padding: 2rem;
-  /* Use global border color and button-like background for consistency */
+  padding: var(--space-4);
   background-color: var(--btn-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -47,39 +44,34 @@
 }
 
 .card:hover {
-  /* Use brand color for the hover state border */
   border-color: var(--primary-color);
   transform: translateY(-4px);
-  /* Subtle elevation effect */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.cardIcon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  /* Administrative items often use error/status colors for emphasis */
-  color: var(--primary-color);
+  /* Replaced hardcoded shadow with global MD elevation */
+  box-shadow: var(--shadow-md);
 }
 
 .cardTitle {
-  margin-bottom: 0.75rem;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin-bottom: var(--space-1);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
   color: var(--text-color);
 }
 
 .cardDescription {
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: var(--text-sm);
+  line-height: var(--lh-relaxed);
   opacity: 0.8;
   color: var(--text-color);
 }
 
-/* Specific styling for dangerous or high-level admin actions */
-.criticalCard .cardIcon {
-  color: var(--error-text);
-}
-
+/* Logic for high-privilege cards using semantic error tokens */
 .criticalCard:hover {
   border-color: var(--error-text);
+  background-color: var(--error-bg);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-2);
+  }
 }

@@ -13,11 +13,11 @@ const AdminDashboard = () => {
   // Extract user info for the personalized header
   const { user } = useAuth();
 
-  // Logic: Identify if the user is a SUPER_ADMIN to potentially show restricted cards
+  // Identify if the user is a SUPER_ADMIN to potentially show restricted cards
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} animate-fade-in`}>
       <header className={styles.header}>
         <h1 className={styles.title}>Admin Control Center</h1>
         <p className={styles.subtitle}>
@@ -27,7 +27,6 @@ const AdminDashboard = () => {
       </header>
 
       <div className={styles.grid}>
-        {/* User Management Card: The primary tool for Admins */}
         <Link to="/admin-dashboard/users" className={styles.card}>
           <h2 className={styles.cardTitle}>User Management</h2>
           <p className={styles.cardDescription}>
@@ -36,7 +35,6 @@ const AdminDashboard = () => {
           </p>
         </Link>
 
-        {/* Audit Logs Card: Example of a standard Admin tool */}
         <Link to="/admin-dashboard/logs" className={styles.card}>
           <h2 className={styles.cardTitle}>System Logs</h2>
           <p className={styles.cardDescription}>
@@ -45,7 +43,6 @@ const AdminDashboard = () => {
           </p>
         </Link>
 
-        {/* High-Level Settings: Use 'criticalCard' style if role is SUPER_ADMIN */}
         <Link
           to="/admin-dashboard/settings"
           className={`${styles.card} ${isSuperAdmin ? styles.criticalCard : ''}`}
