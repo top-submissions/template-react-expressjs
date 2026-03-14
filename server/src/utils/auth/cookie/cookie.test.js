@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { setAuthCookie, clearAuthCookie, cookieOptions } from './cookie.js';
+import { setAuthCookie, clearAuthCookie } from './cookie.js';
+// Import from the actual config source
+import { cookieOptions } from '../../../config/cookieOptions.js';
 
 describe('Auth Cookie Utility', () => {
-  // Create a mock Express response object
+  // Generate mock response
   const mockResponse = () => {
     const res = {};
     res.cookie = vi.fn().mockReturnValue(res);
@@ -11,21 +13,26 @@ describe('Auth Cookie Utility', () => {
   };
 
   it('setAuthCookie() should call res.cookie with correct parameters', () => {
+    // Arrange
     const res = mockResponse();
     const testToken = 'mock-jwt-token';
 
+    // Act
     setAuthCookie(res, testToken);
 
-    // Verify token and options were passed correctly
+    // Assert
     expect(res.cookie).toHaveBeenCalledWith('token', testToken, cookieOptions);
   });
 
   it('clearAuthCookie() should call res.clearCookie with matching options', () => {
+    // Arrange
     const res = mockResponse();
 
+    // Act
     clearAuthCookie(res);
 
-    // Verify clearCookie was called with same security options but 0 maxAge
+    // Assert
+    // Verify security options spread correctly with expired maxAge
     expect(res.clearCookie).toHaveBeenCalledWith('token', {
       ...cookieOptions,
       maxAge: 0,
