@@ -25,7 +25,7 @@ describe('ExternalServiceError Page', () => {
     useNavigate.mockReturnValue(mockNavigate);
   });
 
-  it('renders correctly with service interruption text', () => {
+  it('renders correctly with service interruption text and status label', () => {
     // --- Arrange ---
     render(
       <MemoryRouter>
@@ -34,6 +34,8 @@ describe('ExternalServiceError Page', () => {
     );
 
     // --- Assert ---
+    // Check for the new text label replacing the icon
+    expect(screen.getByText(/Connection Error/i)).toBeInTheDocument();
     expect(screen.getByText(/Service Interruption/i)).toBeInTheDocument();
     expect(screen.getByText(/external providers/i)).toBeInTheDocument();
   });

@@ -17,9 +17,8 @@ const ExternalServiceError = () => {
 
   return (
     <main className={styles.container}>
-      {/* Visual Indicator for External Connection Failure */}
-      <div className={styles.iconWrapper}>
-        <span className={styles.icon}>🔌</span>
+      <div className={styles.labelWrapper}>
+        <span className={styles.errorLabel}>Connection Error</span>
       </div>
 
       <h1 className={styles.title}>Service Interruption</h1>
