@@ -13,8 +13,22 @@ describe('Spinner Component', () => {
     // --- Assert ---
     // Check for the ARIA role status
     expect(screen.getByRole('status')).toBeInTheDocument();
-    // Check for the screen-reader-only text
+    // Default fallback text for screen readers
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
+
+  it('displays the provided message and omits sr-only text', () => {
+    // --- Arrange ---
+    const testMessage = 'Fetching data...';
+
+    // --- Act ---
+    render(<Spinner message={testMessage} />);
+
+    // --- Assert ---
+    // Check that the visible message is present
+    expect(screen.getByText(testMessage)).toBeInTheDocument();
+    // Ensure the default "Loading..." sr-only text is NOT there to avoid double-announcing
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 
   it('applies custom size via props', () => {
@@ -23,6 +37,7 @@ describe('Spinner Component', () => {
 
     // --- Act ---
     render(<Spinner size={customSize} />);
+    // Access the actual animated div inside the wrapper
     const spinnerGraphic = screen.getByRole('status').firstElementChild;
 
     // --- Assert ---

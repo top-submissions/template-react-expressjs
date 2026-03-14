@@ -1,18 +1,24 @@
 import styles from './Spinner.module.css';
 
 /**
- * Reusable loading spinner.
- * @param {string} size - CSS dimension for width/height (defaults to 2.5rem).
+ * Reusable loading spinner with optional message.
+ * @param {string} size - CSS dimension for width/height.
+ * @param {string} message - Optional text to display below the spinner.
  */
-const Spinner = ({ size = '2.5rem' }) => {
+const Spinner = ({ size = '2.5rem', message }) => {
   return (
-    // status role provides immediate feedback to assistive technologies
     <div className={styles.spinnerWrapper} role="status">
       <div
         className={`${styles.spinner} animate-spin`}
         style={{ width: size, height: size }}
       />
-      <span className="sr-only">Loading...</span>
+
+      {/* If message exists, show it; otherwise, keep sr-only for screen readers */}
+      {message ? (
+        <p className={styles.message}>{message}</p>
+      ) : (
+        <span className="sr-only">Loading...</span>
+      )}
     </div>
   );
 };
