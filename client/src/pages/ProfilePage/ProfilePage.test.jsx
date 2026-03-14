@@ -1,20 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
-import { userApi } from '../../modules/api/user/user.api';
 import ProfilePage from './ProfilePage';
-
-vi.mock('../../providers/AuthProvider/AuthProvider', () => ({
-  useAuth: vi.fn(),
-}));
-
-// Mock the API service
-vi.mock('../../modules/api/user/user.api', () => ({
-  userApi: {
-    getById: vi.fn(),
-  },
-}));
 
 describe('ProfilePage Component', () => {
   const mockCurrentUser = {
@@ -29,13 +17,9 @@ describe('ProfilePage Component', () => {
     email: 'test@example.com',
   };
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('renders the current user profile when no ID is provided', async () => {
     // --- Arrange ---
-    useAuth.mockReturnValue({ user: mockCurrentUser });
+    vi.mocked(useAuth).mockReturnValue({ user: mockCurrentUser });
 
     // --- Act ---
     render(
@@ -53,8 +37,8 @@ describe('ProfilePage Component', () => {
 
   it('fetches and displays another user profile when an ID is provided', async () => {
     // --- Arrange ---
-    useAuth.mockReturnValue({ user: mockCurrentUser });
-    userApi.getById.mockResolvedValueOnce({
+    vi.mocked(useAuth).mockReturnValue({ user: mockCurrentUser });
+    fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockTargetUser,
     });

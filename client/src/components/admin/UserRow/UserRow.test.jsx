@@ -1,14 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import UserRow from './UserRow';
-
-// Mock AuthProvider to test permission-based UI rendering
-vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
-  useAuth: vi.fn(),
-}));
 
 describe('UserRow Component', () => {
   const mockUser = {
@@ -18,15 +13,9 @@ describe('UserRow Component', () => {
     createdAt: '2023-01-01T00:00:00Z',
   };
 
-  beforeEach(() => {
-    // Reset global fetch mock before every test
-    global.fetch = vi.fn();
-    // Clear all mock history
-    vi.clearAllMocks();
-  });
-
   it('renders user details correctly', () => {
     // --- Arrange ---
+    // Set specific auth state for this test
     useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
 
     // --- Act ---
@@ -49,6 +38,7 @@ describe('UserRow Component', () => {
     // --- Arrange ---
     const user = userEvent.setup();
     useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
+
     render(
       <MemoryRouter>
         <table>
@@ -93,16 +83,9 @@ describe('UserRow Component', () => {
   it('calls the promote API when the promote button is clicked', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
-    // Allow promotion by mocking a SUPER_ADMIN user
     useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
-    // Simulate a successful API response
+    // Mock specific fetch response for this test
     fetch.mockResolvedValueOnce({ ok: true });
-    // Prevent window reload from crashing the test environment
-    const reloadMock = vi.fn();
-    Object.defineProperty(window, 'location', {
-      value: { reload: reloadMock },
-      writable: true,
-    });
 
     render(
       <MemoryRouter>
@@ -115,13 +98,10 @@ describe('UserRow Component', () => {
     );
 
     // --- Act ---
-    // Open the dropdown menu
     await user.click(screen.getByLabelText(/open actions menu/i));
-    // Click the promotion button
     await user.click(screen.getByText(/promote to admin/i));
 
     // --- Assert ---
-    // Confirm the API endpoint and method are correct
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining(`/api/admin/users/${mockUser.id}/promote`),
       expect.objectContaining({
@@ -129,8 +109,8 @@ describe('UserRow Component', () => {
         credentials: 'include',
       })
     );
-    // Verify the UI triggers a refresh on success
-    expect(reloadMock).toHaveBeenCalled();
+    // Reload mock is now provided globally by setup.js
+    expect(window.location.reload).toHaveBeenCalled();
   });
 
   it('calls the demote API when a Super Admin clicks demote on an Admin', async () => {
@@ -139,12 +119,6 @@ describe('UserRow Component', () => {
     const adminUser = { ...mockUser, role: 'ADMIN' };
     useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
     fetch.mockResolvedValueOnce({ ok: true });
-
-    const reloadMock = vi.fn();
-    Object.defineProperty(window, 'location', {
-      value: { reload: reloadMock },
-      writable: true,
-    });
 
     render(
       <MemoryRouter>
@@ -157,12 +131,10 @@ describe('UserRow Component', () => {
     );
 
     // --- Act ---
-    // Trigger menu and click demote
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/demote to user/i));
 
     // --- Assert ---
-    // Verify demote endpoint is hit with correct method and credentials
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining(`/api/admin/users/${adminUser.id}/demote`),
       expect.objectContaining({
@@ -170,7 +142,7 @@ describe('UserRow Component', () => {
         credentials: 'include',
       })
     );
-    expect(reloadMock).toHaveBeenCalled();
+    expect(window.location.reload).toHaveBeenCalled();
   });
 
   it('hides demote option when a Super Admin views a regular User', async () => {
@@ -192,7 +164,6 @@ describe('UserRow Component', () => {
     await user.click(screen.getByLabelText(/open actions menu/i));
 
     // --- Assert ---
-    // Super Admins can only demote Admins, not regular Users
     expect(screen.queryByText(/demote to user/i)).not.toBeInTheDocument();
   });
 });

@@ -1,21 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { adminApi } from './admin.api';
 
 describe('adminApi', () => {
-  beforeEach(() => {
-    // Standard mock for a successful fetch response
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      })
-    );
-  });
-
   it('getAllUsers calls the correct endpoint with GET', async () => {
+    // --- Arrange ---
+    fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    });
+
+    // --- Act ---
     await adminApi.getAllUsers();
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    // --- Assert ---
+    expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/admin/users'),
       expect.objectContaining({
         method: 'GET',
@@ -25,11 +23,18 @@ describe('adminApi', () => {
   });
 
   it('promoteUser injects the userId into the URL', async () => {
+    // --- Arrange ---
     const testId = 123;
+    fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    });
+
+    // --- Act ---
     await adminApi.promoteUser(testId);
 
-    // Verify ID placement in path
-    expect(global.fetch).toHaveBeenCalledWith(
+    // --- Assert ---
+    expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining(`/api/admin/promote/${testId}`),
       expect.objectContaining({
         method: 'POST',
@@ -39,10 +44,18 @@ describe('adminApi', () => {
   });
 
   it('demoteUser injects the userId into the URL', async () => {
+    // --- Arrange ---
     const testId = 456;
+    fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    });
+
+    // --- Act ---
     await adminApi.demoteUser(testId);
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    // --- Assert ---
+    expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining(`/api/admin/demote/${testId}`),
       expect.objectContaining({
         method: 'POST',

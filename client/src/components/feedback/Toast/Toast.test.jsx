@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import Toast from './Toast';
 
@@ -14,18 +15,19 @@ describe('Toast Component', () => {
     render(<Toast {...mockProps} />);
 
     // --- Assert ---
-    expect(screen.getByText(/Test Message/i)).toBeDefined();
+    expect(screen.getByText(/Test Message/i)).toBeInTheDocument();
   });
 
-  it('calls onClose when the close button is clicked', () => {
+  it('calls onClose when the close button is clicked', async () => {
     // --- Arrange ---
+    const user = userEvent.setup();
     render(<Toast {...mockProps} />);
     const closeButton = screen.getByRole('button', {
       name: /Close notification/i,
     });
 
     // --- Act ---
-    fireEvent.click(closeButton);
+    await user.click(closeButton);
 
     // --- Assert ---
     expect(mockProps.onClose).toHaveBeenCalledTimes(1);
@@ -36,7 +38,7 @@ describe('Toast Component', () => {
     const { container } = render(<Toast {...mockProps} type="error" />);
 
     // --- Assert ---
-    // Check if the div contains a class that looks like the error module class
+    // Validate style application via class name
     expect(container.firstChild.className).toContain('error');
   });
 });

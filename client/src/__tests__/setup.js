@@ -1,20 +1,23 @@
-import { expect, afterEach } from 'vitest';
+import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
+// Extend Vitest with jest-dom matchers
 expect.extend(matchers);
 
+// Clean up DOM after each test
 afterEach(() => {
   cleanup();
+  vi.clearAllMocks();
 });
 
 /**
- * Creates a mock implementation of localStorage for testing
- * @returns {Object} Mock localStorage with all standard methods
+ * Global Browser API Mocks.
  */
+
+// Mock localStorage
 const createLocalStorageMock = () => {
   let store = {};
-
   return {
     getItem: (key) => store[key] || null,
     setItem: (key, value) => {
@@ -34,9 +37,34 @@ const createLocalStorageMock = () => {
 };
 
 if (typeof window !== 'undefined') {
+  // Initialize localStorage
   Object.defineProperty(window, 'localStorage', {
     value: createLocalStorageMock(),
     writable: true,
     configurable: true,
   });
+
+  // Mock global fetch
+  global.fetch = vi.fn();
+
+  // Mock window.location methods to prevent navigation errors
+  Object.defineProperty(window, 'location', {
+    value: {
+      reload: vi.fn(),
+      assign: vi.fn(),
+      replace: vi.fn(),
+    },
+    writable: true,
+  });
 }
+
+// React Router Navigation & Errors
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual('react-router');
+  return {
+    ...actual,
+    useNavigate: vi.fn(() => vi.fn()),
+    useRouteError: vi.fn(),
+    Navigate: vi.fn(() => null),
+  };
+});
