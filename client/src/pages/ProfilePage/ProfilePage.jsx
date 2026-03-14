@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
+import { userApi } from '../../modules/api/user/user.api';
 import styles from './ProfilePage.module.css';
 
 /**
  * User Profile Page.
- * - Displays account details for the current user or a targeted user (admin view).
- * - Handles role-based promotion logic.
+ * - Displays account details for the current user or a targeted user.
  * - Manages data fetching for external profiles via URL parameters.
  * @returns {JSX.Element}
  */
@@ -14,19 +14,18 @@ const ProfilePage = () => {
   const { id } = useParams();
   const { user: currentUser } = useAuth();
 
-  // State for the user being viewed
   const [profileUser, setProfileUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   /**
    * Loads user data.
-   * - If an ID is in the URL, fetches that specific user (Admin view).
+   * - If an ID is in the URL, fetches that specific user.
    * - Otherwise, defaults to the current authenticated user's data.
    */
   useEffect(() => {
     const loadProfile = async () => {
-      // If no ID is provided, we are viewing our own profile
+      // Use current user if no ID parameter is present
       if (!id) {
         setProfileUser(currentUser);
         setIsLoading(false);
@@ -35,7 +34,8 @@ const ProfilePage = () => {
 
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/users/${id}`);
+        // Fetch specific user via API service
+        const response = await userApi.getById(id);
         if (!response.ok) throw new Error('User not found');
         const data = await response.json();
         setProfileUser(data);
@@ -49,36 +49,17 @@ const ProfilePage = () => {
     loadProfile();
   }, [id, currentUser]);
 
-  /**
-   * Administrative action to upgrade a user's role.
-   */
-  const handlePromote = async () => {
-    try {
-      const response = await fetch(`/api/users/${profileUser.id}/promote`, {
-        method: 'PATCH',
-      });
-      if (!response.ok) throw new Error('Promotion failed');
-
-      // Update local state to reflect the new role immediately
-      setProfileUser({ ...profileUser, role: 'ADMIN' });
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
   if (isLoading)
-    return <div className={styles.loadingWrapper}>Loading profile...</div>;
+    return (
+      <div className={`${styles.loadingWrapper} animate-fade-in`}>
+        Loading profile...
+      </div>
+    );
   if (error) return <div className={styles.errorWrapper}>Error: {error}</div>;
   if (!profileUser) return null;
 
-  // Logic: Can only promote if viewer is Admin/SuperAdmin and target is a regular User
-  const showPromoteAction =
-    (currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN') &&
-    profileUser.role === 'USER' &&
-    currentUser.id !== profileUser.id;
-
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} animate-fade-in`}>
       <div className={styles.profileCard}>
         <div className={styles.avatar}>
           {profileUser.username?.charAt(0).toUpperCase()}
@@ -101,14 +82,6 @@ const ProfilePage = () => {
             </span>
           </div>
         </div>
-
-        {showPromoteAction && (
-          <div className={styles.adminActions}>
-            <button className={styles.promoteBtn} onClick={handlePromote}>
-              Promote to Admin
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
