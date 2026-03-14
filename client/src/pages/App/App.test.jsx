@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import App from './App';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 
-// Mock the auth hook to control loading states
+// Mock auth hook to control lifecycle states
 vi.mock('../../providers/AuthProvider/AuthProvider', () => ({
   useAuth: vi.fn(),
 }));
@@ -14,33 +14,39 @@ vi.mock('../../providers/AuthProvider/AuthProvider', () => ({
  */
 describe('App Component', () => {
   it('renders a loading state when initializing', () => {
-    // --- Arrange ---
+    // Arrange
     useAuth.mockReturnValue({ loading: true });
 
-    // --- Act ---
+    // Act
     render(
       <MemoryRouter>
         <App />
       </MemoryRouter>
     );
 
-    // --- Assert ---
-    expect(screen.getByText(/Initializing session.../i)).toBeDefined();
+    // Assert
+    // Verify status role from the Spinner component
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    // Verify specific initialization text
+    expect(screen.getByText(/Initializing session.../i)).toBeInTheDocument();
   });
 
   it('renders the application shell after loading', () => {
-    // --- Arrange ---
+    // Arrange
     useAuth.mockReturnValue({ loading: false });
 
-    // --- Act ---
+    // Act
     const { container } = render(
       <MemoryRouter>
         <App />
       </MemoryRouter>
     );
 
-    // --- Assert ---
+    // Assert
     const mainElement = container.querySelector('main');
+    // Ensure main element exists
     expect(mainElement).toBeDefined();
+    // Verify application of global layout class
+    expect(mainElement).toHaveClass('container');
   });
 });
