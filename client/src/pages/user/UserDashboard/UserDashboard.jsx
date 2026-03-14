@@ -11,7 +11,7 @@ const UserDashboard = () => {
   const { user } = useAuth();
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} animate-fade-in`}>
       <div className={styles.welcomeCard}>
         <h1 className={styles.title}>Welcome back, {user?.username}!</h1>
         <p className={styles.subtitle}>
