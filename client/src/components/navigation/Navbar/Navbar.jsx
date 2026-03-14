@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { useToast } from '../../../providers/ToastProvider/ToastProvider';
+import { useTheme } from '../../../providers/ThemeProvider/ThemeProvider'; // Added theme
 import styles from './Navbar.module.css';
 
 /**
@@ -9,11 +10,13 @@ import styles from './Navbar.module.css';
  * - Manages branding and primary navigation links.
  * - Dynamic "Home" link points to specific dashboards based on user role.
  * - Displays session info and handles secure logout with confirmation.
+ * - Integrated theme switching and role-based navigation.
  * @returns {JSX.Element} The rendered navigation bar.
  */
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
+  const { theme, toggleTheme } = useTheme(); // Consume theme context
 
   // Track visibility of the logout confirmation popup
   const [showConfirm, setShowConfirm] = useState(false);
@@ -51,6 +54,15 @@ const Navbar = () => {
           <Link to="/settings" title="Account Settings">
             Settings
           </Link>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={styles.themeToggle}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
         </div>
 
         {user && (
@@ -71,14 +83,14 @@ const Navbar = () => {
         )}
       </nav>
 
-      {/* Animated Logout Confirmation Modal */}
+      {/* Logout Confirmation Modal */}
       {showConfirm && (
         <div
-          className={styles.modalOverlay}
+          className={`${styles.modalOverlay} animate-fade-in`}
           onClick={() => setShowConfirm(false)}
         >
           <div
-            className={styles.modalContent}
+            className={`${styles.modalContent} animate-slide-up`}
             onClick={(e) => e.stopPropagation()}
           >
             <h3>Confirm Logout</h3>
