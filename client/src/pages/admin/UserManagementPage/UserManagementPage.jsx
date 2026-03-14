@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
+import { adminApi } from '../../../modules/api/admin/admin.api';
 import UserList from '../../../components/admin/UserList/UserList';
+import Spinner from '../../../components/feedback/Spinner/Spinner';
 import styles from './UserManagementPage.module.css';
 
 /**
@@ -25,19 +27,18 @@ const UserManagementPage = () => {
       setIsLoading(true);
       setError(null);
 
-      // Request users
-      const response = await fetch('/api/admin/users');
+      const response = await adminApi.getAllUsers();
 
       if (!response.ok) {
         throw new Error('Failed to retrieve user directory.');
       }
 
       const data = await response.json();
-      // Extract users array
       setUsers(data.users || []);
     } catch (err) {
       setError(err.message);
     } finally {
+      // Always stop the spinner regardless of outcome
       setIsLoading(false);
     }
   };
@@ -52,34 +53,28 @@ const UserManagementPage = () => {
       <header className={styles.header}>
         <div className={styles.titleSection}>
           <Link to="/admin-dashboard" className={styles.backLink}>
-            Back to Dashboard
+            ← Back to Dashboard
           </Link>
           <h1 className={styles.title}>User Management</h1>
-          {/* Ensure length check safe-guard for the user count */}
           <p className={styles.stats}>Total Users: {users?.length || 0}</p>
         </div>
       </header>
 
       <div className={styles.listWrapper}>
-        {/* Render loading feedback during active request */}
-        {isLoading && (
+        {/* Conditional Rendering Logic */}
+        {isLoading ? (
           <div className={styles.loadingState}>
+            <Spinner size="3rem" />
             <p>Loading user records...</p>
           </div>
-        )}
-
-        {/* Render error feedback with retry capability on failure */}
-        {error && (
+        ) : error ? (
           <div className={styles.errorState}>
             <p>{error}</p>
             <button onClick={fetchUsers} className={styles.retryBtn}>
               Retry Fetch
             </button>
           </div>
-        )}
-
-        {/* Render the actual UserList once data is available */}
-        {!isLoading && !error && (
+        ) : (
           <div className={styles.listArea}>
             <UserList users={users} />
           </div>

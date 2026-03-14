@@ -1,45 +1,43 @@
 .container {
-  max-width: 1200px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--space-4);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-4);
   border-bottom: 2px solid var(--border-color);
-  padding-bottom: 1rem;
+  padding-bottom: var(--space-2);
 }
 
 .titleSection {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-1);
 }
 
 .title {
-  /* Use global text color for consistency */
   color: var(--text-color);
-  font-size: 2rem;
+  font-size: var(--text-3xl);
   margin: 0;
+  font-weight: var(--weight-bold);
 }
 
 .stats {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   opacity: 0.7;
   color: var(--text-color);
 }
 
 .backLink {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   text-decoration: none;
   color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-1);
+  transition: color 0.2s;
 }
 
 .backLink:hover {
@@ -53,6 +51,7 @@
   /* Use subtle border to define the data area */
   border: 1px solid var(--border-color);
   overflow: hidden;
+  min-height: 200px; /* Prevents layout jump when loading */
 }
 
 .loadingState,
@@ -61,9 +60,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
+  padding: var(--space-8);
   text-align: center;
-  gap: 1rem;
+  gap: var(--space-2);
 }
 
 .errorState {
@@ -71,25 +70,19 @@
   background-color: var(--error-bg);
   color: var(--error-text);
   border: 1px solid var(--error-border);
+  margin: var(--space-4);
   border-radius: 8px;
 }
 
 .retryBtn {
-  /* Standard button styling with primary accent */
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .retryBtn:hover {
-  background-color: var(--primary-hover);
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
+  border-color: var(--primary-color);
 }
