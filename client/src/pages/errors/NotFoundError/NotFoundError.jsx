@@ -17,10 +17,10 @@ const NotFoundError = () => {
     "We couldn't find the page you're looking for.";
 
   return (
-    <main className={`${styles.container} flex-center`}>
+    <main className={`${styles.container} flex-center animate-fade-in`}>
       <div className={styles.content}>
         <h1 className={styles.errorCode}>404</h1>
-        <h2>Page Not Found</h2>
+        <h2 className={styles.title}>Page Not Found</h2>
         <p className={styles.message}>{errorMessage}</p>
         <Link to="/" className={styles.homeLink}>
           Return to Home
