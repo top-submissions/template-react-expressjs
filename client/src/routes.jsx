@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import App from './pages/App/App';
+import { ThemeProvider } from './providers/ThemeProvider/ThemeProvider';
 import { AuthProvider } from './providers/AuthProvider/AuthProvider';
 import { ToastProvider } from './providers/ToastProvider/ToastProvider';
 import MainLayout from './layouts/MainLayout/MainLayout';
@@ -28,11 +29,13 @@ const routes = createBrowserRouter([
   {
     path: '/',
     element: (
-      <ToastProvider>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </ToastProvider>
+      <ThemeProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </ToastProvider>
+      </ThemeProvider>
     ),
     errorElement: <InternalServerError />,
     children: [
