@@ -2,6 +2,7 @@
 @import './variables/colors.css';
 @import './variables/spacing.css';
 @import './variables/shadows.css';
+@import './variables/typography.css';
 
 /* Base Styles (Reset & Layout) */
 @import './base/reset.css';
@@ -12,15 +13,18 @@
 
 /* --- Application Global Defaults --- */
 body {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-main);
   background-color: var(--bg-color);
   color: var(--text-color);
+  font-size: var(--text-base);
+  line-height: var(--lh-base);
   min-height: 100vh;
 }
 
 h1 {
-  font-size: 3.2rem;
-  line-height: 1.1;
+  font-size: var(--text-4xl);
+  line-height: var(--lh-tight);
+  font-weight: var(--weight-bold);
   margin-bottom: var(--space-3);
 }
 
