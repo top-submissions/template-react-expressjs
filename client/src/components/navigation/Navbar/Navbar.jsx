@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { Home, User, Settings, Sun, Moon, LogOut } from 'lucide-react';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { useToast } from '../../../providers/ToastProvider/ToastProvider';
-import { useTheme } from '../../../providers/ThemeProvider/ThemeProvider'; // Added theme
+import { useTheme } from '../../../providers/ThemeProvider/ThemeProvider';
 import styles from './Navbar.module.css';
 
 /**
@@ -11,23 +12,26 @@ import styles from './Navbar.module.css';
  * - Dynamic "Home" link points to specific dashboards based on user role.
  * - Displays session info and handles secure logout with confirmation.
  * - Integrated theme switching and role-based navigation.
+ * - Uses Lucide icons for visual actions and indicators.
  * @returns {JSX.Element} The rendered navigation bar.
  */
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
-  const { theme, toggleTheme } = useTheme(); // Consume theme context
+  const { theme, toggleTheme } = useTheme();
 
-  // Track visibility of the logout confirmation popup
+  // Manage logout confirmation modal state
   const [showConfirm, setShowConfirm] = useState(false);
 
+  // Define navigation logic based on user authorization
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const homePath = isAdmin ? '/admin-dashboard' : '/dashboard';
 
   /**
    * Finalizes the logout process.
-   * - Calls AuthProvider logout (clears cookies and state).
-   * - Notifies the user of success.
+   * - Clears session data via AuthProvider.
+   * - Triggers success notification.
+   * - Closes the confirmation modal.
    */
   const handleConfirmLogout = async () => {
     await logout();
@@ -38,30 +42,30 @@ const Navbar = () => {
   return (
     <>
       <nav className={styles.navbar}>
-        <div className={styles.logo}>
-          <Link to="/">CapstoneApp</Link>
-        </div>
-
         <div className={styles.navLinks}>
-          {user && (
-            <Link to={homePath} className={styles.homeLink}>
-              Home
+          <Link to={homePath} className={styles.navItem} aria-label="Home">
+            <Home size={20} />
+          </Link>
+          {isAdmin && (
+            <Link
+              to="/profile"
+              className={styles.navItem}
+              aria-label="View Profile"
+            >
+              <User size={20} />
             </Link>
           )}
-          <Link to="/profile" title="View Profile">
-            Profile
-          </Link>
           <Link to="/settings" title="Account Settings">
-            Settings
+            <Settings size={20} />
           </Link>
 
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             className={styles.themeToggle}
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            aria-label="Toggle theme"
           >
-            {theme === 'light' ? '🌙' : '☀️'}
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
 
@@ -71,19 +75,17 @@ const Navbar = () => {
               <span className={styles.username}>{user.username}</span>
               <span className={styles.roleLabel}>{user.role}</span>
             </div>
-            {/* Open confirmation modal instead of logging out immediately */}
             <button
               onClick={() => setShowConfirm(true)}
               className={styles.logoutBtn}
               aria-label="Log out"
             >
-              Logout
+              <LogOut size={18} />
             </button>
           </div>
         )}
       </nav>
 
-      {/* Logout Confirmation Modal */}
       {showConfirm && (
         <div
           className={`${styles.modalOverlay} animate-fade-in`}

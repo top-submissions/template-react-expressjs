@@ -9,10 +9,9 @@ import styles from './SignupForm.module.css';
  * Signup form component for user registration.
  * - Manages local form state for username, password, and confirmation.
  * - Uses authApi service for network requests.
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The rendered signup form.
  */
 const SignupForm = () => {
-  // Initialize form state and error object structure
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -21,7 +20,10 @@ const SignupForm = () => {
   const [errorData, setErrorData] = useState({ message: '', errors: [] });
   const navigate = useNavigate();
 
-  // Track input changes and clear errors on type
+  /**
+   * Updates local state and clears errors on input change.
+   * @param {React.ChangeEvent<HTMLInputElement>} e
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -29,8 +31,8 @@ const SignupForm = () => {
   };
 
   /**
-   * Processes the signup submission.
-   * @param {React.FormEvent} e - The form event.
+   * Processes the signup submission, validation, and API registration.
+   * @param {React.FormEvent} e
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,17 +53,16 @@ const SignupForm = () => {
     }
 
     try {
-      // Delegate Network Request To The Auth API Module
+      // Execute registration request
       const response = await authApi.signup(formData);
-      const data = await response.json();
 
-      // Navigate to login on success or populate error state from server response
       if (response.ok) {
         navigate('/log-in');
       } else {
+        const errorBody = await response.json();
         setErrorData({
-          message: data.message || 'Signup failed',
-          errors: data.errors || [],
+          message: errorBody.message || 'Signup failed',
+          errors: errorBody.errors || [],
         });
       }
     } catch (err) {
@@ -74,10 +75,10 @@ const SignupForm = () => {
   };
 
   return (
-    <div className={styles.formContainer}>
-      <h2>Sign Up</h2>
+    <div className={`${styles.formContainer} animate-fade-in`}>
+      <h2>Create Account</h2>
 
-      {/* Component for displaying rich validation feedback */}
+      {/* Conditional validation feedback */}
       <ValidationError message={errorData.message} errors={errorData.errors} />
 
       <form onSubmit={handleSubmit} className={styles.form} noValidate>
@@ -123,7 +124,10 @@ const SignupForm = () => {
       </form>
 
       <p className={styles.footerText}>
-        Already have an account? <Link to="/log-in">Log In</Link>
+        Already have an account?{' '}
+        <Link to="/log-in" className={styles.link}>
+          Log In
+        </Link>
       </p>
     </div>
   );

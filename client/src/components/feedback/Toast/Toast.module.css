@@ -1,34 +1,23 @@
-/* Container for the toast */
+/* Container for the toast notification */
 .toast {
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-width: 300px;
   max-width: 450px;
-  padding: 1rem;
+  /* Use global spacing and typography variables */
+  padding: var(--space-2);
   border-radius: 8px;
   border: 1px solid var(--border-color);
   background-color: var(--btn-bg);
   color: var(--text-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease-out forwards;
+  /* Use global shadow variables */
+  box-shadow: var(--shadow-md);
 }
 
-/* Slide in from the right */
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Semantic Variants using global tokens */
+/* Semantic Variants using global color tokens */
 .success {
-  border-left: 6px solid var(--primary-color);
+  border-left: 6px solid var(--success-text);
 }
 
 .error {
@@ -38,22 +27,29 @@
 }
 
 .info {
-  border-left: 6px solid var(--primary-color);
+  border-left: 6px solid var(--primary-hover);
   opacity: 0.9;
 }
 
-/* Close Button */
+.message {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--lh-base);
+}
+
 .closeButton {
   background: none;
   border: none;
-  font-size: 1.2rem;
-  padding: 0 0 0 1rem;
-  color: inherit;
+  color: currentColor;
   cursor: pointer;
+  /* Use global spacing for alignment */
+  padding: var(--space-0-5);
+  font-size: var(--text-xl);
+  line-height: 1;
   opacity: 0.6;
+  transition: opacity 0.2s ease;
 }
 
 .closeButton:hover {
   opacity: 1;
-  border: none; /* Override global button hover border */
 }

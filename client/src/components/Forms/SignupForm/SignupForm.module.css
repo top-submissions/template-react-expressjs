@@ -1,65 +1,84 @@
-/* Center the form card */
 .formContainer {
   max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
+  /* Use global spacing and layout variables */
+  margin: var(--space-4) auto;
+  padding: var(--space-4);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--bg-color);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Use global shadow variables */
+  box-shadow: var(--shadow-md);
 }
 
-/* Layout for inputs and labels */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  /* Use global content gap */
+  gap: var(--space-3);
 }
 
 .inputGroup {
   display: flex;
   flex-direction: column;
   text-align: left;
-  gap: 0.5rem;
+  gap: var(--space-1);
 }
 
-/* Inherit theme colors for inputs */
+.inputGroup label {
+  /* Use global typography variables */
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+}
+
 .inputGroup input {
-  padding: 0.75rem;
+  padding: var(--space-1-5, 0.75rem);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   background-color: var(--bg-color);
   color: var(--text-color);
+  font-family: var(--font-main);
+  transition: border-color 0.2s ease;
 }
 
-/* Full width primary action button */
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--primary-hover);
+}
+
 .submitBtn {
   width: 100%;
-  padding: 0.75rem;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
+  /* Use global spacing and typography */
+  padding: var(--space-1-5, 0.75rem);
+  background-color: var(--btn-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .submitBtn:hover {
   background-color: var(--primary-hover);
+  color: white;
 }
-
-.errorMessage {
-  color: #ff4d4d;
-  background-color: rgba(255, 77, 77, 0.1);
-  padding: 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-}
-
-/* ... existing styles below errorMessage ... */
 
 .footerText {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
+  /* Use global typography */
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  text-align: center;
   color: var(--text-color);
+  opacity: 0.8;
+}
+
+.link {
+  color: var(--primary-hover);
+  text-decoration: none;
+  font-weight: var(--weight-medium);
+}
+
+.link:hover {
+  text-decoration: underline;
 }

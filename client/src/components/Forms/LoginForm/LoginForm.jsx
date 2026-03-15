@@ -16,7 +16,6 @@ import styles from './LoginForm.module.css';
  * @returns {JSX.Element} The rendered login form.
  */
 const LoginForm = () => {
-  // Access global toast and auth actions
   const { showToast } = useToast();
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -28,21 +27,24 @@ const LoginForm = () => {
     status: null,
   });
 
-  // Handle field changes and clear stale errors
+  /**
+   * Updates local state and clears errors on input change.
+   * @param {React.ChangeEvent<HTMLInputElement>} e
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errorData.message)
+    if (errorData.message) {
       setErrorData({ message: '', errors: [], status: null });
+    }
   };
 
   /**
-   * Processes the login submission.
-   * @param {React.FormEvent} e - The form event.
+   * Processes form submission, validation, and API authentication.
+   * @param {React.FormEvent} e
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorData({ message: '', errors: [], status: null });
 
     // Validate inputs locally before hitting API
     const validation = loginSchema.safeParse(formData);
@@ -52,32 +54,28 @@ const LoginForm = () => {
         errors: validation.error.issues.map((i) => ({ msg: i.message })),
         status: 400,
       });
-      return;
     }
 
     try {
       const response = await authApi.login(formData);
-      const data = await response.json();
 
       if (response.ok) {
-        // Update auth state and notify user
+        const data = await response.json();
+
+        // Update global auth context
         login(data.user);
-        showToast('Login Successful!', 'success');
+        showToast('Successfully logged in', 'success');
 
-        // Route based on role
-        const isAdmin =
-          data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN';
+        // Access role from the user object
+        const userRole = data.user?.role;
+        const isAdmin = userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
 
-        if (isAdmin) {
-          navigate('/admin-dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate(isAdmin ? '/admin-dashboard' : '/dashboard');
       } else {
-        // Handle server-side validation/auth errors
+        const errorBody = await response.json();
         setErrorData({
-          message: data.message || 'Login failed',
-          errors: data.errors || [],
+          message: errorBody.message || 'Login failed',
+          errors: errorBody.errors || [],
           status: response.status,
         });
       }
@@ -91,9 +89,10 @@ const LoginForm = () => {
   };
 
   return (
-    <div className={styles.formContainer}>
+    <div className={`${styles.formContainer} animate-fade-in`}>
       <h2>Log In</h2>
 
+      {/* Conditional Error Feedback */}
       {errorData.status === 401 ? (
         <AuthenticationError message={errorData.message} />
       ) : (
@@ -134,7 +133,10 @@ const LoginForm = () => {
       </form>
 
       <p className={styles.footerText}>
-        Don't have an account? <Link to="/sign-up">Sign Up</Link>
+        Don't have an account?{' '}
+        <Link to="/sign-up" className={styles.link}>
+          Sign Up
+        </Link>
       </p>
     </div>
   );
