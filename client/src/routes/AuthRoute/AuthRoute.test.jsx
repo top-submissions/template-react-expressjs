@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router';
+import { screen } from '@testing-library/react';
+import { Routes, Route } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 import AuthRoute from './AuthRoute';
+import { render } from '../../__tests__/test-utils';
 
 describe('AuthRoute Component', () => {
   it('should render children when user is authenticated', () => {
@@ -14,13 +15,11 @@ describe('AuthRoute Component', () => {
 
     // --- Act ---
     render(
-      <MemoryRouter initialEntries={['/protected']}>
-        <Routes>
-          <Route element={<AuthRoute />}>
-            <Route path="/protected" element={<div>Protected Content</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AuthRoute />}>
+          <Route path="/" element={<div>Protected Content</div>} />
+        </Route>
+      </Routes>
     );
 
     // --- Assert ---
@@ -33,14 +32,12 @@ describe('AuthRoute Component', () => {
 
     // --- Act ---
     render(
-      <MemoryRouter initialEntries={['/protected']}>
-        <Routes>
-          <Route element={<AuthRoute />}>
-            <Route path="/protected" element={<div>Protected Content</div>} />
-          </Route>
-          <Route path="/log-in" element={<div>Login Page</div>} />
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AuthRoute />}>
+          <Route path="/" element={<div>Protected Content</div>} />
+        </Route>
+        <Route path="/log-in" element={<div>Login Page</div>} />
+      </Routes>
     );
 
     // --- Assert ---
@@ -54,13 +51,11 @@ describe('AuthRoute Component', () => {
 
     // --- Act ---
     const { container } = render(
-      <MemoryRouter initialEntries={['/protected']}>
-        <Routes>
-          <Route element={<AuthRoute />}>
-            <Route path="/protected" element={<div>Protected Content</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AuthRoute />}>
+          <Route path="/" element={<div>Protected Content</div>} />
+        </Route>
+      </Routes>
     );
 
     // --- Assert ---

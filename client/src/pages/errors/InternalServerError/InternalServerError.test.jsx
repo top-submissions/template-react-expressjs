@@ -1,38 +1,39 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '../../../__tests__/test-utils';
+import userEvent from '@testing-library/user-event';
 import { useRouteError } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import InternalServerError from './InternalServerError';
 
-// Mock react-router to simulate a component crash
-vi.mock('react-router', () => ({
-  useRouteError: vi.fn(),
-}));
-
 describe('InternalServerError Component', () => {
   beforeEach(() => {
+    // Reset navigation and error mocks
     vi.clearAllMocks();
   });
 
   it('should render the 500 status and generic error message', () => {
     // --- Arrange ---
-    useRouteError.mockReturnValue(new Error('Critical System Failure'));
+    // Simulate a critical error object caught by the router
+    vi.mocked(useRouteError).mockReturnValue(
+      new Error('Critical System Failure')
+    );
 
     // --- Act ---
     render(<InternalServerError />);
 
-    // --- Act ---
+    // --- Assert ---
     const code = screen.getByText('500');
     const title = screen.getByText(/something went wrong/i);
 
-    // --- Assert ---
     expect(code).toBeInTheDocument();
     expect(title).toBeInTheDocument();
   });
 
-  it('should attempt to reload the application when clicking refresh', () => {
+  it('should attempt to reload the application when clicking refresh', async () => {
     // --- Arrange ---
-    useRouteError.mockReturnValue({});
-    // Mock window.location.assign to track redirects
+    const user = userEvent.setup();
+    vi.mocked(useRouteError).mockReturnValue({});
+
+    // Track page redirection calls
     const assignMock = vi.fn();
     vi.stubGlobal('location', { assign: assignMock });
 
@@ -40,7 +41,7 @@ describe('InternalServerError Component', () => {
 
     // --- Act ---
     const refreshBtn = screen.getByRole('button', { name: /try refreshing/i });
-    fireEvent.click(refreshBtn);
+    await user.click(refreshBtn);
 
     // --- Assert ---
     expect(assignMock).toHaveBeenCalledWith('/');

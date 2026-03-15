@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router';
+import { screen } from '@testing-library/react';
+import { Routes, Route } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 import AdminRoute from './AdminRoute';
+import { render } from '../../__tests__/test-utils';
 
 // Local mock for the error page to simplify assertions
 vi.mock('../../pages/errors/ForbiddenError/ForbiddenError', () => ({
@@ -19,13 +20,11 @@ describe('AdminRoute Component', () => {
 
     // --- Act ---
     render(
-      <MemoryRouter initialEntries={['/admin']}>
-        <Routes>
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<div>Admin Dashboard</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AdminRoute />}>
+          <Route path="/" element={<div>Admin Dashboard</div>} />
+        </Route>
+      </Routes>
     );
 
     // --- Assert ---
@@ -41,13 +40,11 @@ describe('AdminRoute Component', () => {
 
     // --- Act ---
     render(
-      <MemoryRouter initialEntries={['/admin']}>
-        <Routes>
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<div>Admin Dashboard</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AdminRoute />}>
+          <Route path="/" element={<div>Admin Dashboard</div>} />
+        </Route>
+      </Routes>
     );
 
     // --- Assert ---
@@ -63,13 +60,11 @@ describe('AdminRoute Component', () => {
 
     // --- Act ---
     render(
-      <MemoryRouter initialEntries={['/admin']}>
-        <Routes>
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<div>Admin Dashboard</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AdminRoute />}>
+          <Route path="/" element={<div>Admin Dashboard</div>} />
+        </Route>
+      </Routes>
     );
 
     // --- Assert ---
@@ -83,13 +78,11 @@ describe('AdminRoute Component', () => {
 
     // --- Act ---
     const { container } = render(
-      <MemoryRouter initialEntries={['/admin']}>
-        <Routes>
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<div>Admin Dashboard</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      <Routes>
+        <Route element={<AdminRoute />}>
+          <Route path="/" element={<div>Admin Dashboard</div>} />
+        </Route>
+      </Routes>
     );
 
     // --- Assert ---

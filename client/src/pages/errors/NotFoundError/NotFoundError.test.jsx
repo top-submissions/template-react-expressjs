@@ -1,28 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, useRouteError } from 'react-router';
+import { render, screen } from '../../../__tests__/test-utils';
+import { useRouteError } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
 import NotFoundError from './NotFoundError';
-
-// Mock react-router to control the error state
-vi.mock('react-router', async () => {
-  const actual = await vi.importActual('react-router');
-  return {
-    ...actual,
-    useRouteError: vi.fn(),
-  };
-});
 
 describe('NotFoundError Component', () => {
   it('should display the 404 code and error message', () => {
     // --- Arrange ---
-    // Simulate a standard 404 route error
-    useRouteError.mockReturnValue({ statusText: 'Not Found' });
+    // Simulate a standard 404 route error return
+    vi.mocked(useRouteError).mockReturnValue({ statusText: 'Not Found' });
 
-    render(
-      <MemoryRouter>
-        <NotFoundError />
-      </MemoryRouter>
-    );
+    render(<NotFoundError />);
 
     // --- Act ---
     const heading = screen.getByText('404');
@@ -35,13 +22,9 @@ describe('NotFoundError Component', () => {
 
   it('should contain a functional link back to the landing page', () => {
     // --- Arrange ---
-    useRouteError.mockReturnValue({});
+    vi.mocked(useRouteError).mockReturnValue({});
 
-    render(
-      <MemoryRouter>
-        <NotFoundError />
-      </MemoryRouter>
-    );
+    render(<NotFoundError />);
 
     // --- Act ---
     const homeLink = screen.getByRole('link', { name: /return to home/i });
