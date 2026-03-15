@@ -1,4 +1,6 @@
+// client\src\pages\errors\NotFoundError\NotFoundError.jsx
 import { useRouteError, Link } from 'react-router';
+import { useAuth } from '../../../providers/AuthProvider/AuthProvider'; // Import useAuth
 import styles from './NotFoundError.module.css';
 
 /**
@@ -9,6 +11,11 @@ import styles from './NotFoundError.module.css';
  */
 const NotFoundError = () => {
   const error = useRouteError();
+  const { user } = useAuth(); // Get current user
+
+  // Determine home path based on role
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const homePath = user ? (isAdmin ? '/admin-dashboard' : '/dashboard') : '/';
 
   // Extract message if it exists, otherwise provide a fallback
   const errorMessage =
@@ -22,7 +29,7 @@ const NotFoundError = () => {
         <h1 className={styles.errorCode}>404</h1>
         <h2 className={styles.title}>Page Not Found</h2>
         <p className={styles.message}>{errorMessage}</p>
-        <Link to="/" className={styles.homeLink}>
+        <Link to={homePath} className={styles.homeLink}>
           Return to Home
         </Link>
       </div>

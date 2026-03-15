@@ -1,3 +1,4 @@
+// client\src\routes\AuthRoute\AuthRoute.jsx
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 
@@ -11,16 +12,13 @@ const AuthRoute = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // Handle session sync state
-  if (loading) {
-    return null; // Or a global loading spinner
-  }
+  if (loading) return null;
 
-  // If no user exists, redirect to login and pass current location in state
+  // Redirect to Landing Page instead of login
   if (!user) {
     return (
       <Navigate
-        to="/log-in"
+        to="/"
         state={{
           from: location,
           message: 'Please log in to access this page',
