@@ -1,9 +1,8 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { render, screen } from '../../__tests__/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import UserList from './UserList';
 
-// Mock the specific path used in the component import to intercept the render
+// Mock child component to isolate list rendering logic
 vi.mock('../UserRow/UserRow', () => ({
   default: ({ user }) => (
     <tr data-testid="mock-row">
@@ -32,17 +31,13 @@ describe('UserList Component', () => {
     ];
 
     // --- Act ---
-    // Wrap in MemoryRouter to satisfy any internal routing hooks if the mock fails
-    render(
-      <MemoryRouter>
-        <UserList users={mockUsers} />
-      </MemoryRouter>
-    );
+    // MemoryRouter is provided by test-utils render wrapper
+    render(<UserList users={mockUsers} />);
 
     // --- Assert ---
     expect(screen.getByText(/user/i)).toBeInTheDocument();
 
-    // Verify rows rendered based on mock component
+    // Verify row count matches input data
     const rows = screen.getAllByTestId('mock-row');
     expect(rows).toHaveLength(2);
     expect(screen.getByText('alice')).toBeInTheDocument();

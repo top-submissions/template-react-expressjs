@@ -1,10 +1,9 @@
 import styles from './UserList.module.css';
-// UserRow will be created in the next step to handle individual row logic
 import UserRow from '../UserRow/UserRow';
 
 /**
  * Tabular display for user directory.
- * - Renders a semantic table with sortable columns (placeholder for future).
+ * - Renders a semantic table with sortable columns.
  * - Maps through user data to generate specialized UserRow components.
  * - Handles empty states gracefully.
  * @param {Object} props - Component properties.

@@ -1,6 +1,6 @@
 .tableWrapper {
   width: 100%;
-  overflow-x: auto; /* Enable horizontal scroll for small screens */
+  overflow-x: auto;
   background-color: var(--bg-color);
 }
 
@@ -8,49 +8,49 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .table thead {
-  /* Use a subtle background for the header row */
   background-color: var(--btn-bg);
   border-bottom: 2px solid var(--border-color);
 }
 
 .table th {
-  padding: 1rem;
-  font-weight: 600;
+  padding: var(--space-2);
+  font-weight: var(--weight-semibold);
   color: var(--text-color);
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.05em;
 }
 
-/* Individual column widths for layout stability */
 .colUser {
   width: 40%;
 }
+
 .colRole {
   width: 25%;
 }
+
 .colJoined {
   width: 25%;
 }
+
 .colActions {
   width: 10%;
   text-align: center;
 }
 
 .emptyState {
-  padding: 4rem;
+  padding: var(--space-8);
   text-align: center;
   color: var(--text-color);
   opacity: 0.6;
 }
 
-/* Ensure the table looks consistent on mobile */
 @media (max-width: 600px) {
   .table th:nth-child(3) {
-    display: none; /* Hide 'Joined Date' on very small screens to save space */
+    display: none;
   }
 }
