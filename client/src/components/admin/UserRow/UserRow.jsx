@@ -44,7 +44,6 @@ const UserRow = ({ user: targetUser }) => {
    * @returns {Promise<void>}
    */
   const handlePromote = async () => {
-    // Define API endpoint path
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
@@ -78,7 +77,6 @@ const UserRow = ({ user: targetUser }) => {
    * @returns {Promise<void>}
    */
   const handleDemote = async () => {
-    // Define API endpoint path
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
     try {
@@ -109,7 +107,6 @@ const UserRow = ({ user: targetUser }) => {
     <tr className={styles.row}>
       <td className={styles.cell}>
         <div className={styles.userInfo}>
-          {/* Extract Initial For Avatar Display */}
           <div className={styles.avatar}>
             {targetUser.username.charAt(0).toUpperCase()}
           </div>
@@ -133,14 +130,12 @@ const UserRow = ({ user: targetUser }) => {
           ⋮
         </button>
 
-        {/* Conditional Dropdown Rendering */}
         {isMenuOpen && (
           <div className={styles.dropdown}>
             <button className={styles.dropdownItem} onClick={handleViewProfile}>
               View Profile
             </button>
 
-            {/* Display Promotion Option For Eligible Users */}
             {canPromote && (
               <button
                 className={`${styles.dropdownItem} ${styles.promoteAction}`}
@@ -150,7 +145,6 @@ const UserRow = ({ user: targetUser }) => {
               </button>
             )}
 
-            {/* Display Demotion Option For Eligible Admins */}
             {canDemote && (
               <button
                 className={`${styles.dropdownItem} ${styles.demoteAction}`}

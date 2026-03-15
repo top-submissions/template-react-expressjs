@@ -1,7 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '../../__tests__/test-utils';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import UserRow from './UserRow';
 
@@ -13,20 +12,22 @@ describe('UserRow Component', () => {
     createdAt: '2023-01-01T00:00:00Z',
   };
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders user details correctly', () => {
     // --- Arrange ---
-    // Set specific auth state for this test
-    useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
+    // Use local mock for useAuth to control role per test
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'ADMIN' } });
 
     // --- Act ---
     render(
-      <MemoryRouter>
-        <table>
-          <tbody>
-            <UserRow user={mockUser} />
-          </tbody>
-        </table>
-      </MemoryRouter>
+      <table>
+        <tbody>
+          <UserRow user={mockUser} />
+        </tbody>
+      </table>
     );
 
     // --- Assert ---
@@ -37,16 +38,14 @@ describe('UserRow Component', () => {
   it('toggles the actions menu when the trigger is clicked', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
-    useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'ADMIN' } });
 
     render(
-      <MemoryRouter>
-        <table>
-          <tbody>
-            <UserRow user={mockUser} />
-          </tbody>
-        </table>
-      </MemoryRouter>
+      <table>
+        <tbody>
+          <UserRow user={mockUser} />
+        </tbody>
+      </table>
     );
 
     // --- Act ---
@@ -61,16 +60,14 @@ describe('UserRow Component', () => {
     // --- Arrange ---
     const user = userEvent.setup();
     const targetAdmin = { ...mockUser, role: 'ADMIN' };
-    useAuth.mockReturnValue({ user: { role: 'ADMIN' } });
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'ADMIN' } });
 
     render(
-      <MemoryRouter>
-        <table>
-          <tbody>
-            <UserRow user={targetAdmin} />
-          </tbody>
-        </table>
-      </MemoryRouter>
+      <table>
+        <tbody>
+          <UserRow user={targetAdmin} />
+        </tbody>
+      </table>
     );
 
     // --- Act ---
@@ -83,18 +80,15 @@ describe('UserRow Component', () => {
   it('calls the promote API when the promote button is clicked', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
-    useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
-    // Mock specific fetch response for this test
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
     fetch.mockResolvedValueOnce({ ok: true });
 
     render(
-      <MemoryRouter>
-        <table>
-          <tbody>
-            <UserRow user={mockUser} />
-          </tbody>
-        </table>
-      </MemoryRouter>
+      <table>
+        <tbody>
+          <UserRow user={mockUser} />
+        </tbody>
+      </table>
     );
 
     // --- Act ---
@@ -109,7 +103,6 @@ describe('UserRow Component', () => {
         credentials: 'include',
       })
     );
-    // Reload mock is now provided globally by setup.js
     expect(window.location.reload).toHaveBeenCalled();
   });
 
@@ -117,17 +110,15 @@ describe('UserRow Component', () => {
     // --- Arrange ---
     const user = userEvent.setup();
     const adminUser = { ...mockUser, role: 'ADMIN' };
-    useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
     fetch.mockResolvedValueOnce({ ok: true });
 
     render(
-      <MemoryRouter>
-        <table>
-          <tbody>
-            <UserRow user={adminUser} />
-          </tbody>
-        </table>
-      </MemoryRouter>
+      <table>
+        <tbody>
+          <UserRow user={adminUser} />
+        </tbody>
+      </table>
     );
 
     // --- Act ---
@@ -148,16 +139,14 @@ describe('UserRow Component', () => {
   it('hides demote option when a Super Admin views a regular User', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
-    useAuth.mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
+    vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
 
     render(
-      <MemoryRouter>
-        <table>
-          <tbody>
-            <UserRow user={mockUser} />
-          </tbody>
-        </table>
-      </MemoryRouter>
+      <table>
+        <tbody>
+          <UserRow user={mockUser} />
+        </tbody>
+      </table>
     );
 
     // --- Act ---

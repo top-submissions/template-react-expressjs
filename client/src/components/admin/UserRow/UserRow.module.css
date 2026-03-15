@@ -4,45 +4,44 @@
 }
 
 .row:hover {
-  /* Provide subtle feedback when hovering over a user record */
   background-color: var(--btn-bg);
 }
 
 .cell {
-  padding: 1rem;
+  padding: var(--space-2);
   vertical-align: middle;
 }
 
 .userInfo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-2);
 }
 
 .avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: var(--primary-color);
+  background-color: var(--primary-hover);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
 }
 
 .username {
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   color: var(--text-color);
 }
 
 .roleBadge {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
+  padding: var(--space-0-5) var(--space-1);
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   background-color: var(--btn-bg);
   border: 1px solid var(--border-color);
   text-transform: uppercase;
@@ -51,7 +50,7 @@
 .date {
   color: var(--text-color);
   opacity: 0.7;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .actionsArea {
@@ -60,11 +59,10 @@
 }
 
 .menuTrigger {
-  /* Simplified circular button for the '...' menu */
   background: none;
   border: none;
-  padding: 0.5rem;
-  font-size: 1.2rem;
+  padding: var(--space-1);
+  font-size: var(--text-xl);
   line-height: 1;
   border-radius: 50%;
   width: 32px;
@@ -72,61 +70,59 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .menuTrigger:hover {
   background-color: var(--border-color);
-  border-color: transparent;
 }
 
 .dropdown {
   position: absolute;
   right: 0;
   top: 100%;
-  z-index: 10;
+  z-index: var(--z-dropdown);
   min-width: 160px;
   background-color: var(--bg-color);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  margin-top: 0.5rem;
+  box-shadow: var(--shadow-md);
+  margin-top: var(--space-1);
   overflow: hidden;
 }
 
 .dropdownItem {
   width: 100%;
   text-align: left;
-  padding: 0.75rem 1rem;
+  padding: var(--space-1) var(--space-2);
   background: none;
   border: none;
   border-radius: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-1);
+  cursor: pointer;
 }
 
 .dropdownItem:hover {
   background-color: var(--btn-bg);
-  border-color: transparent;
 }
 
 .promoteAction {
-  color: var(--primary-color);
-  font-weight: 600;
+  color: var(--success-text);
+  font-weight: var(--weight-semibold);
 }
 
 .demoteAction {
-  /* Use global warning variables for consistent downgrade signaling */
   color: var(--warning-text);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .demoteAction:hover {
   background-color: var(--warning-bg);
 }
 
-/* Specific styling for mobile: hide overflow menu if it clips */
 @media (max-width: 600px) {
   .cell:nth-child(3) {
     display: none;
