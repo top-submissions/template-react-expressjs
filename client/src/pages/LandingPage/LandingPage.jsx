@@ -6,7 +6,6 @@ import styles from './LandingPage.module.css';
  * Public landing page component.
  * - Serves as the entry point for unauthenticated users.
  * - Redirects authenticated users to their respective dashboards.
- * - Features a hero section and platform overview.
  * @returns {JSX.Element} The rendered landing page.
  */
 const LandingPage = () => {
@@ -14,8 +13,9 @@ const LandingPage = () => {
 
   // Redirect authenticated users away from landing
   if (user) {
-    const destination =
-      user.role === 'ADMIN' ? '/admin-dashboard' : '/dashboard';
+    // Include SUPER_ADMIN in the admin redirect check
+    const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
+    const destination = isAdmin ? '/admin-dashboard' : '/dashboard';
     return <Navigate to={destination} replace />;
   }
 
