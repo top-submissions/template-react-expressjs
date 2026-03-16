@@ -8,10 +8,10 @@ const indexRouter = Router();
 // Mount auth routes
 indexRouter.use('/api/auth', authRouter);
 
-// Mounting authenticated user routes at root
-indexRouter.use('/', userRouter);
+// Mount user routes
+indexRouter.use('/api/user', userRouter);
 
-// Mounting administrative routes under prefix
+// Mount administrative routes
 indexRouter.use('/api/admin', adminRouter);
 
 export default indexRouter;
