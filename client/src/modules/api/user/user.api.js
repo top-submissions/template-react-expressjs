@@ -37,8 +37,7 @@ export const userApi = {
    * @returns {Promise<Response>}
    */
   getById: async (userId) => {
-    // Path parameter lookup
-    return fetch(`${BASE_URL}/api/user/${userId}`, {
+    return fetch(`${BASE_URL}/api/user/profile/${userId}`, {
       method: 'GET',
       credentials: 'include',
     });
