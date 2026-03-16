@@ -8,6 +8,7 @@ import '../../styles/index.css';
  * Main Application Layout.
  * - Acts as the root wrapper for all routed pages.
  * - Blocks rendering until authentication sync is complete.
+ * - Provides a centered global container for main content.
  * @returns {JSX.Element} The base application layout.
  */
 function App() {
@@ -16,7 +17,7 @@ function App() {
   // Block rendering during session initialization
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
+      <div className={`${styles.loadingContainer} animate-fade-in`}>
         <Spinner size="3rem" message="Initializing session..." />
       </div>
     );
@@ -24,8 +25,8 @@ function App() {
 
   return (
     <div className={styles.appContainer}>
+      {/* Use global container class for responsive centering */}
       <main className="container">
-        {/* Render nested routes via Outlet */}
         <Outlet />
       </main>
     </div>

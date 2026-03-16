@@ -1,19 +1,20 @@
-// client\src\pages\errors\NotFoundError\NotFoundError.jsx
-import { useRouteError, Link } from 'react-router';
-import { useAuth } from '../../../providers/AuthProvider/AuthProvider'; // Import useAuth
+import { useRouteError } from 'react-router';
+import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
+import ReturnHomeButton from '../../../components/buttons/ReturnHomeButton/ReturnHomeButton';
 import styles from './NotFoundError.module.css';
 
 /**
  * Fallback page for 404 Not Found scenarios.
  * - Automatically triggered by React Router's errorElement.
  * - Extracts error details from the routing context.
+ * - Redirects to appropriate dashboard via ReturnHomeButton.
  * @returns {JSX.Element}
  */
 const NotFoundError = () => {
   const error = useRouteError();
-  const { user } = useAuth(); // Get current user
+  const { user } = useAuth();
 
-  // Determine home path based on role
+  // Define routing logic based on authentication and role
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const homePath = user ? (isAdmin ? '/admin-dashboard' : '/dashboard') : '/';
 
@@ -29,9 +30,7 @@ const NotFoundError = () => {
         <h1 className={styles.errorCode}>404</h1>
         <h2 className={styles.title}>Page Not Found</h2>
         <p className={styles.message}>{errorMessage}</p>
-        <Link to={homePath} className={styles.homeLink}>
-          Return to Home
-        </Link>
+        <ReturnHomeButton to={homePath} />
       </div>
     </main>
   );

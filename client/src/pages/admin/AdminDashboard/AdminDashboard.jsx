@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { Users, ShieldAlert, FileText, Settings } from 'lucide-react';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import styles from './AdminDashboard.module.css';
 
@@ -7,10 +8,10 @@ import styles from './AdminDashboard.module.css';
  * - Provides entry points to various management tools.
  * - Displays contextual greetings for the logged-in Administrator.
  * - Conditionally highlights high-privilege actions (e.g., Super Admin tools).
- * @returns {JSX.Element}
+ * - Uses Lucide icons for quick visual identification of management categories.
+ * @returns {JSX.Element} The rendered admin dashboard hub.
  */
 const AdminDashboard = () => {
-  // Extract user info for the personalized header
   const { user } = useAuth();
 
   // Identify if the user is a SUPER_ADMIN to potentially show restricted cards
@@ -28,7 +29,10 @@ const AdminDashboard = () => {
 
       <div className={styles.grid}>
         <Link to="/admin-dashboard/users" className={styles.card}>
-          <h2 className={styles.cardTitle}>User Management</h2>
+          <div className={styles.cardHeader}>
+            <Users size={24} className={styles.icon} />
+            <h2 className={styles.cardTitle}>Users</h2>
+          </div>
           <p className={styles.cardDescription}>
             View registered users, promote members to admin roles, or manage
             account status.
@@ -36,7 +40,10 @@ const AdminDashboard = () => {
         </Link>
 
         <Link to="/admin-dashboard/logs" className={styles.card}>
-          <h2 className={styles.cardTitle}>System Logs</h2>
+          <div className={styles.cardHeader}>
+            <FileText size={24} className={styles.icon} />
+            <h2 className={styles.cardTitle}>Logs</h2>
+          </div>
           <p className={styles.cardDescription}>
             Monitor application activity, security events, and server-side
             errors.
@@ -47,7 +54,10 @@ const AdminDashboard = () => {
           to="/admin-dashboard/settings"
           className={`${styles.card} ${isSuperAdmin ? styles.criticalCard : ''}`}
         >
-          <h2 className={styles.cardTitle}>Global Settings</h2>
+          <div className={styles.cardHeader}>
+            {isSuperAdmin ? <ShieldAlert size={24} /> : <Settings size={24} />}
+            <h2 className={styles.cardTitle}>Settings</h2>
+          </div>
           <p className={styles.cardDescription}>
             Configure environment variables and core platform behavior.
           </p>

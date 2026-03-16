@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router';
+import { Users, RefreshCw } from 'lucide-react';
 import { adminApi } from '../../../modules/api/admin/admin.api';
 import UserList from '../../../components/admin/UserList/UserList';
 import Spinner from '../../../components/feedback/Spinner/Spinner';
@@ -9,8 +9,8 @@ import styles from './UserManagementPage.module.css';
  * Administrative User Management Page.
  * - Synchronizes with /api/admin/users.
  * - Handles asynchronous states: loading, error, and success.
- * - Provides navigation back to the Admin Dashboard.
- * @returns {JSX.Element}
+ * - Uses Lucide icons for status and actions.
+ * @returns {JSX.Element} The rendered user management view.
  */
 const UserManagementPage = () => {
   const [users, setUsers] = useState([]);
@@ -38,30 +38,27 @@ const UserManagementPage = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      // Always stop the spinner regardless of outcome
       setIsLoading(false);
     }
   };
 
-  // Initial data fetch on component mount
   useEffect(() => {
     fetchUsers();
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} animate-fade-in`}>
       <header className={styles.header}>
         <div className={styles.titleSection}>
-          <Link to="/admin-dashboard" className={styles.backLink}>
-            ← Back to Dashboard
-          </Link>
-          <h1 className={styles.title}>User Management</h1>
+          <div className={styles.titleWrapper}>
+            <Users size={32} className={styles.headerIcon} />
+            <h1 className={styles.title}>User Management</h1>
+          </div>
           <p className={styles.stats}>Total Users: {users?.length || 0}</p>
         </div>
       </header>
 
       <div className={styles.listWrapper}>
-        {/* Conditional Rendering Logic */}
         {isLoading ? (
           <div className={styles.loadingState}>
             <Spinner size="3rem" />
@@ -71,12 +68,13 @@ const UserManagementPage = () => {
           <div className={styles.errorState}>
             <p>{error}</p>
             <button onClick={fetchUsers} className={styles.retryBtn}>
+              <RefreshCw size={16} />
               Retry Fetch
             </button>
           </div>
         ) : (
           <div className={styles.listArea}>
-            <UserList users={users} />
+            <UserList users={users} onUpdate={fetchUsers} />
           </div>
         )}
       </div>

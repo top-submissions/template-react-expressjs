@@ -21,8 +21,7 @@ const LandingPage = () => {
 
   return (
     <div className={`${styles.container} animate-fade-in`}>
-      {/* Hero Section */}
-      <section className={styles.hero}>
+      <section className={`${styles.hero} flex-center`}>
         <h1 className={styles.title}>Welcome to the App</h1>
         <p className={styles.description}>
           Experience the next generation of productivity. Our platform provides

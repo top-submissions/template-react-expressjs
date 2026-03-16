@@ -1,3 +1,4 @@
+/* Center the error content within the viewport */
 .container {
   min-height: 100vh;
   padding: var(--space-4);
@@ -6,6 +7,7 @@
   color: var(--text-color);
 }
 
+/* Constrain content width for readability */
 .content {
   display: flex;
   flex-direction: column;
@@ -13,6 +15,7 @@
   max-width: 500px;
 }
 
+/* Large error code display using semantic error color */
 .errorCode {
   font-size: var(--text-4xl);
   margin-bottom: calc(var(--space-1) * -1);
@@ -21,34 +24,15 @@
   font-weight: var(--weight-bold);
 }
 
+/* Primary heading style */
 .title {
   font-size: var(--text-2xl);
   font-weight: var(--weight-semibold);
 }
 
+/* Error description text */
 .message {
   line-height: var(--lh-relaxed);
   opacity: 0.9;
   font-size: var(--text-base);
-}
-
-.homeLink {
-  align-self: center;
-  margin-top: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background-color: var(--btn-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  border-radius: var(--space-1);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.homeLink:hover {
-  background-color: var(--primary-hover);
-  border-color: var(--primary-hover);
-  color: white;
 }

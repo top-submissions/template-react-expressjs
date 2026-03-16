@@ -1,10 +1,12 @@
 import { useRouteError } from 'react-router';
+import ReturnHomeButton from '../../../components/buttons/ReturnHomeButton/ReturnHomeButton';
 import styles from './InternalServerError.module.css';
 
 /**
  * Global Error Boundary page for the application.
  * - Catches uncaught JavaScript exceptions and 500 server responses.
  * - Prevents application "white screens" by providing a fallback UI.
+ * - Uses ReturnHomeButton for standardized navigation.
  * @returns {JSX.Element}
  */
 const InternalServerError = () => {
@@ -23,12 +25,7 @@ const InternalServerError = () => {
           fix it.
         </p>
 
-        <button
-          onClick={() => window.location.assign('/')}
-          className={styles.homeLink}
-        >
-          Try Refreshing
-        </button>
+        <ReturnHomeButton label="Try Refreshing" />
       </div>
     </main>
   );

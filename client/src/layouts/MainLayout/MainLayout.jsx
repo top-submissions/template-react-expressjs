@@ -7,16 +7,16 @@ import styles from './MainLayout.module.css';
  * - Provides a persistent global navigation header.
  * - Manages the main content area using the Router Outlet.
  * - Handles top-level layout constraints (min-height, background).
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The rendered structural layout.
  */
 const MainLayout = () => {
   return (
+    // Wrap application in a flex container for full height coverage
     <div className={styles.layoutContainer}>
-      {/* Persistent navigation across all nested routes */}
       <Navbar />
 
-      {/* Main content area with layout-specific padding/constraints */}
-      <main className={styles.mainContent}>
+      {/* Render the inner page content within a centered global container */}
+      <main className={`${styles.mainContent} container`}>
         <Outlet />
       </main>
     </div>

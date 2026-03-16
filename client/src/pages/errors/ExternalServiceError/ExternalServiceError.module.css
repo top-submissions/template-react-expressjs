@@ -1,19 +1,26 @@
+/* Center the error content within the viewport */
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   padding: var(--space-4);
   text-align: center;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
 
+/* Constrain content width for readability */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+}
+
+/* Margin for the semantic status label */
 .labelWrapper {
   margin-bottom: var(--space-3);
 }
 
+/* Semantic error label using global error tokens */
 .errorLabel {
   background-color: var(--error-bg);
   color: var(--error-text);
@@ -26,6 +33,7 @@
   border: 1px solid var(--error-border);
 }
 
+/* Primary heading style */
 .title {
   font-size: var(--text-4xl);
   margin-bottom: var(--space-2);
@@ -33,13 +41,15 @@
   font-weight: var(--weight-bold);
 }
 
+/* Error description text */
 .message {
-  max-width: 450px;
   margin-bottom: var(--space-4);
   line-height: var(--lh-relaxed);
   opacity: 0.9;
+  font-size: var(--text-base);
 }
 
+/* Layout for action buttons */
 .actions {
   display: flex;
   gap: var(--space-2);
@@ -47,15 +57,23 @@
   justify-content: center;
 }
 
+/* Shared button properties and retry-specific styling */
+.retryButton,
+.homeButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--space-1);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 1px solid var(--border-color);
+}
+
 .retryButton {
   background-color: var(--btn-bg);
   color: var(--text-color);
-  border: 1px solid var(--border-color);
-  padding: 0.8rem 1.6rem;
-  font-weight: var(--weight-semibold);
-  border-radius: var(--space-1);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .retryButton:hover {
@@ -63,12 +81,12 @@
   color: white;
 }
 
+/* Secondary action styling */
 .homeButton {
   background-color: transparent;
   color: var(--text-color);
-  border: 1px solid transparent;
-  padding: 0.8rem 1.6rem;
-  font-weight: var(--weight-medium);
-  cursor: pointer;
-  text-decoration: underline;
+}
+
+.homeButton:hover {
+  background-color: var(--btn-bg);
 }

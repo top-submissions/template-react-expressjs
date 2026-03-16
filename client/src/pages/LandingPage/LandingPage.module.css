@@ -5,10 +5,7 @@
 }
 
 .hero {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   padding: var(--space-8) var(--space-4);
   text-align: center;
   background: linear-gradient(180deg, var(--bg-color) 0%, var(--btn-bg) 100%);
@@ -36,7 +33,7 @@
 
 .primaryButton {
   background-color: var(--primary-hover);
-  color: white;
+  color: #ffffff;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--space-1);
   text-decoration: none;
@@ -46,6 +43,8 @@
 
 .primaryButton:hover {
   transform: translateY(-2px);
+  /* Ensure text remains white on hover to prevent invisibility */
+  color: #ffffff;
 }
 
 .secondaryButton {
@@ -56,26 +55,33 @@
   border-radius: var(--space-1);
   text-decoration: none;
   font-weight: var(--weight-semibold);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.secondaryButton:hover {
+  transform: translateY(-2px);
+  background-color: var(--border-color);
 }
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--space-4);
+  padding: var(--space-8) var(--space-4);
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--space-6) var(--container-padding);
 }
 
 .featureCard {
-  padding: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--btn-bg);
   border: 1px solid var(--border-color);
-  border-radius: var(--space-2);
-  background-color: var(--bg-color);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--space-1);
 }
 
 .featureCard h3 {
-  margin-bottom: var(--space-1);
-  color: var(--primary-hover);
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2);
 }

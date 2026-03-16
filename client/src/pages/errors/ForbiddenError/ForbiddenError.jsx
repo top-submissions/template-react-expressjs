@@ -1,11 +1,11 @@
-import { Link } from 'react-router';
+import ReturnHomeButton from '../../../components/buttons/ReturnHomeButton/ReturnHomeButton';
 import styles from './ForbiddenError.module.css';
 
 /**
  * Page displayed when a user attempts to access a restricted resource.
  * - Handles 403 Forbidden scenarios.
- * - Provides navigation back to safety.
- * @returns {JSX.Element}
+ * - Provides navigation back to safety using ReturnHomeButton.
+ * @returns {JSX.Element} The rendered error page.
  */
 const ForbiddenError = () => {
   return (
@@ -17,9 +17,7 @@ const ForbiddenError = () => {
           You do not have the required permissions to view this resource. Please
           contact an administrator if you believe this is an error.
         </p>
-        <Link to="/" className={styles.homeLink}>
-          Return to Home
-        </Link>
+        <ReturnHomeButton />
       </div>
     </main>
   );
