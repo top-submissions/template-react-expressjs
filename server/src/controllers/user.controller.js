@@ -4,23 +4,20 @@ import { AuthenticationError, NotFoundError } from '../errors/AppError.js';
 
 /**
  * Returns the current authenticated user's session data.
- * - Used by the frontend AuthProvider to sync state on refresh.
  * @param {Object} req - Express request.
  * @param {Object} res - Express response.
  * @param {Function} next - Next middleware.
  */
 export const getCurrentUser = (req, res, next) => {
-  // session check via passport/middleware
-  if (!req.user) {
-    return next(new AuthenticationError('User session not found'));
-  }
+  if (!req.user) return next(new AuthenticationError('User session not found'));
 
-  // respond with formatted user object
+  // Include createdAt in session sync
   res.status(200).json({
     user: {
       id: req.user.id,
       username: req.user.username,
       role: req.user.role,
+      createdAt: req.user.createdAt,
     },
   });
 };
@@ -32,17 +29,15 @@ export const getCurrentUser = (req, res, next) => {
  * @param {Function} next - Express next middleware.
  */
 export const profileGet = (req, res, next) => {
-  // Ensure user exists in request from auth middleware
-  if (!req.user) {
-    return next(new AuthenticationError('User session not found'));
-  }
+  if (!req.user) return next(new AuthenticationError('User session not found'));
 
-  // Return user details as JSON
+  // Include createdAt for current user profile
   res.status(200).json({
     user: {
       id: req.user.id,
       username: req.user.username,
       role: req.user.role,
+      createdAt: req.user.createdAt,
     },
   });
 };
@@ -56,20 +51,22 @@ export const profileGet = (req, res, next) => {
 export const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const targetId = parseInt(id, 10);
 
-    // query database using integer ID
-    const user = await userQueries.getUserById(Number(id));
+    if (isNaN(targetId))
+      return next(new NotFoundError('Invalid User ID format'));
 
-    if (!user) {
-      return next(new NotFoundError('User not found'));
-    }
+    const user = await userQueries.getUserById(targetId);
+    if (!user) return next(new NotFoundError(`User with ID ${id} not found`));
 
-    // Strip sensitive data before returning
+    // Map fields from Prisma result to standardized response
     res.status(200).json({
-      id: user.id,
-      username: user.username,
-      role: user.role,
-      email: user.email,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
     });
   } catch (err) {
     next(new InternalServerError(err.message));
