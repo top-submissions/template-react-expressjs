@@ -19,15 +19,6 @@ export const getUserByUsername = async (username) => {
 };
 
 /**
- * Finds a single user by their unique email address.
- * @param {string} email - The email address to search for.
- * @returns {Promise<Object|null>} The user object if found, otherwise null.
- */
-export const getUserByEmail = async (email) => {
-  return await prisma.user.findUnique({ where: { email } });
-};
-
-/**
  * Creates a new user in the database.
  * - Persists a new user record using the provided data object.
  * @param {Object} userData - Object containing account details.
