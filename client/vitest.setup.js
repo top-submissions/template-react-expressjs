@@ -7,6 +7,16 @@ expect.extend(matchers);
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
+});
+
+// Mock Lucide icons to prevent SVG bloat in snapshots
+vi.mock('lucide-react', async () => {
+  const actual = await vi.importActual('lucide-react');
+  return Object.keys(actual).reduce((acc, curr) => {
+    acc[curr] = () => <div data-testid={`icon-${curr}`} />;
+    return acc;
+  }, {});
 });
 
 /**
