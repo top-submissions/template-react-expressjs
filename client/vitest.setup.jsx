@@ -19,36 +19,24 @@ vi.mock('lucide-react', async () => {
   }, {});
 });
 
-/**
- * Mock implementation of the Storage interface.
- * @returns {Object}
- */
-const createLocalStorageMock = () => {
-  let store = {};
-  return {
-    getItem: (key) => store[key] || null,
-    setItem: (key, value) => {
-      store[key] = String(value);
-    },
-    removeItem: (key) => {
-      delete store[key];
-    },
-    clear: () => {
-      store = {};
-    },
-    key: (index) => Object.keys(store)[index] || null,
-    get length() {
-      return Object.keys(store).length;
-    },
-  };
-};
-
-// Initialize browser environment mocks
+// Initialize Browser API Mocks
 if (typeof window !== 'undefined') {
+  // Mock localStorage
+  let store = {};
   Object.defineProperty(window, 'localStorage', {
-    value: createLocalStorageMock(),
+    value: {
+      getItem: (key) => store[key] || null,
+      setItem: (key, value) => {
+        store[key] = String(value);
+      },
+      removeItem: (key) => {
+        delete store[key];
+      },
+      clear: () => {
+        store = {};
+      },
+    },
     writable: true,
-    configurable: true,
   });
 
   global.fetch = vi.fn();
