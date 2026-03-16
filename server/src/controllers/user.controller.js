@@ -11,13 +11,14 @@ import { AuthenticationError, NotFoundError } from '../errors/AppError.js';
 export const getCurrentUser = (req, res, next) => {
   if (!req.user) return next(new AuthenticationError('User session not found'));
 
-  // Include createdAt in session sync
+  // Return session data for state sync
   res.status(200).json({
     user: {
       id: req.user.id,
       username: req.user.username,
       role: req.user.role,
       createdAt: req.user.createdAt,
+      lastLogin: req.user.lastLogin,
     },
   });
 };
@@ -28,18 +29,30 @@ export const getCurrentUser = (req, res, next) => {
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware.
  */
-export const profileGet = (req, res, next) => {
-  if (!req.user) return next(new AuthenticationError('User session not found'));
+export const profileGet = async (req, res, next) => {
+  try {
+    // Authenticate session
+    if (!req.user)
+      return next(new AuthenticationError('User session not found'));
 
-  // Include createdAt for current user profile
-  res.status(200).json({
-    user: {
-      id: req.user.id,
-      username: req.user.username,
-      role: req.user.role,
-      createdAt: req.user.createdAt,
-    },
-  });
+    // Fetch fresh data from database
+    const user = await userQueries.getUserById(req.user.id);
+    if (!user) return next(new NotFoundError('User profile not found'));
+
+    // Send standardized profile response
+    res.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+      },
+    });
+  } catch (err) {
+    // Handle database or unexpected errors
+    next(new InternalServerError(err.message));
+  }
 };
 
 /**
@@ -50,25 +63,29 @@ export const profileGet = (req, res, next) => {
  */
 export const getUserById = async (req, res, next) => {
   try {
+    // Extract and parse ID
     const { id } = req.params;
     const targetId = parseInt(id, 10);
 
     if (isNaN(targetId))
       return next(new NotFoundError('Invalid User ID format'));
 
+    // Fetch targeted user
     const user = await userQueries.getUserById(targetId);
     if (!user) return next(new NotFoundError(`User with ID ${id} not found`));
 
-    // Map fields from Prisma result to standardized response
+    // Send standardized user data
     res.status(200).json({
       user: {
         id: user.id,
         username: user.username,
         role: user.role,
         createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
       },
     });
   } catch (err) {
+    // Catch-all for server errors
     next(new InternalServerError(err.message));
   }
 };
