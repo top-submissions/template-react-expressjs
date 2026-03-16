@@ -59,9 +59,9 @@
 
 .detailsGrid {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   margin-top: var(--space-4);
   padding-top: var(--space-4);
   border-top: 1px solid var(--border-color);
@@ -69,38 +69,29 @@
 
 .detailItem {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-0-5);
+  align-items: center;
+  gap: var(--space-1);
 }
 
-.detailLabel {
-  font-size: var(--text-xs);
-  text-transform: uppercase;
+.detailIcon {
+  color: var(--text-color);
   opacity: 0.6;
-  font-weight: var(--weight-bold);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .detailValue {
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   color: var(--text-color);
+  font-weight: var(--weight-medium);
 }
 
 .loadingWrapper,
 .errorWrapper {
-  min-height: 400px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-}
-
-@media (max-width: 600px) {
-  .detailsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .profileCard {
-    padding: var(--space-3);
-  }
+  padding: var(--space-8);
+  font-size: var(--text-lg);
+  color: var(--text-color);
 }

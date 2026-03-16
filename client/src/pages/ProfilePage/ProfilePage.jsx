@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
+import { Hash, Calendar, LogIn } from 'lucide-react';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 import { userApi } from '../../modules/api/user/user.api';
 import styles from './ProfilePage.module.css';
@@ -7,7 +8,6 @@ import styles from './ProfilePage.module.css';
 /**
  * User Profile Page.
  * - Displays account details for the current user or a targeted user.
- * - Manages data fetching for external profiles via URL parameters.
  * @returns {JSX.Element}
  */
 const ProfilePage = () => {
@@ -18,27 +18,18 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  /**
-   * Loads user data.
-   * - If an ID is in the URL, fetches that specific user.
-   * - Otherwise, defaults to the current authenticated user's data.
-   */
   useEffect(() => {
     const loadProfile = async () => {
-      // Use current user if no ID parameter is present
-      if (!id) {
-        setProfileUser(currentUser);
-        setIsLoading(false);
-        return;
-      }
-
       try {
         setIsLoading(true);
-        // Fetch specific user via API service
-        const response = await userApi.getById(id);
-        if (!response.ok) throw new Error('User not found');
+        const response = id
+          ? await userApi.getById(id)
+          : await userApi.getProfile();
+
+        if (!response.ok) throw new Error('User profile not found');
+
         const data = await response.json();
-        setProfileUser(data);
+        setProfileUser(data.user || data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -49,12 +40,7 @@ const ProfilePage = () => {
     loadProfile();
   }, [id, currentUser]);
 
-  if (isLoading)
-    return (
-      <div className={`${styles.loadingWrapper} animate-fade-in`}>
-        Loading profile...
-      </div>
-    );
+  if (isLoading) return <div className={styles.loadingWrapper}>Loading...</div>;
   if (error) return <div className={styles.errorWrapper}>Error: {error}</div>;
   if (!profileUser) return null;
 
@@ -71,14 +57,35 @@ const ProfilePage = () => {
         </div>
 
         <div className={styles.detailsGrid}>
+          {/* User ID */}
           <div className={styles.detailItem}>
-            <span className={styles.detailLabel}>User ID</span>
+            <div className={styles.detailIcon}>
+              <Hash size={16} /> :
+            </div>
             <span className={styles.detailValue}>{profileUser.id}</span>
           </div>
+
+          {/* Join Date */}
           <div className={styles.detailItem}>
-            <span className={styles.detailLabel}>Email Address</span>
+            <div className={styles.detailIcon}>
+              <Calendar size={16} /> :
+            </div>
             <span className={styles.detailValue}>
-              {profileUser.email || 'N/A'}
+              {profileUser.createdAt
+                ? new Date(profileUser.createdAt).toLocaleDateString()
+                : 'N/A'}
+            </span>
+          </div>
+
+          {/* Last Login */}
+          <div className={styles.detailItem}>
+            <div className={styles.detailIcon}>
+              <LogIn size={16} /> :
+            </div>
+            <span className={styles.detailValue}>
+              {profileUser.lastLogin
+                ? new Date(profileUser.lastLogin).toLocaleString()
+                : 'Never'}
             </span>
           </div>
         </div>
