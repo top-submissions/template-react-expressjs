@@ -1,38 +1,35 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
-import { AuthProvider } from '../../../providers/AuthProvider/AuthProvider';
-import { ToastProvider } from '../../../providers/ToastProvider/ToastProvider';
+import { render, screen, waitFor } from '../../../modules/utils/testing/testing.utils';
+import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import UserManagementPage from './UserManagementPage';
 
-describe('UserManagementPage Component', () => {
-  /**
-   * Helper to render the page with necessary context providers.
-   */
-  const renderPage = () => {
-    return render(
-      <MemoryRouter>
-        <ToastProvider>
-          <AuthProvider>
-            <UserManagementPage />
-          </AuthProvider>
-        </ToastProvider>
-      </MemoryRouter>
-    );
+// Mock AuthProvider to control auth state and prevent internal side effects
+vi.mock('../../../providers/AuthProvider/AuthProvider', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+    AuthProvider: ({ children }) => children,
   };
+});
 
+// Mock adminApi locally since fetch is abstracted away from the component
+vi.mock('../../../modules/api/admin/admin.api', () => ({
+  adminApi: {
+    getAllUsers: vi.fn(),
+  },
+}));
+
+import { adminApi } from '../../../modules/api/admin/admin.api';
+
+describe('UserManagementPage Component', () => {
   it('shows loading state initially', async () => {
     // --- Arrange ---
-    fetch.mockImplementation((url) => {
-      if (url.includes('/api/admin/users')) return new Promise(() => {}); // Never resolves
-      return Promise.resolve({
-        ok: true,
-        json: async () => ({ user: { id: 1, role: 'ADMIN' } }),
-      });
-    });
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 1, role: 'ADMIN' } });
+    vi.mocked(adminApi.getAllUsers).mockImplementation(() => new Promise(() => {}));
 
     // --- Act ---
-    renderPage();
+    render(<UserManagementPage />);
 
     // --- Assert ---
     expect(screen.getByText(/loading user records/i)).toBeInTheDocument();
@@ -40,25 +37,18 @@ describe('UserManagementPage Component', () => {
 
   it('renders user count after successful fetch', async () => {
     // --- Arrange ---
-    const mockResponse = {
-      users: [
-        { id: 1, username: 'user1', role: 'USER' },
-        { id: 2, username: 'user2', role: 'USER' },
-      ],
-    };
-
-    fetch.mockImplementation((url) => {
-      if (url.includes('/api/admin/users')) {
-        return Promise.resolve({ ok: true, json: async () => mockResponse });
-      }
-      return Promise.resolve({
-        ok: true,
-        json: async () => ({ user: { id: 99, role: 'ADMIN' } }),
-      });
+    const mockUsers = [
+      { id: 1, username: 'user1', role: 'USER' },
+      { id: 2, username: 'user2', role: 'USER' },
+    ];
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 99, role: 'ADMIN' } });
+    vi.mocked(adminApi.getAllUsers).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ users: mockUsers }),
     });
 
     // --- Act ---
-    renderPage();
+    render(<UserManagementPage />);
 
     // --- Assert ---
     await waitFor(() => {
@@ -69,24 +59,14 @@ describe('UserManagementPage Component', () => {
 
   it('displays error state on network failure', async () => {
     // --- Arrange ---
-    fetch.mockImplementation((url) => {
-      if (url.includes('/api/admin/users')) {
-        return Promise.resolve({ ok: false });
-      }
-      return Promise.resolve({
-        ok: true,
-        json: async () => ({ user: { id: 1, role: 'ADMIN' } }),
-      });
-    });
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 1, role: 'ADMIN' } });
+    vi.mocked(adminApi.getAllUsers).mockResolvedValueOnce({ ok: false });
 
     // --- Act ---
-    renderPage();
+    render(<UserManagementPage />);
 
     // --- Assert ---
-    await waitFor(() => {
-      expect(
-        screen.getByText(/failed to retrieve user directory/i)
-      ).toBeInTheDocument();
-    });
+    const errorMsg = await screen.findByText(/failed to retrieve user directory/i);
+    expect(errorMsg).toBeInTheDocument();
   });
 });

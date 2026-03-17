@@ -1,13 +1,19 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { adminApi } from './admin.api';
 
 describe('adminApi', () => {
+  // --- Arrange ---
+  // Setup standard success response for fetch
+  const mockSuccessResponse = (data = { success: true }) => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(data),
+    });
+  };
+
   it('getAllUsers calls the correct endpoint with GET', async () => {
     // --- Arrange ---
-    fetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ success: true }),
-    });
+    mockSuccessResponse();
 
     // --- Act ---
     await adminApi.getAllUsers();
@@ -25,10 +31,7 @@ describe('adminApi', () => {
   it('promoteUser injects the userId into the URL', async () => {
     // --- Arrange ---
     const testId = 123;
-    fetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ success: true }),
-    });
+    mockSuccessResponse();
 
     // --- Act ---
     await adminApi.promoteUser(testId);
@@ -46,10 +49,7 @@ describe('adminApi', () => {
   it('demoteUser injects the userId into the URL', async () => {
     // --- Arrange ---
     const testId = 456;
-    fetch.mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ success: true }),
-    });
+    mockSuccessResponse();
 
     // --- Act ---
     await adminApi.demoteUser(testId);

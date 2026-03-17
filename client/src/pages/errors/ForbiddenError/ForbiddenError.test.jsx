@@ -1,16 +1,23 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { useNavigate } from 'react-router';
+import { render, screen } from '../../../modules/utils/testing/testing.utils';
 import ForbiddenError from './ForbiddenError';
+
+// Mock AuthProvider to prevent background state updates
+vi.mock('../../../providers/AuthProvider/AuthProvider', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+    AuthProvider: ({ children }) => children,
+  };
+});
 
 describe('ForbiddenError Component', () => {
   it('should render the 403 error code and permission message', () => {
     // --- Arrange ---
-    render(
-      <MemoryRouter>
-        <ForbiddenError />
-      </MemoryRouter>
-    );
+    render(<ForbiddenError />);
 
     // --- Act ---
     const heading = screen.getByText('403');
@@ -21,18 +28,21 @@ describe('ForbiddenError Component', () => {
     expect(subHeading).toBeInTheDocument();
   });
 
-  it('should provide a link to return to the home page', () => {
+  it('should navigate to home when clicking the return button', async () => {
     // --- Arrange ---
-    render(
-      <MemoryRouter>
-        <ForbiddenError />
-      </MemoryRouter>
-    );
+    const user = userEvent.setup();
+    
+    // Create a stable reference to the mock function
+    const navigateMock = vi.fn();
+    vi.mocked(useNavigate).mockReturnValue(navigateMock);
+
+    render(<ForbiddenError />);
 
     // --- Act ---
-    const link = screen.getByRole('link', { name: /return to home/i });
+    const returnBtn = screen.getByRole('button', { name: /return home/i });
+    await user.click(returnBtn);
 
     // --- Assert ---
-    expect(link).toHaveAttribute('href', '/');
+    expect(navigateMock).toHaveBeenCalledWith('/');
   });
 });

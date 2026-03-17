@@ -1,11 +1,21 @@
-import { screen } from '@testing-library/react';
 import { Routes, Route } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '../../modules/utils/testing/testing.utils';
 import { useAuth } from '../../providers/AuthProvider/AuthProvider';
 import AdminRoute from './AdminRoute';
-import { render } from '../../__tests__/test-utils';
 
-// Local mock for the error page to simplify assertions
+// Mock AuthProvider hook to control auth state
+vi.mock('../../providers/AuthProvider/AuthProvider', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+    // Mock the Provider as a fragment to avoid internal useEffect/state updates
+    AuthProvider: ({ children }) => children,
+  };
+});
+
+// Mock the error page to simplify assertions
 vi.mock('../../pages/errors/ForbiddenError/ForbiddenError', () => ({
   default: () => <div data-testid="forbidden">Forbidden Access</div>,
 }));
@@ -19,6 +29,7 @@ describe('AdminRoute Component', () => {
     });
 
     // --- Act ---
+    // Render admin route with nested content
     render(
       <Routes>
         <Route element={<AdminRoute />}>
@@ -77,15 +88,18 @@ describe('AdminRoute Component', () => {
     vi.mocked(useAuth).mockReturnValue({ user: null, loading: true });
 
     // --- Act ---
-    const { container } = render(
+    render(
       <Routes>
         <Route element={<AdminRoute />}>
-          <Route path="/" element={<div>Admin Dashboard</div>} />
+          <Route path="/" element={<div data-testid="admin-content">Admin Dashboard</div>} />
         </Route>
       </Routes>
     );
 
     // --- Assert ---
-    expect(container.firstChild).toBeNull();
+    // Check that the protected content is not rendered
+    expect(screen.queryByTestId('admin-content')).not.toBeInTheDocument();
+    // Verify ForbiddenError is also not rendered
+    expect(screen.queryByTestId('forbidden')).not.toBeInTheDocument();
   });
 });

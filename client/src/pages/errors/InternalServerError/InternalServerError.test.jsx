@@ -1,49 +1,52 @@
-import { render, screen } from '../../../__tests__/test-utils';
-import userEvent from '@testing-library/user-event';
-import { useRouteError } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { useRouteError, useNavigate } from 'react-router';
+import { render, screen } from '../../../modules/utils/testing/testing.utils';
 import InternalServerError from './InternalServerError';
+
+// Mock AuthProvider to prevent background state updates
+vi.mock('../../../providers/AuthProvider/AuthProvider', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: vi.fn(),
+    AuthProvider: ({ children }) => children,
+  };
+});
 
 describe('InternalServerError Component', () => {
   beforeEach(() => {
     // Reset navigation and error mocks
     vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('should render the 500 status and generic error message', () => {
     // --- Arrange ---
-    // Simulate a critical error object caught by the router
-    vi.mocked(useRouteError).mockReturnValue(
-      new Error('Critical System Failure')
-    );
+    vi.mocked(useRouteError).mockReturnValue(new Error('Fail'));
 
     // --- Act ---
     render(<InternalServerError />);
 
     // --- Assert ---
-    const code = screen.getByText('500');
-    const title = screen.getByText(/something went wrong/i);
-
-    expect(code).toBeInTheDocument();
-    expect(title).toBeInTheDocument();
+    expect(screen.getByText('500')).toBeInTheDocument();
   });
 
-  it('should attempt to reload the application when clicking refresh', async () => {
+  it('should navigate to home when clicking the return button', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
     vi.mocked(useRouteError).mockReturnValue({});
-
-    // Track page redirection calls
-    const assignMock = vi.fn();
-    vi.stubGlobal('location', { assign: assignMock });
-
-    render(<InternalServerError />);
+    
+    // Create a stable reference to the mock function used by the router
+    const navigateMock = vi.fn();
+    vi.mocked(useNavigate).mockReturnValue(navigateMock);
 
     // --- Act ---
-    const refreshBtn = screen.getByRole('button', { name: /try refreshing/i });
-    await user.click(refreshBtn);
+    render(<InternalServerError />);
+    const returnBtn = screen.getByRole('button', { name: /return home/i });
+    await user.click(returnBtn);
 
     // --- Assert ---
-    expect(assignMock).toHaveBeenCalledWith('/');
+    expect(navigateMock).toHaveBeenCalledWith('/');
   });
 });

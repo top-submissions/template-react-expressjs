@@ -8,6 +8,7 @@ import { signupSchema } from './auth.validator';
 describe('Auth Client Validators', () => {
   it('should invalidate a username with special characters', () => {
     // --- Arrange ---
+    // Define input with invalid characters in username
     const invalidData = {
       username: 'user@name',
       password: 'Password1',
@@ -15,11 +16,12 @@ describe('Auth Client Validators', () => {
     };
 
     // --- Act ---
+    // Run validation against the signup schema
     const result = signupSchema.safeParse(invalidData);
 
     // --- Assert ---
+    // Ensure validation failed and returned correct error message
     expect(result.success).toBe(false);
-    // Check if the specific regex error message is returned
     expect(result.error.issues[0].message).toContain(
       'Only letters, numbers, and underscores'
     );
@@ -27,6 +29,7 @@ describe('Auth Client Validators', () => {
 
   it('should invalidate mismatching passwords', () => {
     // --- Arrange ---
+    // Define input with non-matching password fields
     const mismatchData = {
       username: 'validUser',
       password: 'Password1',
@@ -34,9 +37,11 @@ describe('Auth Client Validators', () => {
     };
 
     // --- Act ---
+    // Run validation against the signup schema
     const result = signupSchema.safeParse(mismatchData);
 
     // --- Assert ---
+    // Verify schema catches the mismatch via refinement
     expect(result.success).toBe(false);
     expect(result.error.issues[0].message).toBe("Passwords don't match");
   });

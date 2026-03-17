@@ -5,12 +5,6 @@ import { MemoryRouter } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
 import SignupForm from './SignupForm';
 
-/**
- * Integration tests for SignupForm.
- * - Verifies input capture using userEvent for realistic simulation.
- * - Validates password mismatch handling and Zod integration.
- * - Ensures submission triggers fetch.
- */
 describe('SignupForm', () => {
   it('displays error if passwords do not match', async () => {
     // --- Arrange ---
@@ -18,7 +12,7 @@ describe('SignupForm', () => {
     render(
       <MemoryRouter>
         <SignupForm />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     // --- Act ---
@@ -31,7 +25,7 @@ describe('SignupForm', () => {
     // --- Assert ---
     // Use jest-dom's toBeInTheDocument for better semantic checking
     expect(
-      await screen.findByText(/Passwords don't match/i),
+      await screen.findByText(/Passwords don't match/i)
     ).toBeInTheDocument();
   });
 
@@ -41,7 +35,7 @@ describe('SignupForm', () => {
     render(
       <MemoryRouter>
         <SignupForm />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     // --- Act ---
