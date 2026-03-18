@@ -3,7 +3,6 @@ import * as userQueries from '../../db/queries/user/user.queries.js';
 
 // Centralized error message fragments
 const passwordLengthErr = 'must be at least 6 characters long.';
-const emailErr = 'must be a valid email address.';
 
 /**
  * Signup Validation Chain.
@@ -58,29 +57,4 @@ export const validateLogin = [
   // Check for required credentials
   body('username').trim().notEmpty().withMessage('Username is required.'),
   body('password').notEmpty().withMessage('Password is required.'),
-];
-
-/**
- * Extended Signup Validation with Email.
- * - Inherits all standard signup validation rules.
- * - Adds email format validation and database uniqueness checks via Prisma.
- * @type {Array<import('express-validator').ValidationChain>}
- */
-export const validateSignupWithEmail = [
-  // Spread existing registration rules
-  ...validateSignup,
-
-  // Validate email format and uniqueness
-  body('email')
-    .trim()
-    .isEmail()
-    .withMessage(`Email ${emailErr}`)
-    // Perform async database check for email uniqueness
-    .custom(async (email) => {
-      const user = await userQueries.getUserByEmail(email);
-      if (user) {
-        throw new Error('Email already registered.');
-      }
-      return true;
-    }),
 ];
