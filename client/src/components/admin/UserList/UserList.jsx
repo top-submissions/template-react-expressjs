@@ -8,9 +8,10 @@ import UserRow from '../UserRow/UserRow';
  * - Handles empty states gracefully.
  * @param {Object} props - Component properties.
  * @param {Array} props.users - Array of user objects to display.
+ * @param {function} props.onUpdate - Callback to refresh the user list after a role change.
  * @returns {JSX.Element}
  */
-const UserList = ({ users }) => {
+const UserList = ({ users, onUpdate }) => {
   // Check if directory is empty to show feedback
   const isEmpty = !users || users.length === 0;
 
@@ -33,7 +34,7 @@ const UserList = ({ users }) => {
           <tbody>
             {/* Iterate through list and inject atomic row components */}
             {users.map((user) => (
-              <UserRow key={user.id} user={user} />
+              <UserRow key={user.id} user={user} onUpdate={onUpdate} />
             ))}
           </tbody>
         </table>
