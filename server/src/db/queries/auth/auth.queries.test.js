@@ -1,23 +1,13 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 import * as authQueries from './auth.queries.js';
 import { prisma } from '../../../lib/prisma.js';
 
 // Isolate DB logic by mocking Prisma client
 vi.mock('../../../lib/prisma.js', () => ({
-  prisma: {
-    user: {
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-  },
+  prisma: { user: mockPrismaUser() },
 }));
 
 describe('authQueries module', () => {
-  // Reset mocks before each test to ensure isolation
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('registerUser()', () => {
     it('should create a user with default USER role', async () => {
       // --- Arrange ---
