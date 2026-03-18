@@ -24,7 +24,7 @@ export const adminApi = {
    */
   promoteUser: async (userId) => {
     // POST request to promote specific ID
-    return fetch(`${BASE_URL}/api/admin/promote/${userId}`, {
+    return fetch(`${BASE_URL}/api/admin/users/${userId}/promote`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -37,7 +37,7 @@ export const adminApi = {
    */
   demoteUser: async (userId) => {
     // POST request to demote specific ID
-    return fetch(`${BASE_URL}/api/admin/demote/${userId}`, {
+    return fetch(`${BASE_URL}/api/admin/users/${userId}/demote`, {
       method: 'POST',
       credentials: 'include',
     });
