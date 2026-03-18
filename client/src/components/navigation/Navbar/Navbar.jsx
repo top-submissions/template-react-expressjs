@@ -4,6 +4,7 @@ import { Home, User, Settings, Sun, Moon, LogOut } from 'lucide-react';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { useToast } from '../../../providers/ToastProvider/ToastProvider';
 import { useTheme } from '../../../providers/ThemeProvider/ThemeProvider';
+import ConfirmationModal from '../../feedback/modals/ConfirmationModal/ConfirmationModal';
 import styles from './Navbar.module.css';
 
 /**
@@ -20,10 +21,8 @@ const Navbar = () => {
   const { showToast } = useToast();
   const { theme, toggleTheme } = useTheme();
 
-  // Manage logout confirmation modal state
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Define navigation logic based on user authorization
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const homePath = isAdmin ? '/admin-dashboard' : '/dashboard';
 
@@ -59,7 +58,6 @@ const Navbar = () => {
             <Settings size={20} />
           </Link>
 
-          {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             className={styles.themeToggle}
@@ -86,34 +84,14 @@ const Navbar = () => {
         )}
       </nav>
 
-      {showConfirm && (
-        <div
-          className={`${styles.modalOverlay} animate-fade-in`}
-          onClick={() => setShowConfirm(false)}
-        >
-          <div
-            className={`${styles.modalContent} animate-slide-up`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3>Confirm Logout</h3>
-            <p>Are you sure you want to log out of your session?</p>
-            <div className={styles.modalActions}>
-              <button
-                className={styles.cancelBtn}
-                onClick={() => setShowConfirm(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className={styles.confirmBtn}
-                onClick={handleConfirmLogout}
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationModal
+        isOpen={showConfirm}
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setShowConfirm(false)}
+        title="Confirm Logout"
+        message="Are you sure you want to log out of your session?"
+        confirmLabel="Logout"
+      />
     </>
   );
 };
