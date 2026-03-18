@@ -31,8 +31,6 @@ describe('Admin Integration Tests', () => {
   let app;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-
     // Initialize express app for testing
     app = express();
     app.use(express.json());
@@ -52,7 +50,6 @@ describe('Admin Integration Tests', () => {
   describe('GET /admin/users', () => {
     it('should fetch users and return a JSON list', async () => {
       // --- Arrange ---
-      // Define static mock user data
       const mockUsers = [
         { id: 1, username: 'test1', role: 'USER' },
         { id: 2, username: 'test2', role: 'ADMIN' },
@@ -60,7 +57,6 @@ describe('Admin Integration Tests', () => {
       adminQueries.getAllUsersForManagement.mockResolvedValue(mockUsers);
 
       // --- Act ---
-      // Execute the request to the management list endpoint
       const response = await request(app).get('/admin/users');
 
       // --- Assert ---
@@ -71,7 +67,6 @@ describe('Admin Integration Tests', () => {
 
     it('should return 500 when database retrieval fails', async () => {
       // --- Arrange ---
-      // Force a rejection from the query layer
       adminQueries.getAllUsersForManagement.mockRejectedValue(
         new Error('Connection failure')
       );
@@ -88,7 +83,6 @@ describe('Admin Integration Tests', () => {
   describe('POST /admin/users/:id/promote', () => {
     it('should return 200 and updated user on successful promotion', async () => {
       // --- Arrange ---
-      // Configure target user and mock return value
       const targetUserId = 5;
       const updatedUser = { id: targetUserId, role: 'ADMIN' };
       adminQueries.promoteUserToAdmin.mockResolvedValue(updatedUser);
@@ -109,7 +103,6 @@ describe('Admin Integration Tests', () => {
 
     it('should return 404 error if user does not exist', async () => {
       // --- Arrange ---
-      // Simulate missing user in DB
       adminQueries.promoteUserToAdmin.mockResolvedValue(null);
 
       // --- Act ---
@@ -122,7 +115,6 @@ describe('Admin Integration Tests', () => {
 
     it('should return 400 error if ID is not a number', async () => {
       // --- Arrange ---
-
       // --- Act ---
       const response = await request(app).post('/admin/users/abc/promote');
 
@@ -135,13 +127,11 @@ describe('Admin Integration Tests', () => {
   describe('POST /admin/users/:id/demote', () => {
     it('should return 200 and updated user on successful demotion', async () => {
       // --- Arrange ---
-      // Set target ID and expected user object with USER role
       const targetUserId = 10;
       const updatedUser = { id: targetUserId, role: 'USER' };
       adminQueries.demoteAdminToUser.mockResolvedValue(updatedUser);
 
       // --- Act ---
-      // Perform the POST request to the demote endpoint
       const response = await request(app).post(
         `/admin/users/${targetUserId}/demote`
       );
@@ -155,7 +145,6 @@ describe('Admin Integration Tests', () => {
 
     it('should return 404 if user to demote is not found', async () => {
       // --- Arrange ---
-      // Mock null response from query layer
       adminQueries.demoteAdminToUser.mockResolvedValue(null);
 
       // --- Act ---
@@ -168,7 +157,6 @@ describe('Admin Integration Tests', () => {
 
     it('should return 500 error if demote operation crashes', async () => {
       // --- Arrange ---
-      // Force database error simulation
       adminQueries.demoteAdminToUser.mockRejectedValue(
         new Error('Database Failure')
       );

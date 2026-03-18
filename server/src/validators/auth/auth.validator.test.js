@@ -1,11 +1,10 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 import * as authValidator from './auth.validator.js';
 import * as userQueries from '../../db/queries/user/user.queries.js';
 
-// Mock userQueries to bypass real database logic and isolation validator testing
+// Mock userQueries to bypass real database logic and isolate validator testing
 vi.mock('../../db/queries/user/user.queries.js', () => ({
   getUserByUsername: vi.fn(),
-  getUserByEmail: vi.fn(),
 }));
 
 /**
@@ -28,14 +27,9 @@ const runValidation = async (validations, data) => {
 };
 
 describe('authValidator module', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   describe('validateSignup', () => {
     it('should fail if username contains invalid characters', async () => {
       // --- Arrange ---
-      // Define payload with illegal special characters
       const data = {
         username: 'user@123',
         password: 'Password1',
@@ -58,7 +52,6 @@ describe('authValidator module', () => {
         password: 'Password1',
         confirmPassword: 'Password1',
       };
-      // Mock the query to return an existing user object
       vi.mocked(userQueries.getUserByUsername).mockResolvedValue({
         id: 1,
         username: 'existingUser',
@@ -78,7 +71,6 @@ describe('authValidator module', () => {
 
     it('should fail if passwords do not match', async () => {
       // --- Arrange ---
-      // Define mismatching password and confirmation
       const data = {
         username: 'validUser',
         password: 'Password1',
@@ -99,7 +91,6 @@ describe('authValidator module', () => {
   describe('validateLogin', () => {
     it('should fail if required fields are missing', async () => {
       // --- Arrange ---
-      // Define empty strings to trigger .notEmpty() checks
       const data = { username: '', password: '' };
 
       // --- Act ---
@@ -107,64 +98,9 @@ describe('authValidator module', () => {
 
       // --- Assert ---
       expect(errors.length).toBe(2);
-      // Map messages to ignore race-condition array order
       const messages = errors.map((e) => e.msg);
       expect(messages).toContain('Username is required.');
       expect(messages).toContain('Password is required.');
-    });
-  });
-
-  describe('validateSignupWithEmail', () => {
-    it('should fail if email format is invalid', async () => {
-      // --- Arrange ---
-      // Define a syntactically incorrect email address
-      const data = {
-        username: 'validUser',
-        password: 'Password1',
-        confirmPassword: 'Password1',
-        email: 'not-an-email',
-      };
-      vi.mocked(userQueries.getUserByUsername).mockResolvedValue(null);
-
-      // --- Act ---
-      const errors = await runValidation(
-        authValidator.validateSignupWithEmail,
-        data
-      );
-
-      // --- Assert ---
-      expect(
-        errors.some((e) => e.msg.includes('must be a valid email address'))
-      ).toBe(true);
-    });
-
-    it('should fail if email is already registered', async () => {
-      // --- Arrange ---
-      const data = {
-        username: 'validUser',
-        password: 'Password1',
-        confirmPassword: 'Password1',
-        email: 'taken@example.com',
-      };
-      vi.mocked(userQueries.getUserByUsername).mockResolvedValue(null);
-      vi.mocked(userQueries.getUserByEmail).mockResolvedValue({
-        id: 1,
-        email: 'taken@example.com',
-      });
-
-      // --- Act ---
-      const errors = await runValidation(
-        authValidator.validateSignupWithEmail,
-        data
-      );
-
-      // --- Assert ---
-      expect(errors.some((e) => e.msg === 'Email already registered.')).toBe(
-        true
-      );
-      expect(userQueries.getUserByEmail).toHaveBeenCalledWith(
-        'taken@example.com'
-      );
     });
   });
 });

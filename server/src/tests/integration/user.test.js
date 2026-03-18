@@ -13,6 +13,13 @@ vi.mock('../../middleware/auth/auth.middleware.js', () => ({
   isNotAdmin: vi.fn((req, res, next) => next()),
 }));
 
+// Mock user query layer to prevent real DB calls in profile fetch
+vi.mock('../../db/queries/user/user.queries.js', () => ({
+  getUserById: vi.fn(),
+}));
+
+import * as userQueries from '../../db/queries/user/user.queries.js';
+
 /**
  * Integration tests for the User API module.
  * - Validates JSON profile data delivery.
@@ -22,8 +29,6 @@ describe('User Integration Tests', () => {
   let app;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-
     // Initialize express app for JSON API testing
     app = express();
     app.use(express.json());
@@ -43,14 +48,19 @@ describe('User Integration Tests', () => {
   describe('GET /user/profile', () => {
     it('should return 200 and the sanitized user profile JSON', async () => {
       // --- Arrange ---
-      // Identity is handled by the isAuthenticated mock
+      userQueries.getUserById.mockResolvedValueOnce({
+        id: 10,
+        username: 'standard_user',
+        role: 'USER',
+        createdAt: null,
+        lastLogin: null,
+      });
 
       // --- Act ---
       const response = await request(app).get('/user/profile');
 
       // --- Assert ---
       expect(response.status).toBe(200);
-      // Verify JSON structure instead of view names
       expect(response.body.user.username).toBe('standard_user');
       expect(response.body.user.id).toBe(10);
       expect(response.body.user).not.toHaveProperty('password');

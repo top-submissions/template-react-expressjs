@@ -54,9 +54,6 @@ describe('Auth Integration Tests', () => {
   let app;
 
   beforeEach(() => {
-    // Reset mocks between runs
-    vi.clearAllMocks();
-
     // Initialize express app with test stack
     app = express();
     app.use(express.json());
@@ -88,7 +85,6 @@ describe('Auth Integration Tests', () => {
         password: 'Password123',
         confirmPassword: 'Password123',
       };
-
       userQueries.getUserByUsername.mockResolvedValue(null);
       authQueries.registerUser.mockResolvedValue({
         id: 1,
@@ -99,7 +95,6 @@ describe('Auth Integration Tests', () => {
       const response = await request(app).post('/sign-up').send(userData);
 
       // --- Assert ---
-      // Verify successful creation status
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty(
         'message',
@@ -113,7 +108,6 @@ describe('Auth Integration Tests', () => {
       // --- Arrange ---
       const credentials = { username: 'admin', password: 'password' };
       const mockAdmin = { id: 99, username: 'admin', role: 'ADMIN' };
-
       authQueries.updateLastLogin.mockResolvedValue(true);
 
       // Override default passport mock for this specific login success case
