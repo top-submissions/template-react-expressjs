@@ -7,26 +7,11 @@ vi.mock('../../utils/auth/cookie/cookie.js', () => ({
   clearAuthCookie: vi.fn(),
 }));
 
-/**
- * Unit tests for the Global Error Handling Middleware.
- * - Validates status code defaulting.
- * - Ensures JSON structure consistency.
- * - Verifies field-specific error propagation.
- */
 describe('Global Error Handler Middleware', () => {
-  let mockReq;
-  let mockRes;
-  let next;
+  let req, res, next;
 
   beforeEach(() => {
-    // Initialize mock objects for Express request, response, and next function
-    vi.clearAllMocks();
-    mockReq = {};
-    mockRes = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn().mockReturnThis(),
-    };
-    next = vi.fn();
+    ({ req, res, next } = mockExpressContext());
   });
 
   it('should format a generic Error into a 500 JSON response', () => {
@@ -34,12 +19,11 @@ describe('Global Error Handler Middleware', () => {
     const genericError = new Error('Something went wrong');
 
     // --- Act ---
-    globalErrorHandler(genericError, mockReq, mockRes, next);
+    globalErrorHandler(genericError, req, res, next);
 
     // --- Assert ---
-    // Verify status defaults to 500 when no statusCode is present
-    expect(mockRes.status).toHaveBeenCalledWith(500);
-    expect(mockRes.json).toHaveBeenCalledWith({
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
       status: 'error',
       message: 'Something went wrong',
       errors: [],
@@ -55,12 +39,11 @@ describe('Global Error Handler Middleware', () => {
     };
 
     // --- Act ---
-    globalErrorHandler(customError, mockReq, mockRes, next);
+    globalErrorHandler(customError, req, res, next);
 
     // --- Assert ---
-    // Verify the middleware respects custom status codes
-    expect(mockRes.status).toHaveBeenCalledWith(404);
-    expect(mockRes.json).toHaveBeenCalledWith(
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         status: 'fail',
         message: 'Resource not found',
@@ -70,18 +53,14 @@ describe('Global Error Handler Middleware', () => {
 
   it('should clear auth cookie when a 401 error occurs', () => {
     // --- Arrange ---
-    const authError = {
-      message: 'Unauthorized access',
-      statusCode: 401,
-    };
+    const authError = { message: 'Unauthorized access', statusCode: 401 };
 
     // --- Act ---
-    globalErrorHandler(authError, mockReq, mockRes, next);
+    globalErrorHandler(authError, req, res, next);
 
     // --- Assert ---
-    // Ensure safety net clears cookie on auth failure
-    expect(clearAuthCookie).toHaveBeenCalledWith(mockRes);
-    expect(mockRes.status).toHaveBeenCalledWith(401);
+    expect(clearAuthCookie).toHaveBeenCalledWith(res);
+    expect(res.status).toHaveBeenCalledWith(401);
   });
 
   it('should include validation error arrays in the response', () => {
@@ -93,11 +72,10 @@ describe('Global Error Handler Middleware', () => {
     };
 
     // --- Act ---
-    globalErrorHandler(validationError, mockReq, mockRes, next);
+    globalErrorHandler(validationError, req, res, next);
 
     // --- Assert ---
-    // Ensure the errors array is passed through for frontend consumption
-    expect(mockRes.json).toHaveBeenCalledWith({
+    expect(res.json).toHaveBeenCalledWith({
       status: 'error',
       message: 'Validation failed',
       errors: [{ msg: 'Invalid email' }, { msg: 'Password too short' }],

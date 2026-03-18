@@ -18,22 +18,13 @@ vi.mock('../../utils/auth/cookie/cookie.js', () => ({
 describe('authMiddleware module', () => {
   let req, res, next;
 
-  // Initialize fresh mocks for every test case
   beforeEach(() => {
-    vi.clearAllMocks();
-    req = {};
-    res = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn().mockReturnThis(),
-      redirect: vi.fn().mockReturnThis(),
-    };
-    next = vi.fn();
+    ({ req, res, next } = mockExpressContext());
   });
 
   describe('isAuthenticated()', () => {
     it('should attach user to req and call next if authenticated', () => {
       // --- Arrange ---
-      // Define a valid user and simulate successful passport verification
       const mockUser = { id: 1, username: 'test' };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -45,14 +36,12 @@ describe('authMiddleware module', () => {
       authMiddleware.isAuthenticated(req, res, next);
 
       // --- Assert ---
-      // Verify user injection and middleware progression
       expect(req.user).toEqual(mockUser);
       expect(next).toHaveBeenCalled();
     });
 
     it('should return 401 and clear cookie if no user is found', () => {
       // --- Arrange ---
-      // Simulate passport failing to resolve a user
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
           return (req, res) => callback(null, false);
@@ -63,7 +52,6 @@ describe('authMiddleware module', () => {
       authMiddleware.isAuthenticated(req, res, next);
 
       // --- Assert ---
-      // Ensure cookie is wiped on authentication failure
       expect(clearAuthCookie).toHaveBeenCalledWith(res);
       expect(next).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -77,7 +65,6 @@ describe('authMiddleware module', () => {
   describe('isAdmin()', () => {
     it('should allow access if user is admin', () => {
       // --- Arrange ---
-      // Define a user with role set to ADMIN
       const adminUser = { id: 1, role: 'ADMIN' };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -89,13 +76,11 @@ describe('authMiddleware module', () => {
       authMiddleware.isAdmin(req, res, next);
 
       // --- Assert ---
-      // Confirm the request proceeds for admins
       expect(next).toHaveBeenCalled();
     });
 
     it('should return 403 if user is not admin', () => {
       // --- Arrange ---
-      // Define a standard user lacking admin privileges
       const regularUser = { id: 2, role: 'USER' };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -108,9 +93,7 @@ describe('authMiddleware module', () => {
 
       // --- Assert ---
       expect(next).toHaveBeenCalledWith(
-        expect.objectContaining({
-          statusCode: 403,
-        })
+        expect.objectContaining({ statusCode: 403 })
       );
     });
   });
@@ -118,7 +101,6 @@ describe('authMiddleware module', () => {
   describe('isNotAuthenticated()', () => {
     it('should clear cookie and call next if user is already logged in', () => {
       // --- Arrange ---
-      // Simulate an active session during a guest-only route request
       const existingUser = { id: 1 };
       passport.authenticate.mockImplementation(
         (strategy, options, callback) => {
@@ -130,7 +112,6 @@ describe('authMiddleware module', () => {
       authMiddleware.isNotAuthenticated(req, res, next);
 
       // --- Assert ---
-      // Confirm cookie is cleared to allow new session flow
       expect(clearAuthCookie).toHaveBeenCalledWith(res);
       expect(next).toHaveBeenCalled();
     });
