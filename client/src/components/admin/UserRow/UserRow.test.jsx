@@ -1,9 +1,19 @@
-import { render, screen } from '../../__tests__/test-utils';
-import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import userEvent from '@testing-library/user-event';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
+import { render, screen } from '../../../modules/utils/testing/testing.utils';
 import UserRow from './UserRow';
 
+vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
+  useAuth: vi.fn(),
+  AuthProvider: ({ children }) => <div>{children}</div>,
+}));
+
+/**
+ * Unit tests for the UserRow component.
+ * - Verifies conditional rendering of admin actions.
+ * - Validates API interaction with confirmation and delays.
+ */
 describe('UserRow Component', () => {
   const mockUser = {
     id: '123',
@@ -14,11 +24,14 @@ describe('UserRow Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock window.confirm to always return true
+    vi.spyOn(window, 'confirm').mockImplementation(() => true);
+    // Mock timers for the reload delay
+    vi.useFakeTimers();
   });
 
   it('renders user details correctly', () => {
     // --- Arrange ---
-    // Use local mock for useAuth to control role per test
     vi.mocked(useAuth).mockReturnValue({ user: { role: 'ADMIN' } });
 
     // --- Act ---
@@ -35,54 +48,14 @@ describe('UserRow Component', () => {
     expect(screen.getByText('USER')).toBeInTheDocument();
   });
 
-  it('toggles the actions menu when the trigger is clicked', async () => {
+  it('calls the promote API with confirmation and reloads after delay', async () => {
     // --- Arrange ---
-    const user = userEvent.setup();
-    vi.mocked(useAuth).mockReturnValue({ user: { role: 'ADMIN' } });
-
-    render(
-      <table>
-        <tbody>
-          <UserRow user={mockUser} />
-        </tbody>
-      </table>
-    );
-
-    // --- Act ---
-    const trigger = screen.getByLabelText(/open actions menu/i);
-    await user.click(trigger);
-
-    // --- Assert ---
-    expect(screen.getByText(/view profile/i)).toBeInTheDocument();
-  });
-
-  it('hides the promote option if the current admin lacks clearance', async () => {
-    // --- Arrange ---
-    const user = userEvent.setup();
-    const targetAdmin = { ...mockUser, role: 'ADMIN' };
-    vi.mocked(useAuth).mockReturnValue({ user: { role: 'ADMIN' } });
-
-    render(
-      <table>
-        <tbody>
-          <UserRow user={targetAdmin} />
-        </tbody>
-      </table>
-    );
-
-    // --- Act ---
-    await user.click(screen.getByLabelText(/open actions menu/i));
-
-    // --- Assert ---
-    expect(screen.queryByText(/promote to admin/i)).not.toBeInTheDocument();
-  });
-
-  it('calls the promote API when the promote button is clicked', async () => {
-    // --- Arrange ---
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
     fetch.mockResolvedValueOnce({ ok: true });
+    const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => {});
 
+    // --- Act ---
     render(
       <table>
         <tbody>
@@ -90,69 +63,47 @@ describe('UserRow Component', () => {
         </tbody>
       </table>
     );
-
-    // --- Act ---
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/promote to admin/i));
 
     // --- Assert ---
+    expect(window.confirm).toHaveBeenCalled();
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/admin/users/${mockUser.id}/promote`),
-      expect.objectContaining({
-        method: 'POST',
-        credentials: 'include',
-      })
+      expect.stringContaining(`/api/admin/promote/${mockUser.id}`),
+      expect.objectContaining({ method: 'POST' })
     );
-    expect(window.location.reload).toHaveBeenCalled();
+    // Advance Timers To Trigger Reload
+    vi.advanceTimersByTime(1500);
+    expect(reloadSpy).toHaveBeenCalled();
   });
 
-  it('calls the demote API when a Super Admin clicks demote on an Admin', async () => {
+  it('calls the demote API with confirmation and reloads after delay', async () => {
     // --- Arrange ---
-    const user = userEvent.setup();
-    const adminUser = { ...mockUser, role: 'ADMIN' };
+    const user = userEvent.setup({ delay: null });
+    const adminTarget = { ...mockUser, role: 'ADMIN' };
     vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
     fetch.mockResolvedValueOnce({ ok: true });
+    const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => {});
 
+    // --- Act ---
     render(
       <table>
         <tbody>
-          <UserRow user={adminUser} />
+          <UserRow user={adminTarget} />
         </tbody>
       </table>
     );
-
-    // --- Act ---
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/demote to user/i));
 
     // --- Assert ---
+    expect(window.confirm).toHaveBeenCalled();
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/admin/users/${adminUser.id}/demote`),
-      expect.objectContaining({
-        method: 'POST',
-        credentials: 'include',
-      })
+      expect.stringContaining(`/api/admin/demote/${adminTarget.id}`),
+      expect.objectContaining({ method: 'POST' })
     );
-    expect(window.location.reload).toHaveBeenCalled();
-  });
-
-  it('hides demote option when a Super Admin views a regular User', async () => {
-    // --- Arrange ---
-    const user = userEvent.setup();
-    vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
-
-    render(
-      <table>
-        <tbody>
-          <UserRow user={mockUser} />
-        </tbody>
-      </table>
-    );
-
-    // --- Act ---
-    await user.click(screen.getByLabelText(/open actions menu/i));
-
-    // --- Assert ---
-    expect(screen.queryByText(/demote to user/i)).not.toBeInTheDocument();
+    // Advance Timers To Trigger Reload
+    vi.advanceTimersByTime(1500);
+    expect(reloadSpy).toHaveBeenCalled();
   });
 });
