@@ -1,7 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
-import { render, screen } from '../../../modules/utils/testing/testing.utils';
+import {
+  render,
+  screen,
+  waitFor,
+} from '../../../modules/utils/testing/testing.utils';
 import UserRow from './UserRow';
 
 vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
@@ -9,10 +13,20 @@ vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
   AuthProvider: ({ children }) => <div>{children}</div>,
 }));
 
+// Mock adminApi locally since fetch is abstracted away from the component
+vi.mock('../../../modules/api/admin/admin.api', () => ({
+  adminApi: {
+    promoteUser: vi.fn(),
+    demoteUser: vi.fn(),
+  },
+}));
+
+import { adminApi } from '../../../modules/api/admin/admin.api';
+
 /**
  * Unit tests for the UserRow component.
  * - Verifies conditional rendering of admin actions.
- * - Validates API interaction with confirmation and delays.
+ * - Validates role change flow via ConfirmationModal and Admin API.
  */
 describe('UserRow Component', () => {
   const mockUser = {
@@ -24,10 +38,6 @@ describe('UserRow Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock window.confirm to always return true
-    vi.spyOn(window, 'confirm').mockImplementation(() => true);
-    // Mock timers for the reload delay
-    vi.useFakeTimers();
   });
 
   it('renders user details correctly', () => {
@@ -38,7 +48,7 @@ describe('UserRow Component', () => {
     render(
       <table>
         <tbody>
-          <UserRow user={mockUser} />
+          <UserRow user={mockUser} onUpdate={vi.fn()} />
         </tbody>
       </table>
     );
@@ -48,62 +58,60 @@ describe('UserRow Component', () => {
     expect(screen.getByText('USER')).toBeInTheDocument();
   });
 
-  it('calls the promote API with confirmation and reloads after delay', async () => {
+  it('calls the promote API and triggers onUpdate on confirmation', async () => {
     // --- Arrange ---
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
+    const onUpdate = vi.fn();
     vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
-    fetch.mockResolvedValueOnce({ ok: true });
-    const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => {});
+    vi.mocked(adminApi.promoteUser).mockResolvedValueOnce({ ok: true });
 
     // --- Act ---
     render(
       <table>
         <tbody>
-          <UserRow user={mockUser} />
+          <UserRow user={mockUser} onUpdate={onUpdate} />
         </tbody>
       </table>
     );
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/promote to admin/i));
 
+    // Confirm via ConfirmationModal
+    await user.click(screen.getByRole('button', { name: /^promote$/i }));
+
     // --- Assert ---
-    expect(window.confirm).toHaveBeenCalled();
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/admin/promote/${mockUser.id}`),
-      expect.objectContaining({ method: 'POST' })
-    );
-    // Advance Timers To Trigger Reload
-    vi.advanceTimersByTime(1500);
-    expect(reloadSpy).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(adminApi.promoteUser).toHaveBeenCalledWith(mockUser.id);
+      expect(onUpdate).toHaveBeenCalled();
+    });
   });
 
-  it('calls the demote API with confirmation and reloads after delay', async () => {
+  it('calls the demote API and triggers onUpdate on confirmation', async () => {
     // --- Arrange ---
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup();
+    const onUpdate = vi.fn();
     const adminTarget = { ...mockUser, role: 'ADMIN' };
     vi.mocked(useAuth).mockReturnValue({ user: { role: 'SUPER_ADMIN' } });
-    fetch.mockResolvedValueOnce({ ok: true });
-    const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => {});
+    vi.mocked(adminApi.demoteUser).mockResolvedValueOnce({ ok: true });
 
     // --- Act ---
     render(
       <table>
         <tbody>
-          <UserRow user={adminTarget} />
+          <UserRow user={adminTarget} onUpdate={onUpdate} />
         </tbody>
       </table>
     );
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/demote to user/i));
 
+    // Confirm via ConfirmationModal
+    await user.click(screen.getByRole('button', { name: /^demote$/i }));
+
     // --- Assert ---
-    expect(window.confirm).toHaveBeenCalled();
-    expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/admin/demote/${adminTarget.id}`),
-      expect.objectContaining({ method: 'POST' })
-    );
-    // Advance Timers To Trigger Reload
-    vi.advanceTimersByTime(1500);
-    expect(reloadSpy).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(adminApi.demoteUser).toHaveBeenCalledWith(adminTarget.id);
+      expect(onUpdate).toHaveBeenCalled();
+    });
   });
 });
