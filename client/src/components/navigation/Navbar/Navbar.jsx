@@ -4,6 +4,7 @@ import { Home, User, Settings, Sun, Moon, LogOut } from 'lucide-react';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { useToast } from '../../../providers/ToastProvider/ToastProvider';
 import { useTheme } from '../../../providers/ThemeProvider/ThemeProvider';
+import SearchBar from '../../search/SearchBar/SearchBar';
 import ConfirmationModal from '../../feedback/modals/ConfirmationModal/ConfirmationModal';
 import styles from './Navbar.module.css';
 
@@ -66,6 +67,8 @@ const Navbar = () => {
             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
+
+        <SearchBar />
 
         {user && (
           <div className={styles.userSection}>
