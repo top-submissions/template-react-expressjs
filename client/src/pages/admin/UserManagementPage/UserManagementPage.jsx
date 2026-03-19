@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Users, RefreshCw } from 'lucide-react';
 import { adminApi } from '../../../modules/api/admin/admin.api';
 import TableContainer from '../../../components/tables/TableContainer/TableContainer';
-import UserRow from '../../../components/admin/UserRow/UserRow';
+import UserRow from '../../../components/tables/user/UserRow/UserRow';
 import Spinner from '../../../components/feedback/Spinner/Spinner';
 import styles from './UserManagementPage.module.css';
 

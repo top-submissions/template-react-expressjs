@@ -1,31 +1,30 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
+import { useAuth } from '../../../../providers/AuthProvider/AuthProvider';
 import {
   render,
   screen,
   waitFor,
-} from '../../../modules/utils/testing/testing.utils';
+} from '../../../../modules/utils/testing/testing.utils';
 import UserRow from './UserRow';
 
-vi.mock('../../../providers/AuthProvider/AuthProvider', () => ({
+vi.mock('../../../../providers/AuthProvider/AuthProvider', () => ({
   useAuth: vi.fn(),
   AuthProvider: ({ children }) => <div>{children}</div>,
 }));
 
-// Mock adminApi locally since fetch is abstracted away from the component
-vi.mock('../../../modules/api/admin/admin.api', () => ({
+vi.mock('../../../../modules/api/admin/admin.api', () => ({
   adminApi: {
     promoteUser: vi.fn(),
     demoteUser: vi.fn(),
   },
 }));
 
-import { adminApi } from '../../../modules/api/admin/admin.api';
+import { adminApi } from '../../../../modules/api/admin/admin.api';
 
 /**
  * Unit tests for the UserRow component.
- * - Verifies conditional rendering of admin actions.
+ * - Verifies row data rendering.
  * - Validates role change flow via ConfirmationModal and Admin API.
  */
 describe('UserRow Component', () => {
@@ -75,8 +74,6 @@ describe('UserRow Component', () => {
     );
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/promote to admin/i));
-
-    // Confirm via ConfirmationModal
     await user.click(screen.getByRole('button', { name: /^promote$/i }));
 
     // --- Assert ---
@@ -104,8 +101,6 @@ describe('UserRow Component', () => {
     );
     await user.click(screen.getByLabelText(/open actions menu/i));
     await user.click(screen.getByText(/demote to user/i));
-
-    // Confirm via ConfirmationModal
     await user.click(screen.getByRole('button', { name: /^demote$/i }));
 
     // --- Assert ---
