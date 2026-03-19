@@ -38,7 +38,7 @@ describe('adminApi', () => {
 
     // --- Assert ---
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/admin/promote/${testId}`),
+      expect.stringContaining(`/api/admin/users/${testId}/promote`),
       expect.objectContaining({
         method: 'POST',
         credentials: 'include',
@@ -56,7 +56,7 @@ describe('adminApi', () => {
 
     // --- Assert ---
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/admin/demote/${testId}`),
+      expect.stringContaining(`/api/admin/users/${testId}/demote`),
       expect.objectContaining({
         method: 'POST',
         credentials: 'include',

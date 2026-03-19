@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as authController from '../controllers/auth.controller.js';
-import * as userController from '../controllers/user.controller.js';
 import {
   isNotAuthenticated,
   isAuthenticated,
@@ -27,7 +26,7 @@ authRouter.post(
 );
 
 // Protected: identity and session management
-authRouter.get('/me', isAuthenticated, userController.getCurrentUser);
+authRouter.get('/me', isAuthenticated, authController.getMe);
 authRouter.get('/log-out', isAuthenticated, authController.logoutGet);
 
 export default authRouter;

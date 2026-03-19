@@ -8,6 +8,28 @@ import { InternalServerError } from '../errors/ServerError.js';
 import { setAuthCookie, clearAuthCookie } from '../utils/auth/cookie/cookie.js';
 
 /**
+ * Returns the current authenticated user's session data from the JWT payload.
+ * - No database call — reads directly from req.user.
+ * @param {Object} req - Express request.
+ * @param {Object} res - Express response.
+ * @param {Function} next - Error handler.
+ */
+export const getMe = (req, res, next) => {
+  if (!req.user) return next(new AuthenticationError('User session not found'));
+
+  // Return session data for state sync
+  res.status(200).json({
+    user: {
+      id: req.user.id,
+      username: req.user.username,
+      role: req.user.role,
+      createdAt: req.user.createdAt,
+      lastLogin: req.user.lastLogin,
+    },
+  });
+};
+
+/**
  * Registers a new user.
  * - Validates inputs.
  * - Hashes password.
