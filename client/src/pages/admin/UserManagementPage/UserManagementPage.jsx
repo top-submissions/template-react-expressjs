@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Users, RefreshCw } from 'lucide-react';
 import { adminApi } from '../../../modules/api/admin/admin.api';
-import UserList from '../../../components/admin/UserList/UserList';
+import TableContainer from '../../../components/tables/TableContainer/TableContainer';
+import UserRow from '../../../components/admin/UserRow/UserRow';
 import Spinner from '../../../components/feedback/Spinner/Spinner';
 import styles from './UserManagementPage.module.css';
 
@@ -74,7 +75,14 @@ const UserManagementPage = () => {
           </div>
         ) : (
           <div className={styles.listArea}>
-            <UserList users={users} onUpdate={fetchUsers} />
+            <TableContainer
+              data={users}
+              columns={['User', 'Role', 'Joined', 'Actions']}
+              renderRow={(user) => (
+                <UserRow key={user.id} user={user} onUpdate={fetchUsers} />
+              )}
+              emptyMessage="No users found in the directory."
+            />
           </div>
         )}
       </div>
