@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import styles from './ConfirmationModal.module.css';
 
 /**
@@ -5,6 +6,7 @@ import styles from './ConfirmationModal.module.css';
  * - Controlled entirely by parent via isOpen prop.
  * - Delegates confirm/cancel outcomes to parent callbacks.
  * - Closes on overlay click via onCancel.
+ * - Renders via portal to document.body to avoid stacking context issues.
  * @param {Object} props
  * @param {boolean} props.isOpen - Controls visibility of the modal.
  * @param {function} props.onConfirm - Called when the user confirms the action.
@@ -26,7 +28,7 @@ const ConfirmationModal = ({
 }) => {
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       className={`${styles.modalOverlay} animate-fade-in`}
       onClick={onCancel}
@@ -46,7 +48,8 @@ const ConfirmationModal = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
