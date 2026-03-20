@@ -1,13 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import {
-  render,
-  screen,
-} from '../../../../modules/utils/testing/testing.utils';
+import { render, screen } from '../../../modules/utils/testing/testing.utils';
 import SearchViewSelector from './SearchViewSelector';
 
 vi.mock(
-  '../../../../providers/AuthProvider/AuthProvider',
+  '../../../providers/AuthProvider/AuthProvider',
   async (importOriginal) => {
     const actual = await importOriginal();
     return {
