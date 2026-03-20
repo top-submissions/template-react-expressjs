@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { Home, User, Settings, Sun, Moon, LogOut } from 'lucide-react';
+import { Home, User, Settings, Sun, Moon, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../../providers/AuthProvider/AuthProvider';
 import { useToast } from '../../../providers/ToastProvider/ToastProvider';
 import { useTheme } from '../../../providers/ThemeProvider/ThemeProvider';
@@ -11,11 +11,10 @@ import styles from './Navbar.module.css';
 /**
  * Global navigation component.
  * - Manages branding and primary navigation links.
- * - Dynamic "Home" link points to specific dashboards based on user role.
- * - Displays session info and handles secure logout with confirmation.
- * - Integrated theme switching and role-based navigation.
- * - Uses Lucide icons for visual actions and indicators.
- * @returns {JSX.Element} The rendered navigation bar.
+ * - Dynamic "Home" link based on user role.
+ * - Profile link is visible to ALL authenticated users (not just admins).
+ * - Collapses to a hamburger menu on small screens.
+ * @returns {JSX.Element}
  */
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -23,6 +22,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   const [showConfirm, setShowConfirm] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const homePath = isAdmin ? '/admin-dashboard' : '/dashboard';
@@ -42,11 +42,14 @@ const Navbar = () => {
   return (
     <>
       <nav className={styles.navbar}>
+        {/* Left: nav links */}
         <div className={styles.navLinks}>
           <Link to={homePath} className={styles.navItem} aria-label="Home">
             <Home size={20} />
           </Link>
-          {isAdmin && (
+
+          {/* Profile — all authenticated users */}
+          {user && (
             <Link
               to="/profile"
               className={styles.navItem}
@@ -55,7 +58,12 @@ const Navbar = () => {
               <User size={20} />
             </Link>
           )}
-          <Link to="/settings" title="Account Settings">
+
+          <Link
+            to="/settings"
+            className={styles.navItem}
+            title="Account Settings"
+          >
             <Settings size={20} />
           </Link>
 
@@ -68,8 +76,12 @@ const Navbar = () => {
           </button>
         </div>
 
-        <SearchBar />
+        {/* Center: search bar — hidden on small screens */}
+        <div className={styles.searchWrapper}>
+          <SearchBar />
+        </div>
 
+        {/* Right: user info + logout (desktop) */}
         {user && (
           <div className={styles.userSection}>
             <div className={styles.info}>
@@ -85,7 +97,40 @@ const Navbar = () => {
             </button>
           </div>
         )}
+
+        {/* Mobile: hamburger */}
+        <button
+          className={styles.hamburger}
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </nav>
+
+      {/* Mobile dropdown panel */}
+      {menuOpen && (
+        <div className={styles.mobileMenu}>
+          <SearchBar />
+          {user && (
+            <div className={styles.mobileUser}>
+              <span className={styles.username}>{user.username}</span>
+              <span className={styles.roleLabel}>{user.role}</span>
+              <button
+                onClick={() => {
+                  setShowConfirm(true);
+                  setMenuOpen(false);
+                }}
+                className={styles.logoutBtn}
+                aria-label="Log out"
+              >
+                <LogOut size={18} />
+                <span>Log out</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <ConfirmationModal
         isOpen={showConfirm}
