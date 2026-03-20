@@ -1,9 +1,9 @@
 # Project Name
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![The Odin Project](https://img.shields.io/badge/The%20Odin%20Project-Lesson-red)](https://www.theodinproject.com/)
+[![The Odin Project](https://img.shields.io/badge/The%20Odin%20Project-NodeJS-red)](https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs)
 
-> A hands-on exploration of [Project Topic] built with React as part of The Odin Project curriculum. This repository documents my learning journey through setting up a modern React development environment.
+> A full-stack application built with React and Express as part of The Odin Project's NodeJS curriculum. Features JWT authentication, role-based access control, PostgreSQL via Prisma ORM, and a modular search system.
 
 ## 📋 Table of Contents
 
@@ -11,82 +11,109 @@
   - [📋 Table of Contents](#-table-of-contents)
   - [✨ Features](#-features)
   - [🚀 Getting Started](#-getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Building for Production](#building-for-production)
+  - [📁 Project Structure](#-project-structure)
+  - [📖 Documentation](#-documentation)
+  - [🧪 Testing](#-testing)
   - [💡 Future Improvements](#-future-improvements)
-  - [📚 What I Learned](#-what-i-learned)
   - [🛠️ Technologies Used](#️-technologies-used)
-  - [🔗 Resources](#-resources)
   - [🙏 Acknowledgments](#-acknowledgments)
 
 ## ✨ Features
 
-- Feature 1 - Brief description
-- Feature 2 - Brief description
-- Feature 3 - Brief description
+- JWT authentication with HttpOnly cookies
+- Role-based access control (USER / ADMIN / SUPER_ADMIN)
+- Full-stack search with filters, sorting, and URL-state persistence
+- Prisma ORM with PostgreSQL
+- Vitest + React Testing Library test suite (client & server)
+- Dark/light theme toggle
+- Responsive layout with mobile Navbar
 
 ## 🚀 Getting Started
 
-Want to run this project locally? Here's how:
+See **[docs/setup.md](docs/setup.md)** for the full environment setup guide.
 
-### Prerequisites
+**Quick start** (after setup):
 
-- Requirement 1
-- Requirement 2
-- Requirement 3
+```bash
+npm run install:all   # install all dependencies
+npm run dev           # start client + server concurrently
+```
 
-### Installation
+## 📁 Project Structure
 
-1. Step 1
-2. Step 2
-3. Step 3
+```
+template-react-expressjs/
+├── client/               # React + Vite frontend
+│   └── src/
+│       ├── components/   # UI components grouped by domain
+│       ├── config/       # searchConfig.js — drives all search UI
+│       ├── layouts/      # MainLayout (Navbar + Outlet)
+│       ├── modules/api/  # Fetch wrappers per domain
+│       ├── pages/        # Route-level components
+│       ├── providers/    # Auth, Theme, Toast context
+│       ├── routes/       # AuthRoute, AdminRoute guards
+│       ├── routes.jsx    # createBrowserRouter config
+│       └── styles/       # Global CSS variables, reset, animations
+├── server/               # Express backend
+│   └── src/
+│       ├── config/       # Passport, CORS, cookie options
+│       ├── controllers/  # Route handlers
+│       ├── db/queries/   # Prisma query functions per domain
+│       ├── middleware/   # Auth, error, app middleware
+│       └── routes/       # Express routers
+├── docs/
+│   ├── setup.md          # Environment setup (PostgreSQL, .env, pgAdmin)
+│   ├── architecture.md   # Stack overview, request flow, patterns
+│   └── testing.md        # Testing conventions and patterns
+├── CONTRIBUTING.md       # Branching, commit conventions, PR process
+├── CHANGELOG.md          # Version history
+└── package.json          # Root orchestration scripts
+```
 
-### Building for Production
+## 📖 Documentation
 
-1. Step 1
-2. Step 2
-3. Step 3
+| Doc                                          | Description                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| [docs/setup.md](docs/setup.md)               | PostgreSQL installation (Windows/macOS/Linux), `.env` config, pgAdmin 4 |
+| [docs/architecture.md](docs/architecture.md) | Stack overview, request flow, client/server structure, auth flow        |
+| [docs/testing.md](docs/testing.md)           | Testing patterns, mocking conventions, what to test                     |
+| [CONTRIBUTING.md](CONTRIBUTING.md)           | Branching strategy, commit conventions, PR process                      |
+| [CHANGELOG.md](CHANGELOG.md)                 | Version history                                                         |
+
+## 🧪 Testing
+
+```bash
+cd client && npm run test:watch   # client — watch mode
+cd server && npm run test:watch   # server — watch mode
+```
+
+See [docs/testing.md](docs/testing.md) for patterns, mocking conventions, and gotchas.
 
 ## 💡 Future Improvements
 
-If I were to continue working on this project, here's what I'd add:
-
-- [ ] Improvement idea 1
-- [ ] Improvement idea 2
-- [ ] Improvement idea 3
-- [ ] Improvement idea 4
-
-## 📚 What I Learned
-
-- Learning outcome 1 - Brief explanation
-- Learning outcome 2 - Brief explanation
-- Learning outcome 3 - Brief explanation
+- [ ] Gallery and list view modes for search results
+- [ ] Pagination on search results
+- [ ] Email verification on signup
+- [ ] File upload support (profile avatars)
+- [ ] Rate limiting on auth endpoints
 
 ## 🛠️ Technologies Used
 
-- Technology 1
-- Technology 2
-- Technology 3
+**Client:** React 19, React Router 7, Vite, CSS Modules, Lucide React, Vitest, React Testing Library
 
-## 🔗 Resources
+**Server:** Node.js, Express, Prisma ORM, PostgreSQL, Passport.js (Local + JWT), bcryptjs, express-validator
 
-- [Resource 1](https://example.com)
-- [Resource 2](https://example.com)
-- [Resource 3](https://example.com)
+**Tooling:** ESLint, Prettier, concurrently, nodemon
 
 ## 🙏 Acknowledgments
 
-- **The Odin Project** - For providing an amazing free curriculum
-- **The TOP Community** - For being supportive and helpful throughout
-- **[Specific person/resource]** - For [specific help they provided]
-
-Special thanks to everyone who maintains open-source projects that made this possible!
+- **The Odin Project** — For providing an amazing free curriculum
+- **The TOP Community** — For being supportive and helpful throughout
 
 ---
 
 <div align="center">
 
-Built with 💡 and ☕ as part of my journey through <a href="https://www.theodinproject.com/">The Odin Project</a>
+Built with 💡 and ☕ as part of my journey through <a href="https://www.theodinproject.com/paths/full-stack-javascript/courses/nodejs">The Odin Project — NodeJS</a>
 
 </div>
