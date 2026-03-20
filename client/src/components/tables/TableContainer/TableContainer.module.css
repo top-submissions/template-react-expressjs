@@ -2,10 +2,13 @@
   width: 100%;
   overflow-x: auto;
   background-color: var(--bg-color);
+  /* Prevent wrapper from clipping portal dropdowns on the last row */
+  overflow-y: visible;
 }
 
 .table {
   width: 100%;
+  min-width: 560px; /* triggers horizontal scroll before columns collapse */
   border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
@@ -23,6 +26,7 @@
   text-transform: uppercase;
   font-size: var(--text-xs);
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .emptyState {
@@ -30,10 +34,4 @@
   text-align: center;
   color: var(--text-color);
   opacity: 0.6;
-}
-
-@media (max-width: 600px) {
-  .table th:nth-child(3) {
-    display: none;
-  }
 }
