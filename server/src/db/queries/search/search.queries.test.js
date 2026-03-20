@@ -55,6 +55,67 @@ describe('searchQueries module', () => {
       );
     });
 
+    it('should apply joinedAfter as start-of-day UTC gte filter', async () => {
+      // --- Arrange ---
+      prisma.user.findMany.mockResolvedValue([]);
+
+      // --- Act ---
+      await searchQueries.searchUsers({ joinedAfter: '2024-01-01' });
+
+      // --- Assert ---
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            createdAt: expect.objectContaining({
+              gte: new Date('2024-01-01T00:00:00.000Z'),
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should apply joinedBefore as end-of-day UTC lte filter', async () => {
+      // --- Arrange ---
+      prisma.user.findMany.mockResolvedValue([]);
+
+      // --- Act ---
+      await searchQueries.searchUsers({ joinedBefore: '2024-01-31' });
+
+      // --- Assert ---
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            createdAt: expect.objectContaining({
+              lte: new Date('2024-01-31T23:59:59.999Z'),
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should combine joinedAfter and joinedBefore into a date range', async () => {
+      // --- Arrange ---
+      prisma.user.findMany.mockResolvedValue([]);
+
+      // --- Act ---
+      await searchQueries.searchUsers({
+        joinedAfter: '2024-01-01',
+        joinedBefore: '2024-12-31',
+      });
+
+      // --- Assert ---
+      expect(prisma.user.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            createdAt: {
+              gte: new Date('2024-01-01T00:00:00.000Z'),
+              lte: new Date('2024-12-31T23:59:59.999Z'),
+            },
+          }),
+        })
+      );
+    });
+
     it('should apply sortBy and sortDir when provided', async () => {
       // --- Arrange ---
       prisma.user.findMany.mockResolvedValue([]);
