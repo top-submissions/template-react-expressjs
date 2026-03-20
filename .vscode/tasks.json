@@ -1,14 +1,12 @@
 {
   "version": "2.0.0",
   "tasks": [
+    // ── Development ────────────────────────────────────────────
     {
       "label": "💻 Client: Dev",
       "type": "npm",
       "script": "dev",
       "path": "client",
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "presentation": {
         "group": "dev-env",
         "reveal": "always",
@@ -21,9 +19,6 @@
       "type": "npm",
       "script": "dev",
       "path": "server",
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "presentation": {
         "group": "dev-env",
         "reveal": "always",
@@ -32,47 +27,102 @@
       }
     },
     {
-      "label": "🧪 Client: Tests",
+      "label": "🚀 Dev: Start All",
+      "dependsOn": ["💻 Client: Dev", "🖥️ Server: Dev"],
+      "dependsOrder": "parallel",
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+
+    // ── Testing ────────────────────────────────────────────────
+    {
+      "label": "🧪 Client: Tests (watch)",
       "type": "npm",
       "script": "test:watch",
       "path": "client",
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "presentation": {
         "group": "testing",
-        "panel": "dedicated"
+        "panel": "dedicated",
+        "reveal": "always"
       }
     },
     {
-      "label": "🧪 Server: Tests",
+      "label": "🧪 Client: Tests (run once)",
+      "type": "npm",
+      "script": "test:run",
+      "path": "client",
+      "presentation": {
+        "group": "testing",
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "🧪 Server: Tests (watch)",
       "type": "npm",
       "script": "test:watch",
       "path": "server",
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "presentation": {
         "group": "testing",
-        "panel": "dedicated"
+        "panel": "dedicated",
+        "reveal": "always"
       }
     },
     {
-      "label": "🗄️ Database: Studio",
+      "label": "🧪 Server: Tests (run once)",
+      "type": "npm",
+      "script": "test",
+      "path": "server",
+      "presentation": {
+        "group": "testing",
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+
+    // ── Database ───────────────────────────────────────────────
+    {
+      "label": "🗄️ DB: Studio",
       "type": "npm",
       "script": "db:studio",
       "path": "server",
       "presentation": {
         "group": "database",
-        "panel": "dedicated"
+        "panel": "dedicated",
+        "reveal": "always"
       }
     },
     {
-      "label": "🛠️ Setup Environment",
+      "label": "🗄️ DB: Migrate + Generate",
+      "type": "npm",
+      "script": "db:sync",
+      "path": "server",
+      "presentation": {
+        "group": "database",
+        "panel": "shared",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "🗄️ DB: Seed",
+      "type": "npm",
+      "script": "db:seed",
+      "path": "server",
+      "presentation": {
+        "group": "database",
+        "panel": "shared",
+        "reveal": "always"
+      }
+    },
+
+    // ── Setup ──────────────────────────────────────────────────
+    {
+      "label": "🛠️ Setup: Install All",
       "type": "npm",
       "script": "install:all",
       "presentation": {
-        "reveal": "silent",
+        "reveal": "always",
         "panel": "shared"
       }
     }
