@@ -4,6 +4,16 @@ import { Routes, Route } from 'react-router';
 import { render, screen } from '../../../modules/utils/testing/testing.utils';
 import SearchBar from './SearchBar';
 
+// Mock useNavigate at module level — ESM-safe, no spyOn needed
+const mockNavigate = vi.fn();
+vi.mock('react-router', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 vi.mock(
   '../../../providers/AuthProvider/AuthProvider',
   async (importOriginal) => {
@@ -18,21 +28,13 @@ vi.mock(
 
 describe('SearchBar Component', () => {
   it('renders the search input and form', () => {
-    // --- Arrange ---
-    // --- Act ---
     render(<SearchBar />);
-
-    // --- Assert ---
     expect(screen.getByRole('search')).toBeInTheDocument();
     expect(screen.getByLabelText(/search/i)).toBeInTheDocument();
   });
 
   it('pre-fills the input from the URL q param', () => {
-    // --- Arrange ---
-    // --- Act ---
     render(<SearchBar />, { initialEntries: ['/search?q=bob'] });
-
-    // --- Assert ---
     expect(screen.getByLabelText(/search/i)).toHaveValue('bob');
   });
 
@@ -51,24 +53,27 @@ describe('SearchBar Component', () => {
   it('navigates to /search with q param on submit', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
-    render(
-      <Routes>
-        <Route path="/" element={<SearchBar />} />
-        <Route path="/search" element={<div data-testid="search-page" />} />
-      </Routes>
-    );
+    render(<SearchBar />, { initialEntries: ['/'] });
 
     // --- Act ---
-    await user.type(screen.getByLabelText(/search/i), 'alice');
+    const input = screen.getByLabelText(/search/i);
+    await user.click(input);
+    await user.type(input, 'alice');
     await user.keyboard('{Enter}');
 
     // --- Assert ---
-    expect(screen.getByTestId('search-page')).toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('/search')
+    );
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('q=alice')
+    );
   });
 
   it('preserves the active section in the URL on submit', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
+    mockNavigate.mockClear();
     render(
       <Routes>
         <Route path="/search" element={<SearchBar />} />
@@ -82,7 +87,8 @@ describe('SearchBar Component', () => {
     await user.keyboard('{Enter}');
 
     // --- Assert ---
-    // Section should still be users in the resulting URL — verified by the input re-filling
-    expect(screen.getByLabelText(/search/i)).toHaveValue('new query');
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.stringContaining('section=users')
+    );
   });
 });
