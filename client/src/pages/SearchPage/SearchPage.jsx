@@ -141,10 +141,8 @@ const SearchPage = () => {
             activeSection={activeSection}
             activeFilters={activeFilters}
             activeSort={activeSort}
-            activeView={activeView}
             onFiltersChange={updateParams}
             onSortChange={handleSortChange}
-            onViewChange={handleViewChange}
           />
 
           <div className={styles.results}>

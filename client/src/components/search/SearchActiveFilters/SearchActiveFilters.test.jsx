@@ -20,32 +20,20 @@ describe('SearchActiveFilters Component', () => {
     activeSection: 'users',
     activeFilters: { role: '', joinedAfter: '', joinedBefore: '' },
     activeSort: null,
-    activeView: 'table',
     onFiltersChange: vi.fn(),
     onSortChange: vi.fn(),
-    onViewChange: vi.fn(),
   };
 
-  it('always renders the view selector', () => {
+  it('renders nothing when no filters or sort are active', () => {
     // --- Arrange ---
     // --- Act ---
     render(<SearchActiveFilters {...baseProps} />);
 
     // --- Assert ---
-    expect(
-      screen.getByRole('group', { name: /view mode/i })
-    ).toBeInTheDocument();
-  });
-
-  it('renders nothing in the chip area when no filters or sort are active', () => {
-    // --- Arrange ---
-    // --- Act ---
-    render(<SearchActiveFilters {...baseProps} />);
-
-    // --- Assert ---
+    // customRender always adds a wrapper div — query for the strip itself, not container.firstChild
     expect(screen.queryByLabelText(/remove sort/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /remove.*filter/i })
+      screen.queryByRole('button', { name: /remove/i })
     ).not.toBeInTheDocument();
   });
 
@@ -60,21 +48,22 @@ describe('SearchActiveFilters Component', () => {
     );
 
     // --- Assert ---
-    expect(screen.getByText(/date joined/i)).toBeInTheDocument();
-    expect(screen.getByText('↓')).toBeInTheDocument();
+    // The chip text is "Date Joined ↓" as a single node — match the whole string
+    expect(screen.getByLabelText(/remove sort/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        (content) => content.includes('Date Joined') && content.includes('↓')
+      )
+    ).toBeInTheDocument();
   });
 
   it('renders a filter chip for each active filter', () => {
-    // --- Arrange ---
-    // --- Act ---
     render(
       <SearchActiveFilters
         {...baseProps}
         activeFilters={{ role: 'ADMIN', joinedAfter: '', joinedBefore: '' }}
       />
     );
-
-    // --- Assert ---
     expect(screen.getByText('ADMIN')).toBeInTheDocument();
   });
 
@@ -116,18 +105,5 @@ describe('SearchActiveFilters Component', () => {
     expect(onFiltersChange).toHaveBeenCalledWith(
       expect.objectContaining({ role: '' })
     );
-  });
-
-  it('calls onViewChange when a view button is clicked', async () => {
-    // --- Arrange ---
-    const user = userEvent.setup();
-    const onViewChange = vi.fn();
-
-    // --- Act ---
-    render(<SearchActiveFilters {...baseProps} onViewChange={onViewChange} />);
-    await user.click(screen.getByLabelText(/table view/i));
-
-    // --- Assert ---
-    expect(onViewChange).toHaveBeenCalledWith('table');
   });
 });

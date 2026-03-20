@@ -114,7 +114,7 @@ describe('SearchPage Component', () => {
     });
   });
 
-  it('renders SearchControls and SearchActiveFilters with view selector', async () => {
+  it('renders SearchControls with a view selector', async () => {
     // --- Arrange ---
     vi.mocked(searchApi.search).mockResolvedValueOnce({
       ok: true,
@@ -129,11 +129,10 @@ describe('SearchPage Component', () => {
       { initialEntries: ['/search?section=users'] }
     );
 
-    // --- Assert ---
-    // Two view selectors — one in SearchControls, one in SearchActiveFilters
+    // --- Assert --- only one view selector (in SearchControls)
     await waitFor(() => {
       expect(screen.getAllByRole('group', { name: /view mode/i })).toHaveLength(
-        2
+        1
       );
     });
   });
