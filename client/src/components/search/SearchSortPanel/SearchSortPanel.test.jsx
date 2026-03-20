@@ -25,17 +25,13 @@ describe('SearchSortPanel Component', () => {
   };
 
   it('renders all sort property options', () => {
-    // --- Arrange ---
-    // --- Act ---
     render(<SearchSortPanel {...baseProps} />);
-
-    // --- Assert ---
     expect(screen.getByText(/username/i)).toBeInTheDocument();
     expect(screen.getByText(/date joined/i)).toBeInTheDocument();
     expect(screen.getByText(/last login/i)).toBeInTheDocument();
   });
 
-  it('calls onChange with the selected key and default desc direction on property click', async () => {
+  it('calls onChange with selected key and default desc on property click', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -48,9 +44,8 @@ describe('SearchSortPanel Component', () => {
     expect(onChange).toHaveBeenCalledWith({ key: 'createdAt', dir: 'desc' });
   });
 
-  it('shows Ascending and Descending buttons when a sort is active', () => {
+  it('shows the active sort row with a direction chip when a sort is active', () => {
     // --- Arrange ---
-    // --- Act ---
     render(
       <SearchSortPanel
         {...baseProps}
@@ -59,11 +54,27 @@ describe('SearchSortPanel Component', () => {
     );
 
     // --- Assert ---
-    expect(screen.getByLabelText(/sort ascending/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/sort descending/i)).toBeInTheDocument();
+    expect(screen.getByText('Descending')).toBeInTheDocument();
   });
 
-  it('calls onChange with asc direction when Ascending is clicked', async () => {
+  it('opens the direction dropdown when the direction chip is clicked', async () => {
+    // --- Arrange ---
+    const user = userEvent.setup();
+
+    // --- Act ---
+    render(
+      <SearchSortPanel
+        {...baseProps}
+        activeSort={{ key: 'createdAt', dir: 'desc' }}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /descending/i }));
+
+    // --- Assert ---
+    expect(screen.getAllByText(/ascending/i).length).toBeGreaterThan(0);
+  });
+
+  it('calls onChange with asc direction when Ascending is selected from dropdown', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -76,29 +87,15 @@ describe('SearchSortPanel Component', () => {
         onChange={onChange}
       />
     );
-    await user.click(screen.getByLabelText(/sort ascending/i));
+    // Open the direction dropdown
+    await user.click(screen.getByRole('button', { name: /descending/i }));
+    // Click the Ascending option in the dropdown (role="option")
+    const options = screen.getAllByRole('option');
+    const ascOption = options.find((el) => el.textContent === 'Ascending');
+    await user.click(ascOption);
 
     // --- Assert ---
     expect(onChange).toHaveBeenCalledWith({ key: 'createdAt', dir: 'asc' });
-  });
-
-  it('calls onChange with desc direction when Descending is clicked', async () => {
-    // --- Arrange ---
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-
-    // --- Act ---
-    render(
-      <SearchSortPanel
-        {...baseProps}
-        activeSort={{ key: 'createdAt', dir: 'asc' }}
-        onChange={onChange}
-      />
-    );
-    await user.click(screen.getByLabelText(/sort descending/i));
-
-    // --- Assert ---
-    expect(onChange).toHaveBeenCalledWith({ key: 'createdAt', dir: 'desc' });
   });
 
   it('calls onChange with null and onClose when Clear is clicked', async () => {
@@ -123,7 +120,7 @@ describe('SearchSortPanel Component', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('calls onClose when Done is clicked without clearing the sort', async () => {
+  it('calls onClose when Done is clicked without changing the sort', async () => {
     // --- Arrange ---
     const user = userEvent.setup();
     const onChange = vi.fn();
