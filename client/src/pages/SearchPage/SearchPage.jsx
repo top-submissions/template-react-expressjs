@@ -19,7 +19,7 @@ const rowRenderers = {
 
 /**
  * Search page — all state lives in the URL via useSearchParams.
- * - section, q, sortBy, sortDir, and filter values are URL params.
+ * - section, q, sortBy, sortDir, view, and filter values are URL params.
  * - Fires a new API call whenever params change.
  * @returns {JSX.Element}
  */
@@ -30,6 +30,7 @@ const SearchPage = () => {
   const q = searchParams.get('q') || '';
   const sortBy = searchParams.get('sortBy') || null;
   const sortDir = searchParams.get('sortDir') || 'desc';
+  const activeView = searchParams.get('view') || 'table';
 
   const cfg = sectionConfig[activeSection];
 
@@ -75,6 +76,10 @@ const SearchPage = () => {
     runSearch();
   }, [runSearch]);
 
+  /**
+   * Merges updates into current URL params, deleting null/empty values.
+   * @param {Object} updates
+   */
   const updateParams = (updates) => {
     const next = new URLSearchParams(searchParams);
     Object.entries(updates).forEach(([k, v]) => {
@@ -88,8 +93,8 @@ const SearchPage = () => {
   };
 
   const handleSectionChange = (section) => {
-    // Clear filters/sort when switching sections
-    setSearchParams({ section, q });
+    // Clear filters and sort when switching sections; preserve q and view
+    setSearchParams({ section, q, view: activeView });
   };
 
   const handleSortChange = (sort) => {
@@ -98,6 +103,10 @@ const SearchPage = () => {
     } else {
       updateParams({ sortBy: sort.key, sortDir: sort.dir });
     }
+  };
+
+  const handleViewChange = (view) => {
+    updateParams({ view });
   };
 
   const renderRow = (item) =>
@@ -122,16 +131,20 @@ const SearchPage = () => {
             sectionCfg={cfg}
             activeFilters={activeFilters}
             activeSort={activeSort}
+            activeView={activeView}
             onFiltersChange={updateParams}
             onSortChange={handleSortChange}
+            onViewChange={handleViewChange}
           />
 
           <SearchActiveFilters
             activeSection={activeSection}
             activeFilters={activeFilters}
             activeSort={activeSort}
+            activeView={activeView}
             onFiltersChange={updateParams}
             onSortChange={handleSortChange}
+            onViewChange={handleViewChange}
           />
 
           <div className={styles.results}>
