@@ -18,6 +18,7 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/keybindings.json
 !.vscode/launch.json
 !.vscode/tasks.json
 !.vscode/settings.json
