@@ -16,7 +16,7 @@
 
 ## Scope
 
-<!-- Which area of the app is affected? e.g. appointments, auth, pets, search -->
+<!-- Which area of the app is affected? e.g. auth, appointments, search -->
 
 ## Linked Issue
 
@@ -30,7 +30,7 @@ Closes #
 
 ## What Changed
 
-## <!-- Briefly list key files or components touched and why -->
+<!-- Briefly list key files or components touched and why -->
 
 -
 -

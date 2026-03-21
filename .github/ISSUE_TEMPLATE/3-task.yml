@@ -26,23 +26,12 @@ body:
     validations:
       required: true
 
-  - type: dropdown
+  - type: input
     id: scope
     attributes:
       label: Scope / Area
-      options:
-        - Appointments
-        - Pets / Records
-        - Authentication
-        - User Management
-        - Dashboard
-        - Navigation / Layout
-        - Search
-        - Database / Prisma
-        - CI / GitHub Actions
-        - Documentation
-        - Dependencies
-        - Other
+      description: Which part of the app does this task belong to?
+      placeholder: 'e.g. auth, db, ci, docs, dependencies'
     validations:
       required: true
 

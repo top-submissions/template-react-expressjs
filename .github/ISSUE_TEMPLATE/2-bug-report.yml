@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-description: Report a bug or unexpected behavior in Golden Fur
+description: Report a bug or unexpected behavior
 title: 'fix(<scope>): <short description>'
 labels: ['bug', 'needs-triage']
 assignees: []
@@ -11,21 +11,12 @@ body:
         ## 🐛 Bug Report
         Thanks for reporting a bug! The more detail you provide, the faster we can fix it.
 
-  - type: dropdown
+  - type: input
     id: scope
     attributes:
       label: Scope / Area
       description: Which part of the app is affected?
-      options:
-        - Appointments
-        - Pets / Records
-        - Authentication
-        - User Management
-        - Dashboard
-        - Navigation / Layout
-        - Search
-        - Notifications
-        - Other
+      placeholder: 'e.g. auth, appointments, dashboard, search'
     validations:
       required: true
 

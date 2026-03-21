@@ -1,5 +1,5 @@
 name: ✨ Feature Request
-description: Propose a new feature for Golden Fur
+description: Propose a new feature
 title: 'feat(<scope>): <short description>'
 labels: ['enhancement', 'needs-triage']
 assignees: []
@@ -11,21 +11,12 @@ body:
         ## ✨ New Feature Request
         Thanks for taking the time to propose a feature! Fill in the sections below so the team can evaluate and prioritize it.
 
-  - type: dropdown
+  - type: input
     id: scope
     attributes:
       label: Scope / Area
       description: Which part of the app does this feature belong to?
-      options:
-        - Appointments
-        - Pets / Records
-        - Authentication
-        - User Management
-        - Dashboard
-        - Navigation / Layout
-        - Search
-        - Notifications
-        - Other
+      placeholder: 'e.g. auth, appointments, dashboard, search'
     validations:
       required: true
 
@@ -80,5 +71,5 @@ body:
       options:
         - label: I searched existing issues and this feature hasn't been requested yet.
           required: true
-        - label: This feature aligns with the Golden Fur project scope.
+        - label: This feature aligns with the project scope.
           required: true
